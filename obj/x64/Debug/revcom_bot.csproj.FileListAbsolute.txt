@@ -1,0 +1,5 @@
+c:\users\адам дженсен\documents\visual studio 2015\Projects\revcom_bot\revcom_bot\bin\x64\Debug\revcom_bot.exe.config
+c:\users\адам дженсен\documents\visual studio 2015\Projects\revcom_bot\revcom_bot\obj\x64\Debug\revcom_bot.csprojResolveAssemblyReference.cache
+c:\users\адам дженсен\documents\visual studio 2015\Projects\revcom_bot\revcom_bot\obj\x64\Debug\revcom_bot.Form1.resources
+c:\users\адам дженсен\documents\visual studio 2015\Projects\revcom_bot\revcom_bot\obj\x64\Debug\revcom_bot.Properties.Resources.resources
+c:\users\адам дженсен\documents\visual studio 2015\Projects\revcom_bot\revcom_bot\obj\x64\Debug\revcom_bot.csproj.GenerateResource.Cache
