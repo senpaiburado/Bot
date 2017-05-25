@@ -447,52 +447,43 @@ namespace revcom_bot
             return keyboard;
         }
 
+        private static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)
+        {
+            string[] lines =
+                {
+                    playerLang.YouMessage,
+                    $"{playerLang.HeroNameMessage}: {playerHero.Name}",
+                    $"{playerLang.HpText}: {Convert.ToInt32(playerHero.HP)}/{Convert.ToInt32(playerHero.MaxHP)}{smile_hp}",
+                    $"{playerLang.MpText}: {Convert.ToInt32(playerHero.MP)}/{Convert.ToInt32(playerHero.MaxMP)}{smile_mp}",
+                    $"{playerLang.DpsText}: {Convert.ToInt32(playerHero.DPS)}{smile_dps}",
+                    $"{playerLang.ArmorText}: {Convert.ToInt32(playerHero.Armor)}{smile_armor}",
+                };
+
+            return string.Join("\n", lines);
+        }
+
+        private static string GetMessageForEnemy(Users.User.Text playerLang, IHero enemyHero)
+        {
+            string[] lines =
+            {
+                playerLang.YourEnemyMessage,
+                $"{playerLang.HeroNameMessage}: {enemyHero.Name}",
+                $"{playerLang.HpText}: {Convert.ToInt32(enemyHero.HP)}/{Convert.ToInt32(enemyHero.MaxHP)}{smile_hp}",
+                $"{playerLang.MpText}: {Convert.ToInt32(enemyHero.MP)}/{Convert.ToInt32(enemyHero.MaxMP)}{smile_mp}",
+                $"{playerLang.DpsText}: {Convert.ToInt32(enemyHero.DPS)}{smile_dps}",
+                $"{playerLang.ArmorText}: {Convert.ToInt32(enemyHero.Armor)}{smile_armor}",
+            };
+
+            return string.Join("\n", lines);
+        }
+
         private async void SendHeroesStates()
         {
-            string msg_you = "";
-            msg_you += player_one.lang.YouMessage + ":\n";
-            msg_you += player_one.lang.HeroNameMessage + ": " + hero_one.Name + "\n";
-            msg_you += player_one.lang.HpText + ": " + Convert.ToInt32(hero_one.HP).ToString() + "/"
-                + Convert.ToInt32(hero_one.MaxHP).ToString() + smile_hp + "\n";
-            msg_you += player_one.lang.MpText + ": " + Convert.ToInt32(hero_one.MP).ToString() + "/"
-                + Convert.ToInt32(hero_one.MaxMP).ToString() + smile_mp + "\n";
-            msg_you += player_one.lang.DpsText + ": " + Convert.ToInt32(hero_one.DPS).ToString() + smile_dps + "\n";
-            msg_you += player_one.lang.ArmorText + ": " + Convert.ToInt32(hero_one.Armor).ToString() + smile_armor + "\n";
+            await bot.SendTextMessageAsync(player_one.ID, GetMessageForMe(player_one.lang, hero_one));
+            await bot.SendTextMessageAsync(player_one.ID, GetMessageForEnemy(player_one.lang, hero_two));
 
-            string msg_enemy = "";
-            msg_enemy += player_one.lang.YourEnemyMessage + ":\n";
-            msg_enemy += player_one.lang.HeroNameMessage + ": " + hero_two.Name + "\n";
-            msg_enemy += player_one.lang.HpText + ": " + Convert.ToInt32(hero_two.HP).ToString() + "/"
-                + Convert.ToInt32(hero_two.MaxHP).ToString() + smile_hp + "\n";
-            msg_enemy += player_one.lang.MpText + ": " + Convert.ToInt32(hero_two.MP).ToString() + "/"
-                + Convert.ToInt32(hero_two.MaxMP).ToString() + smile_mp + "\n";
-            msg_enemy += player_one.lang.DpsText + ": " + Convert.ToInt32(hero_two.DPS).ToString() + smile_dps + "\n";
-            msg_enemy += player_one.lang.ArmorText + ": " + Convert.ToInt32(hero_two.Armor).ToString() + smile_armor + "\n";
-
-            string msg1_you = "";
-            msg1_you += player_two.lang.YouMessage + ":\n";
-            msg1_you += player_two.lang.HeroNameMessage + ": " + hero_two.Name + "\n";
-            msg1_you += player_two.lang.HpText + ": " + Convert.ToInt32(hero_two.HP).ToString() + "/"
-                + Convert.ToInt32(hero_two.MaxHP).ToString() + smile_hp + "\n";
-            msg1_you += player_two.lang.MpText + ": " + Convert.ToInt32(hero_two.MP).ToString() + "/"
-                + Convert.ToInt32(hero_two.MaxMP).ToString() + smile_mp + "\n";
-            msg1_you += player_two.lang.DpsText + ": " + Convert.ToInt32(hero_two.DPS).ToString() + smile_dps + "\n";
-            msg1_you += player_two.lang.ArmorText + ": " + Convert.ToInt32(hero_two.Armor).ToString() + smile_armor + "\n";
-
-            string msg1_enemy = "";
-            msg1_enemy += player_two.lang.YourEnemyMessage + ":\n";
-            msg1_enemy += player_two.lang.HeroNameMessage + ": " + hero_one.Name + "\n";
-            msg1_enemy += player_two.lang.HpText + ": " + Convert.ToInt32(hero_one.HP).ToString() + "/"
-                + Convert.ToInt32(hero_one.MaxHP).ToString() + smile_hp + "\n";
-            msg1_enemy += player_two.lang.MpText + ": " + Convert.ToInt32(hero_one.MP).ToString() + "/"
-                + Convert.ToInt32(hero_one.MaxMP).ToString() + smile_mp + "\n";
-            msg1_enemy += player_two.lang.DpsText + ": " + Convert.ToInt32(hero_one.DPS).ToString() + smile_dps + "\n";
-            msg1_enemy += player_two.lang.ArmorText + ": " + Convert.ToInt32(hero_one.Armor).ToString() + smile_armor + "\n";
-
-            await bot.SendTextMessageAsync(player_one.ID, msg_you);
-            await bot.SendTextMessageAsync(player_two.ID, msg1_you);
-            await bot.SendTextMessageAsync(player_one.ID, msg_enemy);
-            await bot.SendTextMessageAsync(player_two.ID, msg1_enemy);
+            await bot.SendTextMessageAsync(player_two.ID, GetMessageForMe(player_two.lang, hero_two));
+            await bot.SendTextMessageAsync(player_two.ID, GetMessageForMe(player_two.lang, hero_one));
         }
     }
 }
