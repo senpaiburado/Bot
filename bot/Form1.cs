@@ -270,16 +270,7 @@ namespace revcom_bot
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
                                 bool isConfirm = message.IsCommand(_usr.lang.YesMessage);
-                                {
-                                    foreach (var game in ActiveGames)
-                                    {
-                                        if (_usr.ActiveGameID == game.GameID)
-                                        {
-                                            game.ConfirmGame(isConfirm, message.Chat.Id);
-                                            break;
-                                        }
-                                    }
-                                }
+                                GetActiveGame(_usr.ActiveGameID)?.ConfirmGame(isConfirm, message.Chat.Id);
                             }
                         }
                         else if (_usr.status == Users.User.Status.DeletingAccount)
@@ -330,7 +321,7 @@ namespace revcom_bot
 
         private Game GetActiveGame(long gameID)
         {
-
+            return ActiveGames.SingleOrDefault(x => x.GameID == gameID);
         }
 
         private void BtnRun_Click(object sender, EventArgs e)
