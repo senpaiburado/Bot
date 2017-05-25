@@ -103,85 +103,13 @@ namespace revcom_bot
             if (PlayerID == player_one.ID)
             {
                 hero_one = Copy(hero);
-                bot.SendTextMessageAsync(player_one.ID, player_one.lang.PickedHero + " " + hero_one.Name + "!");
-
-                if (player_two.status == Users.User.Status.Picked)
-                {
-                    Random random = new Random();
-                    if (random.Next(0, 2) == 0)
-                    {
-                        player_one.status = Users.User.Status.Attacking;
-                        player_two.status = Users.User.Status.Excepting;
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.YourEnemyMessage + ": " + player_two.Name);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.YourEnemyMessage + ": " + player_one.Name);
-
-                        SendHeroesStates();
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.FirstAttackNotify);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.EnemyFirstAttackNotify);
-                    }
-                    else
-                    {
-                        player_one.status = Users.User.Status.Excepting;
-                        player_two.status = Users.User.Status.Attacking;
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.YourEnemyMessage + ": " + player_two.Name);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.YourEnemyMessage + ": " + player_one.Name);
-
-                        SendHeroesStates();
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.EnemyFirstAttackNotify);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.FirstAttackNotify);
-                    }
-                }
-                else
-                {
-                    player_one.status = Users.User.Status.Picked;
-                    bot.SendTextMessageAsync(player_one.ID, player_one.lang.WaitForPickOfAnotherPlayer);
-                }
+                PickHero(player_one, hero_one.Name, player_two);
             }
-                ////Player two
+            ////Player two
             else if (PlayerID == player_two.ID)
             {
                 hero_two = Copy(hero);
-                bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickedHero + " " + hero_two.Name + "!");
-
-                if (player_one.status == Users.User.Status.Picked)
-                {
-                    Random random = new Random();
-                    if (random.Next(0, 2) == 0)
-                    {
-                        player_one.status = Users.User.Status.Attacking;
-                        player_two.status = Users.User.Status.Excepting;
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.YourEnemyMessage + ": " + player_two.Name);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.YourEnemyMessage + ": " + player_one.Name);
-
-                        SendHeroesStates();
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.FirstAttackNotify);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.EnemyFirstAttackNotify);
-                    }
-                    else
-                    {
-                        player_one.status = Users.User.Status.Excepting;
-                        player_two.status = Users.User.Status.Attacking;
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.YourEnemyMessage + ": " + player_two.Name);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.YourEnemyMessage + ": " + player_one.Name);
-
-                        SendHeroesStates();
-
-                        bot.SendTextMessageAsync(player_one.ID, player_one.lang.EnemyFirstAttackNotify);
-                        bot.SendTextMessageAsync(player_two.ID, player_two.lang.FirstAttackNotify);
-                    }
-                }
-                else
-                {
-                    player_two.status = Users.User.Status.Picked;
-                    bot.SendTextMessageAsync(player_two.ID, player_two.lang.WaitForPickOfAnotherPlayer);
-                }
+                PickHero(player_two, hero_two.Name, player_one);
             }
             else
             {
@@ -189,6 +117,39 @@ namespace revcom_bot
                 bot.SendTextMessageAsync(player_one.ID, player_one.lang.PickHeroError);
                 bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickHeroError);
             }
+        }
+
+        private void PickHero(Users.User firstPlayer, string heroName, Users.User secondPlayer)
+        {
+            bot.SendTextMessageAsync(firstPlayer.ID, $"{firstPlayer.lang.PickedHero} {heroName} !");
+
+            if (secondPlayer.status == Users.User.Status.Picked)
+            {
+                Random random = new Random();
+                if (random.Next(0, 2) == 0)
+                    SetAttackerAndExcepter(firstPlayer, secondPlayer);
+                else
+                    SetAttackerAndExcepter(secondPlayer, firstPlayer);
+            }
+            else
+            {
+                firstPlayer.status = Users.User.Status.Picked;
+                bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.WaitForPickOfAnotherPlayer);
+            }
+        }
+
+        private void SetAttackerAndExcepter(Users.User attacker, Users.User excepter)
+        {
+            attacker.status = Users.User.Status.Attacking;
+            excepter.status = Users.User.Status.Excepting;
+
+            bot.SendTextMessageAsync(attacker.ID, attacker.lang.YourEnemyMessage + ": " + excepter.Name);
+            bot.SendTextMessageAsync(excepter.ID, excepter.lang.YourEnemyMessage + ": " + attacker.Name);
+
+            SendHeroesStates();
+
+            bot.SendTextMessageAsync(attacker.ID, attacker.lang.FirstAttackNotify);
+            bot.SendTextMessageAsync(excepter.ID, excepter.lang.EnemyFirstAttackNotify);
         }
 
         public void ConfirmGame(bool accepted, long PlayerID)
