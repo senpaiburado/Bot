@@ -56,47 +56,50 @@ namespace revcom_bot
 
                     while (availablePlayers.Count >= 2)
                     {
-                            ActiveGames.Add(new Game(availablePlayers.ElementAt(0), availablePlayers.ElementAt(1), Bot));
-                            var keyboard1 = new ReplyKeyboardMarkup();
-                            keyboard1.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
-                                {
-                                    new Telegram.Bot.Types.KeyboardButton[] 
-                                    {
-                                        new Telegram.Bot.Types.KeyboardButton(availablePlayers.ElementAt(0).lang.YesMessage),
-                                        new Telegram.Bot.Types.KeyboardButton(availablePlayers.ElementAt(0).lang.NoMessage)
-                                    }
-                                };
-                            keyboard1.ResizeKeyboard = true;
-                            keyboard1.OneTimeKeyboard = true;
+                        var firstPlayer = availablePlayers[0];
+                        var seciondPlayer = availablePlayers[1];
 
-                            var keyboard2 = new ReplyKeyboardMarkup();
-                            keyboard2.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
-                                {
-                                    new Telegram.Bot.Types.KeyboardButton[] 
-                                    {
-                                        new Telegram.Bot.Types.KeyboardButton(availablePlayers.ElementAt(1).lang.YesMessage),
-                                        new Telegram.Bot.Types.KeyboardButton(availablePlayers.ElementAt(1).lang.NoMessage)
-                                    }
-                                };
-                            keyboard2.ResizeKeyboard = true;
-                            keyboard2.OneTimeKeyboard = true;
-
-                            string user1_msg = availablePlayers.ElementAt(0).lang.GameFounded + "\n" + availablePlayers.ElementAt(0).lang.AcceptGameQuestion;
-                            string user2_msg = availablePlayers.ElementAt(1).lang.GameFounded + "\n" + availablePlayers.ElementAt(1).lang.AcceptGameQuestion;
-
-                            await Bot.SendTextMessageAsync(availablePlayers.ElementAt(0).ID, user1_msg, replyMarkup: keyboard1);
-                            await Bot.SendTextMessageAsync(availablePlayers.ElementAt(1).ID, user2_msg, replyMarkup: keyboard2);
-
-                            try
+                        ActiveGames.Add(new Game(firstPlayer, seciondPlayer, Bot));
+                        var keyboard1 = new ReplyKeyboardMarkup();
+                        keyboard1.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                             {
-                                availablePlayers.RemoveRange(0, 2);
-                            }
-                            catch (System.ArgumentOutOfRangeException ex)
+                                new Telegram.Bot.Types.KeyboardButton[] 
+                                {
+                                    new Telegram.Bot.Types.KeyboardButton(firstPlayer.lang.YesMessage),
+                                    new Telegram.Bot.Types.KeyboardButton(firstPlayer.lang.NoMessage)
+                                }
+                            };
+                        keyboard1.ResizeKeyboard = true;
+                        keyboard1.OneTimeKeyboard = true;
+
+                        var keyboard2 = new ReplyKeyboardMarkup();
+                        keyboard2.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                             {
-                                Console.WriteLine(ex);
-                                Console.Read();
-                            }
+                                new Telegram.Bot.Types.KeyboardButton[] 
+                                {
+                                    new Telegram.Bot.Types.KeyboardButton(seciondPlayer.lang.YesMessage),
+                                    new Telegram.Bot.Types.KeyboardButton(seciondPlayer.lang.NoMessage)
+                                }
+                            };
+                        keyboard2.ResizeKeyboard = true;
+                        keyboard2.OneTimeKeyboard = true;
+
+                        string user1_msg = firstPlayer.lang.GameFounded + "\n" + firstPlayer.lang.AcceptGameQuestion;
+                        string user2_msg = seciondPlayer.lang.GameFounded + "\n" + seciondPlayer.lang.AcceptGameQuestion;
+
+                        await Bot.SendTextMessageAsync(firstPlayer.ID, user1_msg, replyMarkup: keyboard1);
+                        await Bot.SendTextMessageAsync(seciondPlayer.ID, user2_msg, replyMarkup: keyboard2);
+
+                        try
+                        {
+                            availablePlayers.RemoveRange(0, 2);
                         }
+                        catch (System.ArgumentOutOfRangeException ex)
+                        {
+                            Console.WriteLine(ex);
+                            Console.Read();
+                        }
+                    }
 
                     var updates = await Bot.GetUpdatesAsync(offset);
                     
