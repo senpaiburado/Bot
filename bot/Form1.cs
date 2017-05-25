@@ -213,12 +213,12 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.LanguageChanging)
                         {
-                            if (message.Text.ToLower().Contains("english") || message.Text.ToLower().Contains("русский"))
+                            if (message.IsCommand("english") || message.IsCommand("русский"))
                             {
                                 _usr.status = Users.User.Status.Default;
-                                if (message.Text.ToLower().Contains("english"))
+                                if (message.IsCommand("english"))
                                     _usr.lang.lang = Users.User.Text.Language.English;
-                                else if (message.Text.ToLower().Contains("русский"))
+                                else if (message.IsCommand("русский"))
                                     _usr.lang.lang = Users.User.Text.Language.Russian;
                                 var hide_keyboard = new ReplyKeyboardHide();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangedLanguage, replyMarkup: hide_keyboard);
@@ -228,20 +228,19 @@ namespace revcom_bot
                         {
                             foreach (var hero in Game.hero_list)
                             {
-                                if (message.Text.ToLower().Contains(hero.Name.ToLower()) ||
-                                    message.Text.Contains(">") || message.Text.Contains("<"))
+                                if (message.IsCommand(hero.Name) || message.IsCommand(">") || message.IsCommand("<"))
                                 {
                                     foreach(var game in ActiveGames)
                                     {
                                         if (_usr.ActiveGameID == game.GameID)
                                         {
-                                            if (message.Text.ToLower().Contains(hero.Name.ToLower()))
+                                            if (message.IsCommand(hero.Name))
                                                 game.PickHero(hero, message.Chat.Id);
                                             else
                                             {
-                                                if (message.Text.Contains(">"))
+                                                if (message.IsCommand(">"))
                                                     game.GetKeyboardNextPage(message.Chat.Id);
-                                                else if (message.Text.Contains("<"))
+                                                else if (message.IsCommand("<"))
                                                     game.GetKeyboardPrevPage(message.Chat.Id);
                                             }
                                             break;
@@ -277,27 +276,15 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.GameConfirming)
                         {
-                            if (message.Text.ToLower().Contains(_usr.lang.YesMessage.ToLower())
-                                || message.Text.ToLower().Contains(_usr.lang.NoMessage.ToLower()))
+                            if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
-                                if (message.Text.ToLower().Contains(_usr.lang.YesMessage.ToLower()))
+                                bool isConfirm = message.IsCommand(_usr.lang.YesMessage);
                                 {
                                     foreach (var game in ActiveGames)
                                     {
                                         if (_usr.ActiveGameID == game.GameID)
                                         {
-                                            game.ConfirmGame(true, message.Chat.Id);
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    foreach (var game in ActiveGames)
-                                    {
-                                        if (_usr.ActiveGameID == game.GameID)
-                                        {
-                                            game.ConfirmGame(false, message.Chat.Id);
+                                            game.ConfirmGame(isConfirm, message.Chat.Id);
                                             break;
                                         }
                                     }
@@ -306,18 +293,16 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.DeletingAccount)
                         {
-                            if (message.Text.ToLower().Contains(_usr.lang.YesMessage.ToLower()) ||
-                                message.Text.ToLower().Contains(_usr.lang.NoMessage.ToLower()))
+                            if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
                                 var h_kb = new ReplyKeyboardHide();
-                                if (message.Text.ToLower().Contains(_usr.lang.YesMessage.ToLower()))
+                                if (message.IsCommand(_usr.lang.YesMessage))
                                 {
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.AccountWasDeletedString, replyMarkup: h_kb);
                                     user.DeleteUser(message.Chat.Id);
                                 }
                                 else
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.YouCanceledTheActionString,
-                                        replyMarkup: h_kb);
+                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.YouCanceledTheActionString, replyMarkup: h_kb);
                             }
                         }
                         else if (_usr.status == Users.User.Status.SettingNickname)
@@ -365,6 +350,15 @@ namespace revcom_bot
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+    }
+
+
+    public static class CommandExtension
+    {
+        public static bool IsCommand(this Telegram.Bot.Types.Message message, string text)
+        {
+            return message.Text.ToLower().Contains(text.ToLower());
         }
     }
 }
