@@ -226,28 +226,19 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.Picking)
                         {
-                            foreach (var hero in Game.hero_list)
+                            if (message.IsCommand(">"))
                             {
-                                if (message.IsCommand(hero.Name) || message.IsCommand(">") || message.IsCommand("<"))
-                                {
-                                    foreach(var game in ActiveGames)
-                                    {
-                                        if (_usr.ActiveGameID == game.GameID)
-                                        {
-                                            if (message.IsCommand(hero.Name))
-                                                game.PickHero(hero, message.Chat.Id);
-                                            else
-                                            {
-                                                if (message.IsCommand(">"))
-                                                    game.GetKeyboardNextPage(message.Chat.Id);
-                                                else if (message.IsCommand("<"))
-                                                    game.GetKeyboardPrevPage(message.Chat.Id);
-                                            }
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                }
+                                GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
+                            }
+                            else if (message.IsCommand("<"))
+                            {
+                                GetActiveGame(_usr.ActiveGameID)?.GetKeyboardPrevPage(message.Chat.Id);
+                            }
+                            else
+                            {
+                                var hero = Game.hero_list.SingleOrDefault(x => message.IsCommand(x.Name));
+                                if (hero != null)
+                                    GetActiveGame(_usr.ActiveGameID)?.PickHero(hero, message.Chat.Id);
                             }
                         }
                         else if (_usr.status == Users.User.Status.Attacking)
@@ -334,6 +325,11 @@ namespace revcom_bot
             {
                 Console.WriteLine(ex.Message);
             }
+
+        }
+
+        private Game GetActiveGame(long gameID)
+        {
 
         }
 
