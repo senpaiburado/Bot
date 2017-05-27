@@ -202,15 +202,44 @@ namespace revcom_bot
             }
         }
 
-        public void UseAbility(int number, long PlayerID)
+        public async void UseAbility(int number, long PlayerID)
         {
-            if (PlayerID == player_one.ID)
-            {
+            Users.User user_attacker = null;
+            Users.User user_excepter = null;
+            IHero attacker = null;
+            IHero excepter = null;
 
+            string step_message_ToAttacker = "";
+            string step_message_ToExcepter = "";
+
+            if (player_one.ID == PlayerID)
+            {
+                user_attacker = player_one;
+                user_excepter = player_two;
+
+                attacker = hero_one;
+                excepter = hero_two;
             }
             else
             {
+                user_attacker = player_two;
+                user_excepter = player_one;
 
+                attacker = hero_two;
+                excepter = hero_one;
+            }
+
+            switch (number)
+            {
+                case 1:
+                    float damage = attacker.Attack(excepter);
+                    step_message_ToAttacker = $"{user_attacker.lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage))}";
+                    step_message_ToExcepter = $"{user_excepter.lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage))}";
+
+                    await bot.SendTextMessageAsync(user_attacker.ID, step_message_ToAttacker);
+                    await bot.SendTextMessageAsync(user_excepter.ID, step_message_ToExcepter);
+
+                    break;
             }
         }
 

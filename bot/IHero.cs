@@ -98,11 +98,12 @@ namespace revcom_bot
 
         }
 
-        virtual public void Attack(IHero target)
+        virtual public float Attack(IHero target)
         {
             Random random = new Random();
+            float damage = 0.0f;
 
-
+            return damage;
         }
 
         virtual public void Update()

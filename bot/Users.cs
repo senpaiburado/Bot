@@ -686,6 +686,24 @@ namespace revcom_bot
                         return "";
                     }
                 }
+
+                public string GetAttackedMessageForAttacker(int damage)
+                {
+                    if (lang == Language.English)
+                        return $"You dealt {damage} damage to the enemy!";
+                    else if (lang == Language.Russian)
+                        return $"Вы нанесли {damage} урона противнику!";
+                    return "";
+                }
+
+                public string GetAttackedMessageForExcepter(int damage)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy inflicted {damage} damage to you!";
+                    else if (lang == Language.Russian)
+                        return $"Противник нанёс вам {damage} урона!";
+                    return "";
+                }
                 
 
                 public struct InstructionText
