@@ -365,7 +365,9 @@ namespace revcom_bot
         }
         public static bool IsDigits(this Telegram.Bot.Types.Message message, string text)
         {
-            int value = Convert.ToInt32(text);
+            int value = 0;
+            if (int.TryParse(text, out value))
+                value = int.Parse(text);
             if (value >= 1 && value <= 2)
                 return true;
             else

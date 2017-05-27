@@ -143,6 +143,8 @@ namespace revcom_bot
                     MessageForExcepter += $"{target_user.lang.TheEnemyStunnedYou}\n";
                 }
                 MessageForAttacker += attacker_user.lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage));
+                MessageForExcepter += target_user.lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage));
+                Console.WriteLine(MessageForAttacker);
             }
             else
             {
@@ -174,6 +176,10 @@ namespace revcom_bot
             }
             HP += HealthRestore;
             MP += ManaRestore;
+
+            HP = HP > MaxHP ? MaxHP : HP;
+            MP = MP > MaxMP ? MaxMP : MP;
+
             HealCountdown = HealCountdownDefault;
 
             await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageHpAndMpRestored(
@@ -185,11 +191,22 @@ namespace revcom_bot
 
         virtual public void Update()
         {
+            if (HP <= 0)
+            {
+                HP = 0;
+                return;
+            }
             Regeneration();
             UpdateCountdowns();
+            UpdateDefaultCountdowns();
         }
 
         virtual public void UpdateCountdowns()
+        {
+            
+        }
+
+        virtual public void UpdateDefaultCountdowns()
         {
             if (HealCountdown > 0)
                 HealCountdown--;

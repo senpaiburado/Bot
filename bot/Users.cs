@@ -87,6 +87,35 @@ namespace revcom_bot
             public long ActiveGameID = 0L;
             public short HeroListPage = 0;
 
+            public int wins = 0;
+            public int loses = 0;
+            public float winrate = 0;
+
+            public void AddWin()
+            {
+                wins++;
+                winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
+            }
+
+            public void AddLose()
+            {
+                loses++;
+                winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
+            }
+
+            public string GetStatisctisMessage()
+            {
+                string[] lines =
+                {
+                    $"Nickname: {Name}",
+                    $"Games: {wins+loses}",
+                    $"Wins: {wins}",
+                    $"Loses: {loses}",
+                    $"Winrate: {winrate}",
+                };
+                return string.Join("\n", lines);
+            }
+
             public enum Status
             {
                 Default, LanguageChanging, Attacking, Excepting, Picking, Searching,
@@ -820,7 +849,62 @@ namespace revcom_bot
                         return "";
                     }
                 }
-                
+
+                public string @Winner
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Winner";
+                        else if (lang == Language.Russian)
+                            return "Победитель";
+                        return "";
+                    }
+                }
+                public string @Loser
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Loser";
+                        else if (lang == Language.Russian)
+                            return "Проигравший";
+                        return "";
+                    }
+                }
+                public string @HasWonThisBattle
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "has won this battle";
+                        else if (lang == Language.Russian)
+                            return "победил эту битву";
+                        return "";
+                    }
+                }
+                public string @HasLostThisBattle
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "has lost this battle";
+                        else if (lang == Language.Russian)
+                            return "проиграл эту битву";
+                        return "";
+                    }
+                }
+                public string @Result
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Result";
+                        else if (lang == Language.Russian)
+                            return "Результат";
+                        return "";
+                    }
+                }
 
                 public struct InstructionText
                 {

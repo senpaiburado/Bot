@@ -119,9 +119,10 @@ namespace revcom_bot
             }
         }
 
-        private void PickHero(Users.User firstPlayer, string heroName, Users.User secondPlayer)
+        private async void PickHero(Users.User firstPlayer, string heroName, Users.User secondPlayer)
         {
-            bot.SendTextMessageAsync(firstPlayer.ID, $"{firstPlayer.lang.PickedHero} {heroName} !");
+            var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
+            await bot.SendTextMessageAsync(firstPlayer.ID, $"{firstPlayer.lang.PickedHero} {heroName} !", replyMarkup: kb);
 
             if (secondPlayer.status == Users.User.Status.Picked)
             {
@@ -134,56 +135,56 @@ namespace revcom_bot
             else
             {
                 firstPlayer.status = Users.User.Status.Picked;
-                bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.WaitForPickOfAnotherPlayer);
+                await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.WaitForPickOfAnotherPlayer);
             }
         }
 
-        private void SetAttackerAndExcepter(Users.User attacker, Users.User excepter)
+        private async void SetAttackerAndExcepter(Users.User attacker, Users.User excepter)
         {
             attacker.status = Users.User.Status.Attacking;
             excepter.status = Users.User.Status.Excepting;
 
-            bot.SendTextMessageAsync(attacker.ID, attacker.lang.YourEnemyMessage + ": " + excepter.Name);
-            bot.SendTextMessageAsync(excepter.ID, excepter.lang.YourEnemyMessage + ": " + attacker.Name);
+            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.YourEnemyMessage + ": " + excepter.Name);
+            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.YourEnemyMessage + ": " + attacker.Name);
 
             SendHeroesStates();
 
-            bot.SendTextMessageAsync(attacker.ID, attacker.lang.FirstAttackNotify);
-            bot.SendTextMessageAsync(excepter.ID, excepter.lang.EnemyFirstAttackNotify);
+            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.FirstAttackNotify);
+            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.EnemyFirstAttackNotify);
         }
 
-        private void confirmGame(Users.User firstPlayer, bool accepted, Users.User secondPlayer)
+        private async void confirmGame(Users.User firstPlayer, bool accepted, Users.User secondPlayer)
         {
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             if (accepted)
             {
-                bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameAccepted);
+                await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameAccepted);
                 if (secondPlayer.status == Users.User.Status.WaitingForRespond)
                 {
                     firstPlayer.status = Users.User.Status.Picking;
                     secondPlayer.status = Users.User.Status.Picking;
 
-                    bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameStarted, replyMarkup: kb);
-                    bot.SendTextMessageAsync(secondPlayer.ID, secondPlayer.lang.GameStarted, replyMarkup: kb);
+                    await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameStarted, replyMarkup: kb);
+                    await bot.SendTextMessageAsync(secondPlayer.ID, secondPlayer.lang.GameStarted, replyMarkup: kb);
 
                     string allHero = string.Join("\n", hero_list.Select(x => x.Name));
                     string msg = $"{firstPlayer.lang.StringHeroes}:\n{allHero}\n{firstPlayer.lang.PickHero}:";
                     string msg1 = $"{secondPlayer.lang.StringHeroes}:\n{allHero}\n{secondPlayer.lang.PickHero}:";
 
-                    bot.SendTextMessageAsync(firstPlayer.ID, msg, replyMarkup: GetKeyboardNextPage(firstPlayer.ID));
-                    bot.SendTextMessageAsync(secondPlayer.ID, msg1, replyMarkup: GetKeyboardNextPage(secondPlayer.ID));
+                    await bot.SendTextMessageAsync(firstPlayer.ID, msg, replyMarkup: GetKeyboardNextPage(firstPlayer.ID));
+                    await bot.SendTextMessageAsync(secondPlayer.ID, msg1, replyMarkup: GetKeyboardNextPage(secondPlayer.ID));
                 }
                 else
                 {
                     firstPlayer.status = Users.User.Status.WaitingForRespond;
-                    bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.AnotherPlayerGameAcceptWaiting, replyMarkup: kb);
+                    await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.AnotherPlayerGameAcceptWaiting, replyMarkup: kb);
                 }
             }
             else
             {
                 Reset();
-                bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameCanceled + "\n" + firstPlayer.lang.GameNotAccepted, replyMarkup: kb);
-                bot.SendTextMessageAsync(secondPlayer.ID, secondPlayer.lang.GameCanceled + "\n" + secondPlayer.lang.AnotherPlayerDidntAcceptGame, replyMarkup: kb);
+                await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.GameCanceled + "\n" + firstPlayer.lang.GameNotAccepted, replyMarkup: kb);
+                await bot.SendTextMessageAsync(secondPlayer.ID, secondPlayer.lang.GameCanceled + "\n" + secondPlayer.lang.AnotherPlayerDidntAcceptGame, replyMarkup: kb);
             }
         }
 
@@ -245,12 +246,27 @@ namespace revcom_bot
                 hero_one.Update();
                 hero_two.Update();
 
+                if (hero_one.HP <= 0 || hero_two.MP <= 0)
+                {
+                    if (hero_one.HP <= 0)
+                        GameOver(hero_two, hero_one, player_two, player_one);
+                    else
+                        GameOver(hero_one, hero_two, player_one, player_two);
+                    return true;
+                }
+
+                await bot.SendTextMessageAsync(user_attacker.ID, GetMessageForMe(user_excepter.lang, attacker));
+                await bot.SendTextMessageAsync(user_excepter.ID, GetMessageForMe(user_excepter.lang, excepter));
+                await bot.SendTextMessageAsync(user_attacker.ID, GetMessageForEnemy(user_attacker.lang, excepter));
+                await bot.SendTextMessageAsync(user_excepter.ID, GetMessageForEnemy(user_excepter.lang, attacker));
+
                 if (player_one.status == Users.User.Status.Attacking)
                 {
+                    Console.WriteLine("one");
                     if (hero_two.StunCounter == 0)
                     {
-                        player_one.status = Users.User.Status.Excepting;
-                        player_two.status = Users.User.Status.Attacking;
+                        user_attacker.status = Users.User.Status.Excepting;
+                        user_excepter.status = Users.User.Status.Attacking;
 
                         string[] msg =
                         {
@@ -258,10 +274,26 @@ namespace revcom_bot
                             "2 - Heal",
                             "Choose ability:",
                         };
-                        await bot.SendTextMessageAsync(player_two.ID, string.Join("\n", msg));
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", msg));
                     }
                 }
-
+                else
+                {
+                    Console.WriteLine("Two");
+                    if (hero_one.StunCounter == 0)
+                    {
+                        user_attacker.status = Users.User.Status.Excepting;
+                        user_excepter.status = Users.User.Status.Attacking;
+                        string[] msg =
+                        {
+                            "1 - Attack",
+                            "2 - Heal",
+                            "Choose ability:",
+                        };
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", msg));
+                    }
+                }
+                Console.WriteLine("End.");
                 return true;
             }
             else
@@ -343,6 +375,40 @@ namespace revcom_bot
                     break;
             }
             return keyboard;
+        }
+
+        private async void GameOver(IHero winner, IHero loser, Users.User uwinner, Users.User uloser)
+        {
+            string[] msg1 =
+            {
+                $"{uwinner.Name}({winner.Name}) {uwinner.lang.HasWonThisBattle}!",
+                $"{uloser.Name}({loser.Name} {uwinner.lang.HasLostThisBattle}!",
+                $"{uwinner.lang.Result}:",
+            };
+            string[] msg2 =
+            {
+                $"{uwinner.Name}({winner.Name}) {uloser.lang.HasWonThisBattle}!",
+                $"{uloser.Name}({loser.Name} {uloser.lang.HasLostThisBattle}!",
+                $"{uloser.lang.Result}:",
+            };
+            uwinner.AddWin();
+            uloser.AddLose();
+
+            await bot.SendTextMessageAsync(uwinner.ID, string.Join("\n", msg1));
+            await bot.SendTextMessageAsync(uloser.ID, string.Join("\n", msg2));
+
+            await bot.SendTextMessageAsync(uwinner.ID, GetMessageForMe(uwinner.lang, winner));
+            await bot.SendTextMessageAsync(uloser.ID, GetMessageForMe(uloser.lang, loser));
+            await bot.SendTextMessageAsync(uwinner.ID, GetMessageForEnemy(uwinner.lang, loser));
+            await bot.SendTextMessageAsync(uloser.ID, GetMessageForEnemy(uloser.lang, winner));
+
+            winner = null;
+            loser = null;
+
+            player_one.status = Users.User.Status.Default;
+            player_two.status = Users.User.Status.Default;
+
+            isWorking = false;
         }
 
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardPrevPage(long PlayerID)
@@ -455,10 +521,11 @@ namespace revcom_bot
         private async void SendHeroesStates()
         {
             await bot.SendTextMessageAsync(player_one.ID, GetMessageForMe(player_one.lang, hero_one));
-            await bot.SendTextMessageAsync(player_one.ID, GetMessageForEnemy(player_one.lang, hero_two));
-
             await bot.SendTextMessageAsync(player_two.ID, GetMessageForMe(player_two.lang, hero_two));
-            await bot.SendTextMessageAsync(player_two.ID, GetMessageForMe(player_two.lang, hero_one));
+
+
+            await bot.SendTextMessageAsync(player_one.ID, GetMessageForEnemy(player_one.lang, hero_two));
+            await bot.SendTextMessageAsync(player_two.ID, GetMessageForEnemy(player_two.lang, hero_one));
         }
     }
 }
