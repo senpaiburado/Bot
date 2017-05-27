@@ -813,6 +813,13 @@ namespace revcom_bot
                         return $"Враг восстановил {hp} очков здоровья и {mp} очков маны.";
                     return "";
                 }
+                public string @YouLose
+                {
+                    get
+                    {
+                        return "";
+                    }
+                }
                 
 
                 public struct InstructionText
