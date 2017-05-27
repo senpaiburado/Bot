@@ -8,6 +8,7 @@ namespace revcom_bot
 {
     class IHero
     {
+        public static Telegram.Bot.TelegramBotClient bot;
         public enum MainFeature
         {
             Str, Agi, Intel
@@ -31,9 +32,27 @@ namespace revcom_bot
         //////////////////
 
         protected float AttackSpeed { get; set; }
-        protected float CriticalShotChance { get; set; }
-        protected float CriticalShotMultiplier { get; set; }
+        protected float CriticalHitChance { get; set; }
+        protected float CriticalHitMultiplier { get; set; }
         protected float HpStealPercent { get; set; }
+        protected float StunHitChance { get; set; }
+        public float MissChance { get; set; }
+        public float StunDamage { get; set; }
+
+        public int StunCounter = 0;
+        public int BurningCounter = 0;
+        public float BurningDamage = 0.0f;
+        public int ArmorPenetratingCounter = 0;
+        public float ArmorPenetrationValue = 0.0f;
+
+        // Abilities:
+
+            // Heal
+        private float HealthRestore = 500.0f;
+        private float ManaRestore = 250.0f;
+        public const int HealCountdownDefault = 20;
+        public int HealCountdown = 0;
+        public const float HealPayMana = 50.0f;
 
         public IHero(string name, int str, int agi, int itl, MainFeature feat)
         {
@@ -80,9 +99,11 @@ namespace revcom_bot
                 damage = Intelligence * 1.0f;
             DPS = damage + damage * AttackSpeed;
 
-            CriticalShotChance = 20.0f;
-            CriticalShotMultiplier = 1.5f;
+            CriticalHitChance = 20.0f;
+            CriticalHitMultiplier = 1.5f;
             HpStealPercent = 5.0f;
+            MissChance = 10.0f;
+            StunDamage = DPS / 100 * 95;
 
             InitAdditional();
             InitPassiveAbilities();
@@ -98,12 +119,68 @@ namespace revcom_bot
 
         }
 
-        virtual public float Attack(IHero target)
+        virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
         {
             Random random = new Random();
             float damage = 0.0f;
 
-            return damage;
+            string MessageForAttacker = "";
+            string MessageForExcepter = "";
+
+            if (random.Next(1, 101) >= target.MissChance)
+            {
+                damage += this.DPS;
+                if (random.Next(1, 101) <= CriticalHitChance)
+                {
+                    damage *= CriticalHitMultiplier;
+                    MessageForAttacker += $"{attacker_user.lang.CriticalHit}!\n";
+                    MessageForExcepter += $"{target_user.lang.TheEnemyDealtCriticalDamageToYou}\n";
+                }
+                if (random.Next(1,101) <= StunHitChance)
+                {
+                    target.StunCounter++;
+                    MessageForAttacker += $"{attacker_user.lang.StunningHit}!\n";
+                    MessageForExcepter += $"{target_user.lang.TheEnemyStunnedYou}\n";
+                }
+                MessageForAttacker += attacker_user.lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage));
+            }
+            else
+            {
+                MessageForAttacker += attacker_user.lang.YouMissedTheEnemy;
+                MessageForExcepter += target_user.lang.TheEnemyMissedYou;
+            }
+
+            target.GetDamage(damage);
+
+            await bot.SendTextMessageAsync(attacker_user.ID, MessageForAttacker);
+            await bot.SendTextMessageAsync(target_user.ID, MessageForExcepter);
+
+            return true;
+        }
+
+        virtual public async Task<bool> Heal(Users.User attacker, Users.User excepter)
+        {
+            if (HealCountdown > 0)
+            {
+                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageCountdown(
+                    HealCountdownDefault - HealCountdown));
+                return false;
+            }
+            if (MP < HealPayMana)
+            {
+                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageNeedMana(Convert.ToInt32(
+                    HealPayMana - MP)));
+                return false;
+            }
+            HP += HealthRestore;
+            MP += ManaRestore;
+            HealCountdown = HealCountdownDefault;
+
+            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageHpAndMpRestored(
+                Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
+            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.GetMessageEnemyHpAndMpRestored(
+                Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
+            return true;
         }
 
         virtual public void Update()
@@ -114,7 +191,8 @@ namespace revcom_bot
 
         virtual public void UpdateCountdowns()
         {
-
+            if (HealCountdown > 0)
+                HealCountdown--;
         }
 
         virtual public void GetDamage(float value)

@@ -202,15 +202,12 @@ namespace revcom_bot
             }
         }
 
-        public async void UseAbility(int number, long PlayerID)
+        public async Task<bool> UseAbility(int number, long PlayerID)
         {
             Users.User user_attacker = null;
             Users.User user_excepter = null;
             IHero attacker = null;
             IHero excepter = null;
-
-            string step_message_ToAttacker = "";
-            string step_message_ToExcepter = "";
 
             if (player_one.ID == PlayerID)
             {
@@ -229,18 +226,46 @@ namespace revcom_bot
                 excepter = hero_one;
             }
 
+            bool finished = false;
+
             switch (number)
             {
                 case 1:
-                    float damage = attacker.Attack(excepter);
-                    step_message_ToAttacker = $"{user_attacker.lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage))}";
-                    step_message_ToExcepter = $"{user_excepter.lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage))}";
-
-                    await bot.SendTextMessageAsync(user_attacker.ID, step_message_ToAttacker);
-                    await bot.SendTextMessageAsync(user_excepter.ID, step_message_ToExcepter);
-
-                    break;
+                    if (await attacker.Attack(excepter, user_attacker, user_excepter))
+                            finished = true;
+                        break;
+                case 2:
+                    if (await attacker.Heal(user_attacker, user_excepter))
+                            finished = true;
+                        break;
             }
+
+            if (finished)
+            {
+                hero_one.Update();
+                hero_two.Update();
+
+                if (player_one.status == Users.User.Status.Attacking)
+                {
+                    if (hero_two.StunCounter == 0)
+                    {
+                        player_one.status = Users.User.Status.Excepting;
+                        player_two.status = Users.User.Status.Attacking;
+
+                        string[] msg =
+                        {
+                            "1 - Attack",
+                            "2 - Heal",
+                            "Choose ability:",
+                        };
+                        await bot.SendTextMessageAsync(player_two.ID, string.Join("\n", msg));
+                    }
+                }
+
+                return true;
+            }
+            else
+                return false;
         }
 
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage(long PlayerID)

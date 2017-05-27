@@ -45,7 +45,8 @@ namespace revcom_bot
             List<Users.User> availablePlayers = new List<Users.User>();
             try
             {
-                var Bot = new Telegram.Bot.TelegramBotClient(key); 
+                var Bot = new Telegram.Bot.TelegramBotClient(key);
+                IHero.bot = Bot;
                 await Bot.SetWebhookAsync("");
                 //Bot.SetWebhook("");
                 int offset = 0;
@@ -246,7 +247,19 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.Attacking)
                         {
-
+                            if (message.IsDigits(message.Text))
+                            {
+                                foreach (var game in ActiveGames)
+                                {
+                                    if (game.GameID == _usr.ActiveGameID)
+                                    {
+                                        await game.UseAbility(Convert.ToInt32(message.Text), message.Chat.Id);
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.IncorrectSelection);
                         }
                         else if (_usr.status == Users.User.Status.Excepting)
                         {
@@ -349,6 +362,14 @@ namespace revcom_bot
         public static bool IsCommand(this Telegram.Bot.Types.Message message, string text)
         {
             return message.Text.ToLower().Contains(text.ToLower());
+        }
+        public static bool IsDigits(this Telegram.Bot.Types.Message message, string text)
+        {
+            int value = Convert.ToInt32(text);
+            if (value >= 1 && value <= 2)
+                return true;
+            else
+                return false;
         }
     }
 }

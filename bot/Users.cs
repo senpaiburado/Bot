@@ -595,6 +595,17 @@ namespace revcom_bot
                         return "";
                     }
                 }
+                public string @IncorrectSelection
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You chose incorrect ability. Try another!";
+                        else if (lang == Language.Russian)
+                            return "Вы выбрали неверную способность. Попробуйте другую!";
+                        return "";
+                    }
+                }
 
                 public string @AccountWasDeletedString
                 {
@@ -702,6 +713,104 @@ namespace revcom_bot
                         return $"The enemy inflicted {damage} damage to you!";
                     else if (lang == Language.Russian)
                         return $"Противник нанёс вам {damage} урона!";
+                    return "";
+                }
+                public string @CriticalHit
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Critical hit";
+                        else if (lang == Language.Russian)
+                            return "Критический удар";
+                        return "";
+                    }
+                }
+                public string @StunningHit
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Stunning hit";
+                        else if (lang == Language.Russian)
+                            return "Оглушающий удар";
+                        return "";
+                    }
+                }
+                public string @YouMissedTheEnemy
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You missed the enemy!";
+                        else if (lang == Language.Russian)
+                            return "Вы промазали по противнику!";
+                        return "";
+                    }
+                }
+                public string @TheEnemyMissedYou
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy missed you!";
+                        else if (lang == Language.Russian)
+                            return "Противник промазал по вам!";
+                        return "";
+                    }
+                }
+                public string @TheEnemyDealtCriticalDamageToYou
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy dealt critical damage to you!";
+                        else if (lang == Language.Russian)
+                            return "Враг нанёс вам критический урон!";
+                        return "";
+                    }
+                }
+                public string @TheEnemyStunnedYou
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy stunned you!";
+                        else if (lang == Language.Russian)
+                            return "Противник оглушил вас!";
+                        return "";
+                    }
+                }
+                public string GetMessageNeedMana(int value)
+                {
+                    if (lang == Language.English)
+                        return $"You need another {value} MP to do that.";
+                    else if (lang == Language.Russian)
+                        return $"Вам нужно ещё {value} маны, чтобы сделать это.";
+                    return "";
+                }
+                public string GetMessageCountdown(int value)
+                {
+                    if (lang == Language.English)
+                        return $"Ability will be available in {value} steps.";
+                    else if (lang == Language.Russian)
+                        return $"Способность будет доступна через {value} шагов.";
+                    return "";
+                }
+                public string GetMessageHpAndMpRestored(int hp, int mp)
+                {
+                    if (lang == Language.English)
+                        return $"You restored {hp} HP and {mp} MP.";
+                    else if (lang == Language.Russian)
+                        return $"Вы восстановили {hp} очков здоровья и {mp} очков маны!";
+                    return "";
+                }
+                public string GetMessageEnemyHpAndMpRestored(int hp, int mp)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy restored {hp} HP and {mp} MP";
+                    else if (lang == Language.Russian)
+                        return $"Враг восстановил {hp} очков здоровья и {mp} очков маны.";
                     return "";
                 }
                 
