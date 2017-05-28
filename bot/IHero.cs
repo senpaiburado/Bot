@@ -121,7 +121,8 @@ namespace revcom_bot
 
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
         {
-            Random random = new Random();
+            Random temp_rand = new Random();
+            Random random = new Random(temp_rand.Next(1000000));
             float damage = 0.0f;
 
             string MessageForAttacker = "";
@@ -191,10 +192,19 @@ namespace revcom_bot
 
         virtual public void Update()
         {
-            if (HP <= 0)
+            if (Math.Floor(HP) <= 0.0f)
             {
                 HP = 0;
                 return;
+            }
+            if (Math.Ceiling(HP) >= MaxHP)
+                HP = MaxHP;
+            if (Math.Ceiling(MP) >= MaxMP || Math.Floor(MP) < 0.0f)
+            {
+                if (Math.Ceiling(MP) >= MaxMP)
+                    MP = MaxMP;
+                else
+                    MP = 0.0f;
             }
             Regeneration();
             UpdateCountdowns();

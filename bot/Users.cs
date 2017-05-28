@@ -556,6 +556,17 @@ namespace revcom_bot
                         return "";
                     }
                 }
+                public string @GameFinished
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The game is finished.";
+                        else if (lang == Language.Russian)
+                            return "Игра закончена.";
+                        return "";
+                    }
+                }
 
                 public string @PickedHero
                 {
@@ -839,7 +850,7 @@ namespace revcom_bot
                     if (lang == Language.English)
                         return $"The enemy restored {hp} HP and {mp} MP";
                     else if (lang == Language.Russian)
-                        return $"Враг восстановил {hp} очков здоровья и {mp} очков маны.";
+                        return $"Противник восстановил {hp} очков здоровья и {mp} очков маны.";
                     return "";
                 }
                 public string @YouLose
@@ -879,7 +890,7 @@ namespace revcom_bot
                         if (lang == Language.English)
                             return "has won this battle";
                         else if (lang == Language.Russian)
-                            return "победил эту битву";
+                            return "выиграл эту битву";
                         return "";
                     }
                 }
@@ -902,6 +913,52 @@ namespace revcom_bot
                             return "Result";
                         else if (lang == Language.Russian)
                             return "Результат";
+                        return "";
+                    }
+                }
+
+                // Abilities
+                public string @AttackString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Attack";
+                        else if (lang == Language.Russian)
+                            return "Атака";
+                        return "";
+                    }
+                }
+                public string @Heal
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Heal";
+                        else if (lang == Language.Russian)
+                            return "Лечение";
+                        return "";
+                    }
+                }
+                public string @SelectAbility
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Select ability";
+                        else if (lang == Language.Russian)
+                            return "Выберите способность";
+                        return "";
+                    }
+                }
+                public string @WaitingForAnotherPlayerAction
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Waiting for the action of another player...";
+                        else if (lang == Language.Russian)
+                            return "Ожидание действия другого игрока...";
                         return "";
                     }
                 }

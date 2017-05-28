@@ -232,11 +232,15 @@ namespace revcom_bot
                         {
                             if (message.IsCommand(">"))
                             {
-                                GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
+                                await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
+                                Console.WriteLine(">");
                             }
                             else if (message.IsCommand("<"))
                             {
-                                GetActiveGame(_usr.ActiveGameID)?.GetKeyboardPrevPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardPrevPage(message.Chat.Id);
+                                await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
+                                Console.WriteLine("<");
                             }
                             else
                             {
