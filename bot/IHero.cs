@@ -92,18 +92,19 @@ namespace revcom_bot
 
             float damage = 0.0f;
             if (Feature == MainFeature.Str)
-                damage = Strength * 1.0f;
+                damage = Strength * 0.4f;
             else if (Feature == MainFeature.Agi)
-                damage = Agility * 1.0f;
+                damage = Agility * 0.3f;
             else if (Feature == MainFeature.Intel)
-                damage = Intelligence * 1.0f;
+                damage = Intelligence * 0.4f;
             DPS = damage + damage * AttackSpeed;
 
-            CriticalHitChance = 20.0f;
+            CriticalHitChance = 15.0f;
             CriticalHitMultiplier = 1.5f;
             HpStealPercent = 5.0f;
             MissChance = 10.0f;
-            StunDamage = DPS / 100 * 95;
+            StunHitChance = 10.0f;
+            StunDamage = DPS / 100 * 15;
 
             InitAdditional();
             InitPassiveAbilities();
@@ -153,7 +154,7 @@ namespace revcom_bot
                 MessageForExcepter += target_user.lang.TheEnemyMissedYou;
             }
 
-            target.GetDamage(damage);
+            target.GetDamage(damage-target.Armor);
 
             await bot.SendTextMessageAsync(attacker_user.ID, MessageForAttacker);
             await bot.SendTextMessageAsync(target_user.ID, MessageForExcepter);
@@ -165,8 +166,7 @@ namespace revcom_bot
         {
             if (HealCountdown > 0)
             {
-                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageCountdown(
-                    HealCountdownDefault - HealCountdown));
+                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageCountdown(HealCountdown));
                 return false;
             }
             if (MP < HealPayMana)
@@ -190,6 +190,17 @@ namespace revcom_bot
             return true;
         }
 
+        virtual public string GetMessageAbiliesList(Users.User user)
+        {
+            string[] list =
+            {
+                $"1 - {user.lang.AttackString}",
+                $"2 - {user.lang.Heal} ({HealCountdown}) [{HealPayMana}]",
+                $"{user.lang.SelectAbility}:",
+            };
+            return string.Join("\n", list);
+        }
+
         virtual public void Update()
         {
             if (Math.Floor(HP) <= 0.0f)
@@ -197,6 +208,9 @@ namespace revcom_bot
                 HP = 0;
                 return;
             }
+            Regeneration();
+            UpdateCountdowns();
+            UpdateDefaultCountdowns();
             if (Math.Ceiling(HP) >= MaxHP)
                 HP = MaxHP;
             if (Math.Ceiling(MP) >= MaxMP || Math.Floor(MP) < 0.0f)
@@ -206,9 +220,6 @@ namespace revcom_bot
                 else
                     MP = 0.0f;
             }
-            Regeneration();
-            UpdateCountdowns();
-            UpdateDefaultCountdowns();
         }
 
         virtual public void UpdateCountdowns()

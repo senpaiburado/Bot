@@ -12,11 +12,14 @@ namespace revcom_bot
         private List<long> IDs;
         private List<User> users;
 
+        public static long AdminID = 295568848;
+
         public void Init()
         {
             System.IO.Directory.CreateDirectory("Users");
             IDs = new List<long>();
             users = new List<User>();
+            InitializeFromFiles();
         }
 
         public bool Contains(long _Id)
@@ -34,6 +37,42 @@ namespace revcom_bot
             return false;
         }
 
+        private async void InitializeFromFiles()
+        {
+            string[] files = Directory.GetFiles("Users", "*.ini");
+            foreach (var file in files)
+            {
+                StreamReader sr = new StreamReader(@file);
+
+                string _Name = "";
+                long _Id = 0L;
+                User.Text.Language _Lang = 0;
+                int _Wines = 0;
+                int _Loses = 0;
+                int _Rate = 0;
+
+                _Name = await sr.ReadLineAsync();
+                _Id = Convert.ToInt64(await sr.ReadLineAsync());
+                _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), await sr.ReadLineAsync());
+                _Wines = int.Parse(await sr.ReadLineAsync());
+                _Loses = int.Parse(await sr.ReadLineAsync());
+                _Rate = int.Parse(await sr.ReadLineAsync());
+
+                User user = new User();
+                user.Name = _Name;
+                user.ID = _Id;
+                user.lang.lang = _Lang;
+                user.wins = _Wines;
+                user.loses = _Loses;
+                user.rate = _Rate;
+                user.winrate = (user.wins + user.loses) == 0 ? 0 : (user.wins * 100.0f) / (user.wins + user.loses);
+                user.Init();
+                AddUser(user);
+
+                sr.Close();
+            }
+        }
+
         public bool AddUser(long _Id)
         {
             if (IDs.Contains(_Id))
@@ -49,12 +88,22 @@ namespace revcom_bot
             return true;
         }
 
+        public bool AddUser(User user)
+        {
+            if (IDs.Contains(user.ID))
+                return false;
+            users.Add(user);
+            IDs.Add(user.ID);
+            return true;
+        }
+
         public bool DeleteUser(long UserID)
         {
             for (int i = 0; i < users.Count; i++)
             {
                 if (users[i].ID == UserID)
                 {
+                    File.Delete("Users/ " + users[i].ID.ToString() + "_userdata.ini");
                     users.RemoveAt(i);
                     return true;
                 }
@@ -86,32 +135,42 @@ namespace revcom_bot
 
             public long ActiveGameID = 0L;
             public short HeroListPage = 0;
+            public string HeroName = "";
 
             public int wins = 0;
             public int loses = 0;
             public float winrate = 0;
 
+            public int rate = 1000;
+
             public void AddWin()
             {
                 wins++;
                 winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
+                rate += 25;
+                CreateFile();
             }
 
             public void AddLose()
             {
                 loses++;
                 winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
+                rate -= 25;
+                if (rate < 0)
+                    rate = 0;
+                CreateFile();
             }
 
             public string GetStatisctisMessage()
             {
                 string[] lines =
                 {
-                    $"Nickname: {Name}",
-                    $"Games: {wins+loses}",
-                    $"Wins: {wins}",
-                    $"Loses: {loses}",
-                    $"Winrate: {winrate}",
+                    $"{lang.NameMessage}: {Name}",
+                    $"{lang.GamesCountString}: {wins+loses}",
+                    $"{lang.WinsCountString}: {wins}",
+                    $"{lang.LosesCountString}: {loses}",
+                    $"{lang.WinrateString}: {winrate}",
+                    $"{lang.RatingString}: {rate}",
                 };
                 return string.Join("\n", lines);
             }
@@ -134,23 +193,23 @@ namespace revcom_bot
                 net_status = NetworkStatus.Offline;
             }
 
-            public void CreateFile()
+            public async void CreateFile()
             {
                 File.Create("Users/ " + ID.ToString() + "_userdata.ini").Close();
-                string text = "";
-                text += "#Name:\n";
-                text += Name;
-                text += "#Id:\n";
-                text += ID.ToString();
-                text += "\n#Status:\n";
-                text += status.ToString();
-                text += "\n#Language:\n";
-                text += lang.lang.ToString();
-                text += "\n#Network Status:\n";
-                text += net_status.ToString();
-                text += "\n#End.";
 
-                File.WriteAllText(("Users/ " + ID.ToString() + "_userdata.ini"), text);
+                string[] text =
+                {
+                    $"{Name}",
+                    $"{ID}",
+                    $"{lang.lang}",
+                    $"{wins}",
+                    $"{loses}",
+                    $"{rate}",
+                };
+                StreamWriter sw = new StreamWriter("Users/ " + ID.ToString() + "_userdata.ini");
+                foreach (var str in text)
+                    await sw.WriteLineAsync(str);
+                sw.Close();
                 
             }
 
@@ -375,6 +434,62 @@ namespace revcom_bot
                             return "Hero name";
                         else if (lang == Language.Russian)
                             return "Имя героя";
+                        return "";
+                    }
+                }
+
+                public string @WinsCountString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Count of wins";
+                        else if (lang == Language.Russian)
+                            return "Количество побед";
+                        return "";
+                    }
+                }
+                public string @LosesCountString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Count of loses";
+                        else if (lang == Language.Russian)
+                            return "Количество поражений";
+                        return "";
+                    }
+                }
+                public string @GamesCountString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Count of games";
+                        else if (lang == Language.Russian)
+                            return "Количество игр";
+                        return "";
+                    }
+                }
+                public string @RatingString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Rating";
+                        else if (lang == Language.Russian)
+                            return "Рейтинг";
+                        return "";
+                    }
+                }
+                public string @WinrateString
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Winrate";
+                        else if (lang == Language.Russian)
+                            return "Процент побед";
                         return "";
                     }
                 }
@@ -913,6 +1028,28 @@ namespace revcom_bot
                             return "Result";
                         else if (lang == Language.Russian)
                             return "Результат";
+                        return "";
+                    }
+                }
+                public string @Retreat
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have retreated.";
+                        else if (lang == Language.Russian)
+                            return "Вы отступили.";
+                        return "";
+                    }
+                }
+                public string @RetreatEnemy
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy has retreated.";
+                        else if (lang == Language.Russian)
+                            return "Противник отступил.";
                         return "";
                     }
                 }

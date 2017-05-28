@@ -109,7 +109,10 @@ namespace revcom_bot
                         var message = update.Message;
 
                         if (!user.Contains(message.Chat.Id))
+                        {
                             user.AddUser(message.Chat.Id);
+                            Console.WriteLine("LOL");
+                        }
 
                         Users.User _usr = user.getUserByID(message.Chat.Id);
 
@@ -136,6 +139,13 @@ namespace revcom_bot
                                 _usr.status = Users.User.Status.LanguageChanging;
 
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangeLanguage, replyMarkup: keyboard);
+                            }
+                            else if (message.Text == "/profile")
+                            {
+                                if (_usr.net_status == Users.User.NetworkStatus.Online)
+                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.GetStatisctisMessage());
+                                else
+                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ErrorByStatusOffline);
                             }
                             else if (message.Text == "/online")
                             {
@@ -225,6 +235,7 @@ namespace revcom_bot
                                 else if (message.IsCommand("русский"))
                                     _usr.lang.lang = Users.User.Text.Language.Russian;
                                 var hide_keyboard = new ReplyKeyboardHide();
+                                _usr.CreateFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangedLanguage, replyMarkup: hide_keyboard);
                             }
                         }
@@ -251,6 +262,7 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.Attacking)
                         {
+                            CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.IsDigits(message.Text))
                             {
                                 foreach (var game in ActiveGames)
@@ -267,7 +279,7 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.Excepting)
                         {
-
+                            CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                         }
                         else if (_usr.status == Users.User.Status.Searching)
                         {
@@ -315,6 +327,7 @@ namespace revcom_bot
                             {
                                 _usr.Name = message.Text;
                                 _usr.status = Users.User.Status.Default;
+                                _usr.CreateFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameSet);
                             }
                         }
@@ -358,8 +371,13 @@ namespace revcom_bot
         {
 
         }
-    }
 
+        private void CheckLeave(Users.User user, Game game, string text)
+        {
+            if (text == "/leavegame")
+                game.LeaveGame(user.ID);
+        }
+    }
 
     public static class CommandExtension
     {

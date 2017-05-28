@@ -14,8 +14,8 @@ namespace revcom_bot
         public static short MinPageValue = 1;
 
         public static string smile_hp = "\u2764";
-        public static string smile_mp = "\u1F52F";
-        public static string smile_dps = "%F0%9F%%94%AA";
+        public static string smile_mp = "🔯";
+        public static string smile_dps = "🔥";
         public static string smile_armor = "\u25FB";
 
         public long GameID;
@@ -40,18 +40,19 @@ namespace revcom_bot
 
         public static void Initialize()
         {
-            hero_list.Add(new IHero("Juggernaut", 35, 60, 22, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Faceless Void", 23, 71, 27, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Alchemist", 50, 32, 30, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Abaddon", 40, 24, 50, IHero.MainFeature.Intel));
-            hero_list.Add(new IHero("Lifestealer", 52, 15, 34, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Silencer", 37, 20, 77, IHero.MainFeature.Intel));
-            hero_list.Add(new IHero("Wraith King", 70, 35, 21, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Sniper", 25, 80, 30, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Earthshaker", 70, 25, 25, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Slardar", 91, 15, 30, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Razor", 34, 101, 39, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Ursa", 41, 80, 35, IHero.MainFeature.Agi));
+            // main += 20
+            hero_list.Add(new IHero("Juggernaut", 200, 280, 140, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
+            hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Slardar", 230, 170, 150, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
         }
 
         public Game(Users.User user_one, Users.User user_two, Telegram.Bot.TelegramBotClient _bot)
@@ -93,6 +94,8 @@ namespace revcom_bot
             player_two.ActiveGameID = 0L;
             player_one.status = Users.User.Status.Default;
             player_two.status = Users.User.Status.Default;
+            player_one.HeroName = "";
+            player_two.HeroName = "";
 
             isWorking = false;
         }
@@ -123,6 +126,7 @@ namespace revcom_bot
         {
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             await bot.SendTextMessageAsync(firstPlayer.ID, $"{firstPlayer.lang.PickedHero} {heroName} !", replyMarkup: kb);
+            firstPlayer.HeroName = heroName;
 
             if (secondPlayer.status == Users.User.Status.Picked)
             {
@@ -152,13 +156,9 @@ namespace revcom_bot
             await bot.SendTextMessageAsync(attacker.ID, attacker.lang.FirstAttackNotify);
             await bot.SendTextMessageAsync(excepter.ID, excepter.lang.EnemyFirstAttackNotify);
 
-            string[] ChooseAbilityMessage =
-            {
-                $"1 - {attacker.lang.AttackString}",
-                $"2 - {attacker.lang.Heal}",
-                $"{attacker.lang.SelectAbility}:",
-            };
-            await bot.SendTextMessageAsync(attacker.ID, string.Join("\n", ChooseAbilityMessage));
+            IHero temp = attacker.HeroName == hero_one.Name ? hero_one : hero_two;
+
+            await bot.SendTextMessageAsync(attacker.ID, string.Join("\n", temp.GetMessageAbiliesList(attacker)));
             await bot.SendTextMessageAsync(excepter.ID, excepter.lang.WaitingForAnotherPlayerAction);
         }
 
@@ -210,6 +210,29 @@ namespace revcom_bot
                     confirmGame(player_two, accepted, player_one);
                 }
             }
+        }
+
+        public async void LeaveGame(long PlayerID)
+        {
+            if (PlayerID == player_one.ID)
+            {
+                player_one.AddLose();
+                await bot.SendTextMessageAsync(player_one.ID, player_one.lang.Retreat);
+                await bot.SendTextMessageAsync(player_two.ID, player_two.lang.RetreatEnemy);
+            }
+            else
+            {
+                player_one.AddWin();
+                await bot.SendTextMessageAsync(player_two.ID, player_two.lang.Retreat);
+                await bot.SendTextMessageAsync(player_one.ID, player_one.lang.RetreatEnemy);
+            }
+            hero_one = null;
+            hero_two = null;
+            player_one.ActiveGameID = 0L;
+            player_two.ActiveGameID = 0L;
+            player_one.status = Users.User.Status.Default;
+            player_two.status = Users.User.Status.Default;
+            isWorking = false;
         }
 
         public async Task<bool> UseAbility(int number, long PlayerID)
@@ -277,13 +300,8 @@ namespace revcom_bot
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
 
-                        string[] msg =
-                        {
-                            $"1 - {user_excepter.lang.AttackString}",
-                            $"2 - {user_excepter.lang.Heal}",
-                            $"{user_excepter.lang.SelectAbility}:",
-                        };
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", msg));
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
+                            user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                 }
@@ -294,13 +312,8 @@ namespace revcom_bot
                     {
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
-                        string[] msg =
-                        {
-                            $"1 - {user_excepter.lang.AttackString}",
-                            $"2 - {user_excepter.lang.Heal}",
-                            $"{user_excepter.lang.SelectAbility}:",
-                        };
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", msg));
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
+                            user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                 }
