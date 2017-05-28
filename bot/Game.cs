@@ -100,6 +100,21 @@ namespace revcom_bot
             isWorking = false;
         }
 
+        public async void LeaveConfirming(long PlayerID)
+        {
+            if (PlayerID == player_one.ID)
+            {
+                await bot.SendTextMessageAsync(PlayerID, player_one.lang.SearchingModeStopped);
+                await bot.SendTextMessageAsync(player_two.ID, player_two.lang.PlayerLeftThisLobby);
+            }
+            else
+            {
+                await bot.SendTextMessageAsync(PlayerID, player_two.lang.SearchingModeStopped);
+                await bot.SendTextMessageAsync(player_one.ID, player_one.lang.PlayerLeftThisLobby);
+            }
+            Reset();
+        }
+
         public void PickHero(IHero hero, long PlayerID)
         {
             ///// Player one
@@ -318,6 +333,8 @@ namespace revcom_bot
                     }
                 }
                 //Console.WriteLine("End.");
+                attacker.UpdateStunDuration();
+                excepter.UpdateStunDuration();
                 return true;
             }
             else

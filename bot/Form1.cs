@@ -241,7 +241,11 @@ namespace revcom_bot
                         }
                         else if (_usr.status == Users.User.Status.Picking)
                         {
-                            if (message.IsCommand(">"))
+                            if (message.Text == "/stopsearching")
+                            {
+                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                            }
+                            else if (message.IsCommand(">"))
                             {
                                 var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
                                 await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
@@ -305,6 +309,13 @@ namespace revcom_bot
                                 GetActiveGame(_usr.ActiveGameID)?.ConfirmGame(isConfirm, message.Chat.Id);
                             }
                         }
+                        else if (_usr.status == Users.User.Status.WaitingForRespond)
+                        {
+                            if (message.Text == "/stopsearching")
+                            {
+                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                            }
+                        }
                         else if (_usr.status == Users.User.Status.DeletingAccount)
                         {
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
@@ -316,7 +327,10 @@ namespace revcom_bot
                                     user.DeleteUser(message.Chat.Id);
                                 }
                                 else
+                                {
+                                    _usr.status = Users.User.Status.Default;
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.YouCanceledTheActionString, replyMarkup: h_kb);
+                                }
                             }
                         }
                         else if (_usr.status == Users.User.Status.SettingNickname)

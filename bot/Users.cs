@@ -104,6 +104,7 @@ namespace revcom_bot
                 if (users[i].ID == UserID)
                 {
                     File.Delete("Users/ " + users[i].ID.ToString() + "_userdata.ini");
+                    IDs.Remove(users[i].ID);
                     users.RemoveAt(i);
                     return true;
                 }
@@ -735,6 +736,28 @@ namespace revcom_bot
                             return "Waiting for another player to pick...";
                         else if (lang == Language.Russian)
                             return "Ожидание выбора другого игрока...";
+                        return "";
+                    }
+                }
+                public string @YouDontTakePartInBattle
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You don't take a part in battles.";
+                        else if (lang == Language.Russian)
+                            return "Вы не участвуете в битвах.";
+                        return "";
+                    }
+                }
+                public string @PlayerLeftThisLobby
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy left this lobby.";
+                        else if (lang == Language.Russian)
+                            return "Противник покинул эту комнату";
                         return "";
                     }
                 }

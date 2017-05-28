@@ -227,6 +227,12 @@ namespace revcom_bot
             
         }
 
+        virtual public void UpdateStunDuration()
+        {
+            if (StunCounter > 0)
+                StunCounter--;
+        }
+
         virtual public void UpdateDefaultCountdowns()
         {
             if (HealCountdown > 0)
