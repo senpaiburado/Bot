@@ -132,6 +132,7 @@ namespace revcom_bot
             if (random.Next(1, 101) >= target.MissChance)
             {
                 damage += this.DPS;
+                damage -= target.Armor;
                 if (random.Next(1, 101) <= CriticalHitChance)
                 {
                     damage *= CriticalHitMultiplier;
@@ -154,7 +155,7 @@ namespace revcom_bot
                 MessageForExcepter += target_user.lang.TheEnemyMissedYou;
             }
 
-            target.GetDamage(damage-target.Armor);
+            target.GetDamage(damage);
 
             await bot.SendTextMessageAsync(attacker_user.ID, MessageForAttacker);
             await bot.SendTextMessageAsync(target_user.ID, MessageForExcepter);

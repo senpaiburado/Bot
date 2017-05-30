@@ -27,6 +27,56 @@ namespace revcom_bot
             return IDs.Contains(_Id);
         }
 
+        public List<long> GetIDs()
+        {
+            return IDs;
+        }
+
+        public bool Contains(string name)
+        {
+            name = name.ToLower();
+            foreach (var item in users)
+            {
+                if (item.Name.ToLower() == name)
+                    return true;
+            }
+            return false;
+        }
+
+        public List<string> GetNames()
+        {
+            List<string> strs = new List<string>();
+            foreach (var item in users)
+            {
+                strs.Add(item.Name);
+            }
+            return strs;
+        }
+
+        public User GetUserByName(string name)
+        {
+            name = name.ToLower();
+            foreach (var item in users)
+            {
+                if (item.Name.ToLower() == name)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        public long GetIdByName(string name)
+        {
+            name = name.ToLower();
+            foreach (var item in users)
+            {
+                if (name == item.Name.ToLower())
+                    return item.ID;
+            }
+            return -1L;
+        }
+
         public bool NicknameExists(string nick)
         {
             foreach (var user in users)
@@ -1121,6 +1171,15 @@ namespace revcom_bot
                             return "Ожидание действия другого игрока...";
                         return "";
                     }
+                }
+
+                public string GetMessageAdminCommandSuccesful(string command)
+                {
+                    if (lang == Language.English)
+                        return $"The command\"{command}\" has been compited succesful!";
+                    else if (lang == Language.Russian)
+                        return $"Команда \"{command}\" была успешно выполнена.";
+                    return "";
                 }
 
                 public struct InstructionText

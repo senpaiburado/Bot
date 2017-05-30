@@ -114,6 +114,9 @@ namespace revcom_bot
                             Console.WriteLine("LOL");
                         }
 
+                        await Bot.SendTextMessageAsync(message.Chat.Id, "LOL");
+                        //return;
+
                         Users.User _usr = user.getUserByID(message.Chat.Id);
 
                         if (_usr.status == Users.User.Status.Default)
@@ -178,16 +181,16 @@ namespace revcom_bot
                             else if (message.Text == "/instruction")
                             {
                                 _usr.lang.instruction.SetLanguage(_usr.lang.lang);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step1_Describe);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step2_AboutNetMode);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step3_AboutOnlineMode);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step4_AboutOfflineMode);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step5_AboutLanguage);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step6_AboutGame);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step7_AboutHeroes);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step8_AboutDonate);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step9_AboutDeveloper);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step10_TheEnd);
+                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step1_Describe);
+                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step2_AboutNetMode);
+                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step3_AboutOnlineMode);
+                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step4_AboutOfflineMode);
+                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step5_AboutLanguage);
+                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step6_AboutGame);
+                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step7_AboutHeroes);
+                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step8_AboutDonate);
+                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step9_AboutDeveloper);
+                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step10_TheEnd);
                             }
                             else if (message.Text == "/donate")
                             {
@@ -219,6 +222,61 @@ namespace revcom_bot
                                     }
                                 }, true, true);
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ConfirmQuestion, replyMarkup: kb);
+                            }
+                            else if (message.IsCommand("[ADMIN] Set rating:") && message.Chat.Id == Users.AdminID)
+                            {
+                                int rating = 0;
+                                string res = System.Text.RegularExpressions.Regex.Match(message.Text, @"\d+").Value;
+                                if (int.TryParse(res, out rating))
+                                    rating = int.Parse(res);
+                                Console.WriteLine($"Parse {rating}");
+                                Users.User find_user = null;
+
+                                string name = System.Text.RegularExpressions.Regex.Match(
+                                    message.Text, "\"(.*)\"").Groups[1].ToString();
+
+                                if (name != "")
+                                {
+                                    find_user = user.GetUserByName(name);
+
+                                    if (find_user != null && rating > 0)
+                                    {
+                                        find_user.rate = rating;
+                                        await Bot.SendTextMessageAsync(message.Chat.Id,
+                                            _usr.lang.GetMessageAdminCommandSuccesful(message.Text) + $" : {find_user.ID}");
+                                    }
+                                }
+                            }
+                            else if (message.IsCommand("[ADMIN] Send to all:") && message.Chat.Id == Users.AdminID)
+                            {
+                                string res = System.Text.RegularExpressions.Regex.Match(message.Text, "\"(.*)\"")
+                                    .Groups[1].ToString();
+                                if (res != "")
+                                {
+                                    foreach (var item in user.GetIDs())
+                                    {
+                                        await Bot.SendTextMessageAsync(item, res);
+                                    }
+                                    await Bot.SendTextMessageAsync(message.Chat.Id,
+                                        _usr.lang.GetMessageAdminCommandSuccesful(message.Text));
+                                }
+                                    
+                            }
+                            else if (message.IsCommand("[ADMIN] Send to one:") && message.Chat.Id == Users.AdminID)
+                            {
+                                string name = System.Text.RegularExpressions.Regex.Match(message.Text, @"\{(.*)\}")
+                                    .Groups[1].ToString();
+                                string text = System.Text.RegularExpressions.Regex.Match(message.Text, "\"(.*)\"")
+                                    .Groups[1].ToString();
+
+                                long id = 0;
+                                id = user.GetIdByName(name);
+
+                                if (id != -1)
+                                {
+                                    if (text != "")
+                                        await Bot.SendTextMessageAsync(id, text);
+                                }
                             }
                             else
                             {

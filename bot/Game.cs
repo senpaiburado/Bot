@@ -302,10 +302,8 @@ namespace revcom_bot
                     return true;
                 }
 
-                await bot.SendTextMessageAsync(user_attacker.ID, GetMessageForMe(user_excepter.lang, attacker));
-                await bot.SendTextMessageAsync(user_excepter.ID, GetMessageForMe(user_excepter.lang, excepter));
-                await bot.SendTextMessageAsync(user_attacker.ID, GetMessageForEnemy(user_attacker.lang, excepter));
-                await bot.SendTextMessageAsync(user_excepter.ID, GetMessageForEnemy(user_excepter.lang, attacker));
+                await bot.SendTextMessageAsync(user_attacker.ID, $"{GetMessageForMe(user_attacker.lang, attacker)}\n\n{GetMessageForEnemy(user_attacker.lang, excepter)}");
+                await bot.SendTextMessageAsync(user_excepter.ID, $"{GetMessageForMe(user_excepter.lang, excepter)}\n\n{GetMessageForEnemy(user_excepter.lang, attacker)}");
 
                 if (player_one.status == Users.User.Status.Attacking)
                 {
@@ -319,6 +317,9 @@ namespace revcom_bot
                             user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
+                    else
+                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
+                            user_attacker)));
                 }
                 else
                 {
@@ -327,10 +328,14 @@ namespace revcom_bot
                     {
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
+
                         await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
                             user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
+                    else
+                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
+                            user_attacker)));
                 }
                 //Console.WriteLine("End.");
                 attacker.UpdateStunDuration();
