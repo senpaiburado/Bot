@@ -104,7 +104,7 @@ namespace revcom_bot
 
                     var updates = await Bot.GetUpdatesAsync(offset);
                     
-                    foreach(var update in updates)
+                    foreach(var update in updates.Where(x => x.Message != null && x.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage))
                     {
                         var message = update.Message;
 
@@ -301,7 +301,7 @@ namespace revcom_bot
                         {
                             if (message.Text == "/stopsearching")
                             {
-                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                                GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
                             }
                             else if (message.IsCommand(">"))
                             {
@@ -364,14 +364,14 @@ namespace revcom_bot
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
                                 bool isConfirm = message.IsCommand(_usr.lang.YesMessage);
-                                GetActiveGame(_usr.ActiveGameID)?.ConfirmGame(isConfirm, message.Chat.Id);
+                                GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.ConfirmGame(isConfirm);
                             }
                         }
                         else if (_usr.status == Users.User.Status.WaitingForRespond)
                         {
                             if (message.Text == "/stopsearching")
                             {
-                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                                await GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.LeaveConfirming();
                             }
                         }
                         else if (_usr.status == Users.User.Status.DeletingAccount)
