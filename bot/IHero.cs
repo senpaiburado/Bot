@@ -191,13 +191,13 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public string GetMessageAbiliesList(Users.User user)
+        virtual public string GetMessageAbiliesList(Users.User.Text lang)
         {
             string[] list =
             {
-                $"1 - {user.lang.AttackString}",
-                $"2 - {user.lang.Heal} ({HealCountdown}) [{HealPayMana}]",
-                $"{user.lang.SelectAbility}:",
+                $"1 - {lang.AttackString}",
+                $"2 - {lang.Heal} ({HealCountdown}) [{HealPayMana}]",
+                $"{lang.SelectAbility}:",
             };
             return string.Join("\n", list);
         }

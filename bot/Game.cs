@@ -6,13 +6,31 @@ using System.Threading.Tasks;
 
 namespace revcom_bot
 {
+    class PlayerGameContext
+    {
+        public Users.User User;
+        public IHero hero;
+        private Telegram.Bot.TelegramBotClient bot;
+
+        public PlayerGameContext(Users.User user, Telegram.Bot.TelegramBotClient bot)
+        {
+            this.User = user;
+            this.bot = bot;
+        }
+
+        public async Task SendAsync(Func<Users.User.Text, string> getText, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup=null)
+        {
+            await bot.SendTextMessageAsync(User.ID, getText(User.lang), replyMarkup: replyMarkup);
+        }
+    }
+
     class PlayerController
     {
-        private Users.User player;
-        private Users.User enemyPlayer;
+        public PlayerGameContext player;
+        private PlayerGameContext enemyPlayer;
         private Game game;
 
-        public PlayerController(Users.User player, Users.User enemyPlayer, Game game)
+        public PlayerController(PlayerGameContext player, PlayerGameContext enemyPlayer, Game game)
         {
             this.player = player;
             this.enemyPlayer = enemyPlayer;
@@ -21,8 +39,9 @@ namespace revcom_bot
 
         public async Task LeaveConfirming()
         {
-            await game.bot.SendTextMessageAsync(player.ID, player.lang.SearchingModeStopped);
-            await game.bot.SendTextMessageAsync(enemyPlayer.ID, enemyPlayer.lang.PlayerLeftThisLobby);
+            await player.SendAsync(lang => lang.SearchingModeStopped);
+            await enemyPlayer.SendAsync(lang => lang.PlayerLeftThisLobby);
+
             game.Reset();
         }
 
@@ -31,34 +50,77 @@ namespace revcom_bot
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             if (accepted)
             {
-                await game.bot.SendTextMessageAsync(player.ID, player.lang.GameAccepted);
-                if (enemyPlayer.status == Users.User.Status.WaitingForRespond)
+                await player.SendAsync(lang => lang.GameAccepted);
+                if (enemyPlayer.User.status == Users.User.Status.WaitingForRespond)
                 {
-                    player.status = Users.User.Status.Picking;
-                    enemyPlayer.status = Users.User.Status.Picking;
+                    player.User.status = Users.User.Status.Picking;
+                    enemyPlayer.User.status = Users.User.Status.Picking;
 
-                    await game.bot.SendTextMessageAsync(player.ID, player.lang.GameStarted, replyMarkup: kb);
-                    await game.bot.SendTextMessageAsync(enemyPlayer.ID, enemyPlayer.lang.GameStarted, replyMarkup: kb);
+                    await player.SendAsync(lang => lang.GameStarted, kb);
+                    await enemyPlayer.SendAsync(lang => lang.GameStarted, kb);
 
                     string allHero = string.Join("\n", Game.hero_list.Select(x => x.Name));
-                    string msg = $"{player.lang.StringHeroes}:\n{allHero}\n{player.lang.PickHero}:";
-                    string msg1 = $"{enemyPlayer.lang.StringHeroes}:\n{allHero}\n{enemyPlayer.lang.PickHero}:";
 
-                    await game.bot.SendTextMessageAsync(player.ID, msg, replyMarkup: game.GetKeyboardNextPage(player.ID));
-                    await game.bot.SendTextMessageAsync(enemyPlayer.ID, msg1, replyMarkup: game.GetKeyboardNextPage(enemyPlayer.ID));
+                    await player.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", game.GetKeyboardNextPage(player.User.ID));
+                    await enemyPlayer.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", game.GetKeyboardNextPage(enemyPlayer.User.ID));
                 }
                 else
                 {
-                    player.status = Users.User.Status.WaitingForRespond;
-                    await game.bot.SendTextMessageAsync(player.ID, player.lang.AnotherPlayerGameAcceptWaiting, replyMarkup: kb);
+                    player.User.status = Users.User.Status.WaitingForRespond;
+                    await player.SendAsync(lang => lang.AnotherPlayerGameAcceptWaiting, replyMarkup: kb);
                 }
             }
             else
             {
                 game.Reset();
-                await game.bot.SendTextMessageAsync(player.ID, player.lang.GameCanceled + "\n" + player.lang.GameNotAccepted, replyMarkup: kb);
-                await game.bot.SendTextMessageAsync(enemyPlayer.ID, enemyPlayer.lang.GameCanceled + "\n" + enemyPlayer.lang.AnotherPlayerDidntAcceptGame, replyMarkup: kb);
+                await player.SendAsync(lang => lang.GameCanceled + "\n" + lang.GameNotAccepted, replyMarkup: kb);
+                await enemyPlayer.SendAsync(lang => lang.GameCanceled + "\n" + lang.AnotherPlayerDidntAcceptGame, kb);
             }
+        }
+
+        public async Task PickHero(IHero hero)
+        {
+            player.hero = new IHero(hero);
+
+
+            var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
+
+            await player.SendAsync(lang => $"{lang.PickedHero} {hero.Name} !", kb);
+            player.User.HeroName = hero.Name; //??
+
+            if (enemyPlayer.User.status == Users.User.Status.Picked)
+            {
+                Random random = new Random();
+                if (random.Next(0, 2) == 0)
+                    SetAttackerAndExcepter(player, enemyPlayer);
+                else
+                    SetAttackerAndExcepter(enemyPlayer, player);
+            }
+            else
+            {
+                player.User.status = Users.User.Status.Picked;
+                await player.SendAsync(lang => lang.WaitForPickOfAnotherPlayer);
+            }
+        }
+
+        private async void SetAttackerAndExcepter(PlayerGameContext attacker, PlayerGameContext excepter)
+        {
+            attacker.User.status = Users.User.Status.Attacking;
+            excepter.User.status = Users.User.Status.Excepting;
+
+            await attacker.SendAsync(lang => lang.YourEnemyMessage + ": " + excepter.User.Name);
+            await excepter.SendAsync(lang => lang.YourEnemyMessage + ": " + attacker.User.Name);
+
+            //Временно вызывается из game
+            await game.SendHeroesStates();
+
+            await attacker.SendAsync(lang => lang.FirstAttackNotify);
+            await excepter.SendAsync(lang => lang.EnemyFirstAttackNotify);
+
+            IHero temp = attacker.hero;
+
+            await attacker.SendAsync(lang => string.Join("\n", attacker.hero.GetMessageAbiliesList(lang)));
+            await excepter.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
         }
     }
 
@@ -79,8 +141,8 @@ namespace revcom_bot
         private Users.User player_two;
         public Telegram.Bot.TelegramBotClient bot;
 
-        private IHero hero_one;
-        private IHero hero_two;
+        private PlayerController player_one_controller;
+        private PlayerController player_two_controller;
 
         public bool isWorking = false;
 
@@ -116,6 +178,12 @@ namespace revcom_bot
             player_two.status = Users.User.Status.GameConfirming;
 
             isWorking = true;
+
+            var player_one_context = new PlayerGameContext(player_one, bot);
+            var player_two_context = new PlayerGameContext(player_two, bot);
+
+            player_one_controller = new PlayerController(player_one_context, player_two_context, this);
+            player_two_controller = new PlayerController(player_two_context, player_one_context, this);
         }
 
         public void PickHeroes()
@@ -126,15 +194,12 @@ namespace revcom_bot
             player_two.status = Users.User.Status.Picking;
         }
 
-        public IHero Copy(IHero hero)
-        {
-            return new IHero(hero);
-        }
+
 
         public void Reset()
         {
-            hero_one = null;
-            hero_two = null;
+            player_one_controller.player.hero = null;
+            player_two_controller.player.hero = null;
 
             player_one.ActiveGameID = 0L;
             player_two.ActiveGameID = 0L;
@@ -148,11 +213,12 @@ namespace revcom_bot
 
         public PlayerController GetController(long PlayerID)
         {
+            //сохранить в поля
             if (PlayerID == player_one.ID)
-                return new PlayerController(player_one, player_two, this);
+                return player_one_controller;
 
             if (PlayerID == player_two.ID)
-                return new PlayerController(player_two, player_one, this);
+                return player_two_controller;
 
             Reset();
 
@@ -161,68 +227,6 @@ namespace revcom_bot
             bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickHeroError);
 
             return null;
-        }
-
-        public void PickHero(IHero hero, long PlayerID)
-        {
-            ///// Player one
-            if (PlayerID == player_one.ID)
-            {
-                hero_one = Copy(hero);
-                PickHero(player_one, hero_one.Name, player_two);
-            }
-            ////Player two
-            else if (PlayerID == player_two.ID)
-            {
-                hero_two = Copy(hero);
-                PickHero(player_two, hero_two.Name, player_one);
-            }
-            else
-            {
-                Reset();
-                bot.SendTextMessageAsync(player_one.ID, player_one.lang.PickHeroError);
-                bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickHeroError);
-            }
-        }
-
-        private async void PickHero(Users.User firstPlayer, string heroName, Users.User secondPlayer)
-        {
-            var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
-            await bot.SendTextMessageAsync(firstPlayer.ID, $"{firstPlayer.lang.PickedHero} {heroName} !", replyMarkup: kb);
-            firstPlayer.HeroName = heroName;
-
-            if (secondPlayer.status == Users.User.Status.Picked)
-            {
-                Random random = new Random();
-                if (random.Next(0, 2) == 0)
-                    SetAttackerAndExcepter(firstPlayer, secondPlayer);
-                else
-                    SetAttackerAndExcepter(secondPlayer, firstPlayer);
-            }
-            else
-            {
-                firstPlayer.status = Users.User.Status.Picked;
-                await bot.SendTextMessageAsync(firstPlayer.ID, firstPlayer.lang.WaitForPickOfAnotherPlayer);
-            }
-        }
-
-        private async void SetAttackerAndExcepter(Users.User attacker, Users.User excepter)
-        {
-            attacker.status = Users.User.Status.Attacking;
-            excepter.status = Users.User.Status.Excepting;
-
-            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.YourEnemyMessage + ": " + excepter.Name);
-            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.YourEnemyMessage + ": " + attacker.Name);
-
-            await SendHeroesStates();
-
-            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.FirstAttackNotify);
-            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.EnemyFirstAttackNotify);
-
-            IHero temp = attacker.HeroName == hero_one.Name ? hero_one : hero_two;
-
-            await bot.SendTextMessageAsync(attacker.ID, string.Join("\n", temp.GetMessageAbiliesList(attacker)));
-            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.WaitingForAnotherPlayerAction);
         }
 
         public async void LeaveGame(long PlayerID)
@@ -239,13 +243,8 @@ namespace revcom_bot
                 await bot.SendTextMessageAsync(player_two.ID, player_two.lang.Retreat);
                 await bot.SendTextMessageAsync(player_one.ID, player_one.lang.RetreatEnemy);
             }
-            hero_one = null;
-            hero_two = null;
-            player_one.ActiveGameID = 0L;
-            player_two.ActiveGameID = 0L;
-            player_one.status = Users.User.Status.Default;
-            player_two.status = Users.User.Status.Default;
-            isWorking = false;
+
+            Reset();
         }
 
         public async Task<bool> UseAbility(int number, long PlayerID)
@@ -260,16 +259,16 @@ namespace revcom_bot
                 user_attacker = player_one;
                 user_excepter = player_two;
 
-                attacker = hero_one;
-                excepter = hero_two;
+                attacker = player_one_controller.player.hero;
+                excepter = player_two_controller.player.hero;
             }
             else
             {
                 user_attacker = player_two;
                 user_excepter = player_one;
 
-                attacker = hero_two;
-                excepter = hero_one;
+                attacker = player_two_controller.player.hero;
+                excepter = player_one_controller.player.hero;
             }
 
             bool finished = false;
@@ -288,52 +287,53 @@ namespace revcom_bot
 
             if (finished)
             {
-                hero_one.Update();
-                hero_two.Update();
+                attacker.Update();
+                excepter.Update();
 
-                if (Math.Floor(hero_one.HP) <= 0.0f || Math.Floor(hero_two.HP) <= 0.0f)
+                if (Math.Floor(attacker.HP) <= 0.0f || Math.Floor(excepter.HP) <= 0.0f)
                 {
-                    if (Math.Floor(hero_one.HP) <= 0.0f)
-                        GameOver(hero_two, hero_one, player_two, player_one);
+                    if (Math.Floor(attacker.HP) <= 0.0f)
+                        GameOver(excepter, attacker, user_excepter, user_attacker);
                     else
-                        GameOver(hero_one, hero_two, player_one, player_two);
+                        GameOver(attacker, excepter, user_attacker, user_excepter);
                     return true;
                 }
 
                 await bot.SendTextMessageAsync(user_attacker.ID, $"{GetMessageForMe(user_attacker.lang, attacker)}\n\n{GetMessageForEnemy(user_attacker.lang, excepter)}");
                 await bot.SendTextMessageAsync(user_excepter.ID, $"{GetMessageForMe(user_excepter.lang, excepter)}\n\n{GetMessageForEnemy(user_excepter.lang, attacker)}");
 
+                //не понятный иф
                 if (player_one.status == Users.User.Status.Attacking)
                 {
                     //Console.WriteLine("one");
-                    if (hero_two.StunCounter == 0)
+                    if (excepter.StunCounter == 0)
                     {
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
 
                         await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
-                            user_excepter)));
+                            user_excepter.lang)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                     else
                         await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
-                            user_attacker)));
+                            user_attacker.lang)));
                 }
                 else
                 {
                     //Console.WriteLine("Two");
-                    if (hero_one.StunCounter == 0)
+                    if (attacker.StunCounter == 0)
                     {
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
 
                         await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
-                            user_excepter)));
+                            user_excepter.lang)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                     else
                         await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
-                            user_attacker)));
+                            user_attacker.lang)));
                 }
                 //Console.WriteLine("End.");
                 attacker.UpdateStunDuration();
@@ -566,8 +566,13 @@ namespace revcom_bot
             return string.Join("\n", lines);
         }
 
-        private async Task SendHeroesStates()
+        public async Task SendHeroesStates()
         {
+            //временно
+            var hero_one = player_one_controller.player.hero;
+            var hero_two = player_two_controller.player.hero;
+
+
             await bot.SendTextMessageAsync(player_one.ID, GetMessageForMe(player_one.lang, hero_one));
             await bot.SendTextMessageAsync(player_two.ID, GetMessageForMe(player_two.lang, hero_two));
 

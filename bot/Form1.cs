@@ -319,7 +319,7 @@ namespace revcom_bot
                             {
                                 var hero = Game.hero_list.SingleOrDefault(x => message.IsCommand(x.Name));
                                 if (hero != null)
-                                    GetActiveGame(_usr.ActiveGameID)?.PickHero(hero, message.Chat.Id);
+                                    GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.PickHero(hero);
                             }
                         }
                         else if (_usr.status == Users.User.Status.Attacking)
