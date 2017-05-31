@@ -293,7 +293,7 @@ namespace revcom_bot
                                 else if (message.IsCommand("русский"))
                                     _usr.lang.lang = Users.User.Text.Language.Russian;
                                 var hide_keyboard = new ReplyKeyboardHide();
-                                _usr.CreateFile();
+                                _usr.SaveToFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangedLanguage, replyMarkup: hide_keyboard);
                             }
                         }
@@ -399,7 +399,7 @@ namespace revcom_bot
                             {
                                 _usr.Name = message.Text;
                                 _usr.status = Users.User.Status.Default;
-                                _usr.CreateFile();
+                                _usr.SaveToFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameSet);
                             }
                         }

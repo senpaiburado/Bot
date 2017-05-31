@@ -97,7 +97,7 @@ namespace revcom_bot
             };
             
             user.Init();
-            user.CreateFile();
+            user.SaveToFile();
 
             users[_Id] = user;
 
@@ -160,7 +160,7 @@ namespace revcom_bot
             {
                 wins++;
                 rate += 25;
-                CreateFile();
+                SaveToFile();
             }
 
             public void AddLose()
@@ -169,7 +169,7 @@ namespace revcom_bot
                 rate -= 25;
                 if (rate < 0)
                     rate = 0;
-                CreateFile();
+                SaveToFile();
             }
 
             public string GetStatisctisMessage()
@@ -204,7 +204,7 @@ namespace revcom_bot
                 net_status = NetworkStatus.Offline;
             }
 
-            public async void CreateFile()
+            public async void SaveToFile()
             {
                 string[] text =
                 {
