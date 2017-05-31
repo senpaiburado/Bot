@@ -419,7 +419,7 @@ namespace revcom_bot
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-                Console.WriteLine(ex.Message);
+                 Console.WriteLine(ex.Message);
             }
 
         }

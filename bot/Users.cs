@@ -9,166 +9,128 @@ namespace revcom_bot
 {
     class Users
     {
-        private List<long> IDs;
-        private List<User> users;
+        private Dictionary<long, User> users = new Dictionary<long, User>();
 
         public static long AdminID = 295568848;
 
-        public void Init()
+        public async void Init()
         {
-            System.IO.Directory.CreateDirectory("Users");
-            IDs = new List<long>();
-            users = new List<User>();
-            InitializeFromFiles();
+            Directory.CreateDirectory("Users");
+            await InitializeFromFiles();
         }
 
         public bool Contains(long _Id)
         {
-            return IDs.Contains(_Id);
+            return users.Keys.Contains(_Id);
         }
 
-        public List<long> GetIDs()
+        public ICollection<long> GetIDs()
         {
-            return IDs;
+            return users.Keys;
         }
 
         public bool Contains(string name)
         {
-            name = name.ToLower();
-            foreach (var item in users)
-            {
-                if (item.Name.ToLower() == name)
-                    return true;
-            }
-            return false;
+            return GetUserByName(name) != null;
         }
 
-        public List<string> GetNames()
+        public string[] GetNames()
         {
-            List<string> strs = new List<string>();
-            foreach (var item in users)
-            {
-                strs.Add(item.Name);
-            }
-            return strs;
+            return users.Values.Select(x => x.Name).ToArray();
         }
 
         public User GetUserByName(string name)
         {
             name = name.ToLower();
-            foreach (var item in users)
-            {
-                if (item.Name.ToLower() == name)
-                {
-                    return item;
-                }
-            }
-            return null;
+            return users.Values.SingleOrDefault(x => x.Name.ToLower() == name);
         }
 
         public long GetIdByName(string name)
         {
-            name = name.ToLower();
-            foreach (var item in users)
-            {
-                if (name == item.Name.ToLower())
-                    return item.ID;
-            }
-            return -1L;
+            return GetUserByName(name)?.ID ?? -1L;
         }
 
         public bool NicknameExists(string nick)
         {
-            foreach (var user in users)
-            {
-                if (nick == user.Name)
-                    return true;
-            }
-            return false;
+            return users.Values.Any(x => x.Name == nick);
         }
 
-        private async void InitializeFromFiles()
+        private async Task InitializeFromFiles()
         {
             string[] files = Directory.GetFiles("Users", "*.ini");
             foreach (var file in files)
             {
-                StreamReader sr = new StreamReader(@file);
+                using (StreamReader sr = new StreamReader(@file))
+                {
+                    string _Name = await sr.ReadLineAsync();
+                    long _Id = Convert.ToInt64(await sr.ReadLineAsync());
+                    User.Text.Language _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), await sr.ReadLineAsync());
+                    int _Wines = int.Parse(await sr.ReadLineAsync());
+                    int _Loses = int.Parse(await sr.ReadLineAsync());
+                    int _Rate = int.Parse(await sr.ReadLineAsync());
 
-                string _Name = "";
-                long _Id = 0L;
-                User.Text.Language _Lang = 0;
-                int _Wines = 0;
-                int _Loses = 0;
-                int _Rate = 0;
+                    User user = new User
+                    {
+                        Name = _Name,
+                        ID = _Id,
+                        wins = _Wines,
+                        loses = _Loses,
+                        rate = _Rate
+                    };
+                    user.lang.lang = _Lang;
 
-                _Name = await sr.ReadLineAsync();
-                _Id = Convert.ToInt64(await sr.ReadLineAsync());
-                _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), await sr.ReadLineAsync());
-                _Wines = int.Parse(await sr.ReadLineAsync());
-                _Loses = int.Parse(await sr.ReadLineAsync());
-                _Rate = int.Parse(await sr.ReadLineAsync());
-
-                User user = new User();
-                user.Name = _Name;
-                user.ID = _Id;
-                user.lang.lang = _Lang;
-                user.wins = _Wines;
-                user.loses = _Loses;
-                user.rate = _Rate;
-                user.winrate = (user.wins + user.loses) == 0 ? 0 : (user.wins * 100.0f) / (user.wins + user.loses);
-                user.Init();
-                AddUser(user);
-
-                sr.Close();
+                    user.Init();
+                    AddUser(user);
+                }
             }
         }
 
         public bool AddUser(long _Id)
         {
-            if (IDs.Contains(_Id))
+            if (users.ContainsKey(_Id))
                 return false;
-            User user = new User();
-            user.Name = "";
-            user.ID = _Id;
+
+            User user = new User
+            {
+                Name = "",
+                ID = _Id
+            };
+            
             user.Init();
             user.CreateFile();
-            users.Add(user);
-            IDs.Add(_Id);
-            IDs.Sort();
+
+            users[_Id] = user;
+
+            //IDs.Sort(); Зачем это?
             return true;
         }
 
         public bool AddUser(User user)
         {
-            if (IDs.Contains(user.ID))
+            if (users.ContainsKey(user.ID))
                 return false;
-            users.Add(user);
-            IDs.Add(user.ID);
+
+            users[user.ID] = user;
             return true;
         }
 
         public bool DeleteUser(long UserID)
         {
-            for (int i = 0; i < users.Count; i++)
+            if(users.ContainsKey(UserID))
             {
-                if (users[i].ID == UserID)
-                {
-                    File.Delete("Users/ " + users[i].ID.ToString() + "_userdata.ini");
-                    IDs.Remove(users[i].ID);
-                    users.RemoveAt(i);
-                    return true;
-                }
+                File.Delete($"Users/{UserID}_userdata.ini");
+                users.Remove(UserID);
+                return true;
             }
+
             return false;
         }
 
         public User getUserByID(long _Id)
         {
-            foreach (var user in users)
-            {
-                if (user.ID == _Id)
-                    return user;
-            }
+            if(users.ContainsKey(_Id))
+                return users[_Id];
+
             return null;
         }
 
@@ -190,14 +152,13 @@ namespace revcom_bot
 
             public int wins = 0;
             public int loses = 0;
-            public float winrate = 0;
+            public float winrate => loses == 0 ? 0 : (wins * 100.0f) / (wins + loses);
 
             public int rate = 1000;
 
             public void AddWin()
             {
                 wins++;
-                winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
                 rate += 25;
                 CreateFile();
             }
@@ -205,7 +166,6 @@ namespace revcom_bot
             public void AddLose()
             {
                 loses++;
-                winrate = loses == 0 ? 0 : (Convert.ToSingle(wins) * 100.0f) / Convert.ToSingle(wins + loses);
                 rate -= 25;
                 if (rate < 0)
                     rate = 0;
@@ -246,8 +206,6 @@ namespace revcom_bot
 
             public async void CreateFile()
             {
-                File.Create("Users/ " + ID.ToString() + "_userdata.ini").Close();
-
                 string[] text =
                 {
                     $"{Name}",
@@ -257,11 +215,15 @@ namespace revcom_bot
                     $"{loses}",
                     $"{rate}",
                 };
-                StreamWriter sw = new StreamWriter("Users/ " + ID.ToString() + "_userdata.ini");
-                foreach (var str in text)
-                    await sw.WriteLineAsync(str);
-                sw.Close();
-                
+
+                using (var fileStream = File.Create($"Users/{ID}_userdata.ini"))
+                {
+                    using (StreamWriter sw = new StreamWriter(fileStream))
+                    {
+                        foreach (var str in text)
+                            await sw.WriteLineAsync(str);
+                    }
+                }
             }
 
             public struct Text
