@@ -204,11 +204,28 @@ namespace revcom_bot
             if (user.HeroListPage > MaxPageValue)
                 user.HeroListPage = MaxPageValue;
             
+            return GetKeyboard(user.HeroListPage);
+        }
+
+        public const short MinPageValue = 1;
+        public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardPrevPage()
+        {
+            Users.User user = player.User;
+
+            user.HeroListPage--;
+            if (user.HeroListPage < MinPageValue)
+                user.HeroListPage = MinPageValue;
+
+            return GetKeyboard(user.HeroListPage);
+        }
+
+        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboard(int heroListPage)
+        {
             var keyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
             keyboard.OneTimeKeyboard = true;
             keyboard.ResizeKeyboard = true;
 
-            switch (user.HeroListPage)
+            switch (heroListPage)
             {
                 case 1:
                     keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
@@ -270,14 +287,15 @@ namespace revcom_bot
                     break;
             }
             return keyboard;
+
         }
+
     }
 
     class Game
     {
         public static long IGameID = 0L;
         public static List<IHero> hero_list = new List<IHero>();
-        public static short MinPageValue = 1;
 
         public static string smile_hp = "\u2764";
         public static string smile_mp = "🔯";
@@ -403,83 +421,6 @@ namespace revcom_bot
             player_two.status = Users.User.Status.Default;
 
             isWorking = false;
-        }
-
-        public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardPrevPage(long PlayerID)
-        {
-            Users.User user = PlayerID == player_one.ID ? player_one : player_two;
-
-            if (user.HeroListPage <= MinPageValue)
-                user.HeroListPage = MinPageValue;
-            else
-                user.HeroListPage--;
-
-            var keyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
-            keyboard.OneTimeKeyboard = true;
-            keyboard.ResizeKeyboard = true;
-
-            switch (user.HeroListPage)
-            {
-                case 1:
-                    keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
-                    {
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Juggernaut"),
-                            new Telegram.Bot.Types.KeyboardButton("Faceless Void")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Alchemist"),
-                            new Telegram.Bot.Types.KeyboardButton("Abaddon")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton(">")
-                        }
-                    };
-                    break;
-                case 2:
-                    keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
-                    {
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Lifestealer"),
-                            new Telegram.Bot.Types.KeyboardButton("Silencer")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Wraith King"),
-                            new Telegram.Bot.Types.KeyboardButton("Sniper")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("<"),
-                            new Telegram.Bot.Types.KeyboardButton(">")
-                        }
-                    };
-                    break;
-                case 3:
-                    keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
-                    {
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Earthshaker"),
-                            new Telegram.Bot.Types.KeyboardButton("Slardar")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("Razor"),
-                            new Telegram.Bot.Types.KeyboardButton("Ursa")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton("<")
-                        }
-                    };
-                    break;
-            }
-            return keyboard;
         }
 
         public static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)

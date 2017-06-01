@@ -311,7 +311,7 @@ namespace revcom_bot
                             }
                             else if (message.IsCommand("<"))
                             {
-                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardPrevPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id).GetKeyboardPrevPage();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
                                 Console.WriteLine("<");
                             }
