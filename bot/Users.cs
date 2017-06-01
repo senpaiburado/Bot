@@ -152,7 +152,7 @@ namespace revcom_bot
 
             public int wins = 0;
             public int loses = 0;
-            public float winrate => loses == 0 ? 0 : (wins * 100.0f) / (wins + loses);
+            public float winrate => loses + wins == 0 ? 0.0f : (wins * 100.0f) / (wins + loses);
 
             public int rate = 1000;
 
@@ -180,7 +180,7 @@ namespace revcom_bot
                     $"{lang.GamesCountString}: {wins+loses}",
                     $"{lang.WinsCountString}: {wins}",
                     $"{lang.LosesCountString}: {loses}",
-                    $"{lang.WinrateString}: {winrate}",
+                    $"{lang.WinrateString}: {winrate}%",
                     $"{lang.RatingString}: {rate}",
                 };
                 return string.Join("\n", lines);
@@ -1011,6 +1011,18 @@ namespace revcom_bot
                     }
                 }
 
+                public string @List
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "List";
+                        else if (lang == Language.Russian)
+                            return "Список";
+                        return "";
+                    }
+                }
+
                 public string @Winner
                 {
                     get
@@ -1141,6 +1153,24 @@ namespace revcom_bot
                         return $"The command\"{command}\" has been compited succesful!";
                     else if (lang == Language.Russian)
                         return $"Команда \"{command}\" была успешно выполнена.";
+                    return "";
+                }
+
+                public string GetMessageYouHaveUsedAbility(string ability_name)
+                {
+                    if (lang == Language.English)
+                        return $"You have used ability {ability_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Вы использовали способность {ability_name}!";
+                    return "";
+                }
+
+                public string GetMessageEnemyHasUsedAbility(string ability_name)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy has used ability {ability_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Противник использовал способность {ability_name}!";
                     return "";
                 }
 

@@ -8,7 +8,7 @@ namespace revcom_bot
 {
     class IHero
     {
-        public static Telegram.Bot.TelegramBotClient bot;
+        public Telegram.Bot.TelegramBotClient bot;
         public enum MainFeature
         {
             Str, Agi, Intel
@@ -40,10 +40,14 @@ namespace revcom_bot
         public float StunDamage { get; set; }
 
         public int StunCounter = 0;
+
         public int BurningCounter = 0;
         public float BurningDamage = 0.0f;
+        public bool BurningActive = false;
+
         public int ArmorPenetratingCounter = 0;
         public float ArmorPenetrationValue = 0.0f;
+        public bool ArmorPenetratingActive = false;
 
         // Abilities:
 
@@ -78,7 +82,7 @@ namespace revcom_bot
             Intelligence = itl;
             Feature = feat;
 
-            MaxHP = Strength * 20.0f;
+            MaxHP = Strength * 20.0f + 10000.0f;
             HPregen = Strength * 0.03f;
 
             Armor = Agility * 0.14f;
@@ -223,6 +227,14 @@ namespace revcom_bot
             }
         }
 
+        virtual public void LoosenArmor(float power, int time)
+        {
+            ArmorPenetratingCounter += time;
+            ArmorPenetrationValue += power;
+            Armor -= power;
+            ArmorPenetratingActive = true;
+        }
+
         virtual public void UpdateCountdowns()
         {
             
@@ -239,6 +251,35 @@ namespace revcom_bot
             if (HealCountdown > 0)
                 HealCountdown--;
         }
+        virtual public void UpdateDebuffs()
+        {
+            // Armor penetration debuff
+            if (ArmorPenetratingCounter > 0)
+                ArmorPenetratingCounter--;
+            else
+            {
+                if (ArmorPenetratingActive && ArmorPenetratingCounter == 0)
+                {
+                    Armor += ArmorPenetrationValue;
+                    ArmorPenetratingActive = false;
+                    ArmorPenetrationValue = 0.0f;
+                }
+            }
+            // Burning debuff
+            if (BurningCounter > 0)
+            {
+                BurningCounter--;
+                GetDamage(BurningDamage);
+            }
+            else
+            {
+                if (BurningActive && BurningCounter == 0)
+                {
+                    BurningActive = false;
+                    BurningDamage = 0.0f;
+                }
+            }
+        }
 
         virtual public void GetDamage(float value)
         {
@@ -248,6 +289,15 @@ namespace revcom_bot
         {
             HP += HPregen;
             MP += MPregen;
+        }
+
+        virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
+        }
+        virtual async public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
         }
     }
 }
