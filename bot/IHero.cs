@@ -41,6 +41,10 @@ namespace revcom_bot
 
         public int StunCounter = 0;
 
+        public int GettingDamageCounter = 0;
+        public float GettingDamagePower = 0.0f;
+        public bool GettingDamageActive = false;
+
         public int BurningCounter = 0;
         public float BurningDamage = 0.0f;
         public bool BurningActive = false;
@@ -215,7 +219,9 @@ namespace revcom_bot
             }
             Regeneration();
             UpdateCountdowns();
+            UpdateCounters();
             UpdateDefaultCountdowns();
+            UpdateDebuffs();
             if (Math.Ceiling(HP) >= MaxHP)
                 HP = MaxHP;
             if (Math.Ceiling(MP) >= MaxMP || Math.Floor(MP) < 0.0f)
@@ -225,6 +231,11 @@ namespace revcom_bot
                 else
                     MP = 0.0f;
             }
+        }
+
+        virtual protected void UpdateCounters()
+        {
+
         }
 
         virtual public void LoosenArmor(float power, int time)
@@ -279,6 +290,20 @@ namespace revcom_bot
                     BurningDamage = 0.0f;
                 }
             }
+            //Getting damage per step
+            if (GettingDamageCounter > 0)
+            {
+                GettingDamageCounter--;
+                GetDamage(GettingDamagePower);
+            }
+            else
+            {
+                if (GettingDamageActive && GettingDamageCounter == 0)
+                {
+                    GettingDamageActive = false;
+                    GettingDamagePower = 0.0f;
+                }
+            }
         }
 
         virtual public void GetDamage(float value)
@@ -289,6 +314,13 @@ namespace revcom_bot
         {
             HP += HPregen;
             MP += MPregen;
+        }
+
+        virtual public void GetDamageByDebuffs(float power, int time)
+        {
+            GettingDamageCounter += time;
+            GettingDamagePower += power;
+            GettingDamageActive = true;
         }
 
         virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)

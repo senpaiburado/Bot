@@ -1174,6 +1174,46 @@ namespace revcom_bot
                     return "";
                 }
 
+                public string GetMessageYouActivated(string abi_name)
+                {
+                    if (lang == Language.English)
+                        return $"You have actived {abi_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Вы активировали {abi_name}";
+                    return "";
+                }
+                public string GetMessageEnemyActivated(string abi_name)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy has activated {abi_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Противник активировал {abi_name}!";
+                    return "";
+                }
+
+                public string ALCHEMIST_YouHaveThrownUC
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have thrown Unstable Concoction at the enemy!\nYou have stunned the enemy.";
+                        else if (lang == Language.Russian)
+                            return "Вы кинули Unstable Concoction у врага!\nВы оглушили врага.";
+                        return "";
+                    }
+                }
+                public string ALCHEMIST_TheEnemyHasThrownUC
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy has thrown Unstable Concoction at you!\nYou are stunned.";
+                        else if (lang == Language.Russian)
+                            return "Противник бросил Unstable Concoction на вас!\nВы оглушены.";
+                        return "";
+                    }
+                }
+
                 public struct InstructionText
                 {
                     private Language lang;

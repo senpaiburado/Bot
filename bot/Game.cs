@@ -286,6 +286,14 @@ namespace revcom_bot
                     if (await attacker.Heal(user_attacker, user_excepter))
                             finished = true;
                         break;
+                case 3:
+                    if (await attacker.UseAbilityOne(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
+                case 4:
+                    if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
             }
 
             if (finished)
