@@ -1174,6 +1174,40 @@ namespace revcom_bot
                     return "";
                 }
 
+                public string @YouStunnedYourself
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have stunned yourself.";
+                        else if (lang == Language.Russian)
+                            return "Вы оглушили себя.";
+                        return "";
+                    }
+                }
+                public string @YouStunnedEnemy
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have stunned the enemy.";
+                        else if (lang == Language.Russian)
+                            return "Вы оглушили противника.";
+                        return "";
+                    }
+                }
+                public string @TheEnemyHasStunnedItself
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy has stunned itself.";
+                        else if (lang == Language.Russian)
+                            return "Враг оглушил себя.";
+                        return "";
+                    }
+                }
+
                 public string GetMessageYouActivated(string abi_name)
                 {
                     if (lang == Language.English)
@@ -1191,18 +1225,18 @@ namespace revcom_bot
                     return "";
                 }
 
-                public string ALCHEMIST_YouHaveThrownUC
+                public string @ALCHEMIST_YouHaveThrownUC
                 {
                     get
                     {
                         if (lang == Language.English)
-                            return "You have thrown Unstable Concoction at the enemy!\nYou have stunned the enemy.";
+                            return "You have thrown Unstable Concoction at the enemy!";
                         else if (lang == Language.Russian)
-                            return "Вы кинули Unstable Concoction у врага!\nВы оглушили врага.";
+                            return "Вы кинули Unstable Concoction у врага!";
                         return "";
                     }
                 }
-                public string ALCHEMIST_TheEnemyHasThrownUC
+                public string @ALCHEMIST_TheEnemyHasThrownUC
                 {
                     get
                     {
@@ -1213,6 +1247,18 @@ namespace revcom_bot
                         return "";
                     }
                 }
+                public string @ALCHEMIST_UC_HasExploded
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Unstable Concocton has exploded!";
+                        else if (lang == Language.Russian)
+                            return "Unstable Concoction взорвался!";
+                        return "";
+                    }
+                }
+                    
 
                 public struct InstructionText
                 {

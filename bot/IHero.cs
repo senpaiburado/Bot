@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace revcom_bot
 {
     class IHero
     {
-        public Telegram.Bot.TelegramBotClient bot;
+        public static Telegram.Bot.TelegramBotClient bot;
         public enum MainFeature
         {
             Str, Agi, Intel
@@ -130,24 +131,23 @@ namespace revcom_bot
 
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
         {
-            Random temp_rand = new Random();
-            Random random = new Random(temp_rand.Next(1000000));
             float damage = 0.0f;
 
             string MessageForAttacker = "";
             string MessageForExcepter = "";
 
-            if (random.Next(1, 101) >= target.MissChance)
+
+            if (GetRandomNumber(1, 101) >= target.MissChance)
             {
                 damage += this.DPS;
                 damage -= target.Armor;
-                if (random.Next(1, 101) <= CriticalHitChance)
+                if (GetRandomNumber(1, 101) <= CriticalHitChance)
                 {
                     damage *= CriticalHitMultiplier;
                     MessageForAttacker += $"{attacker_user.lang.CriticalHit}!\n";
                     MessageForExcepter += $"{target_user.lang.TheEnemyDealtCriticalDamageToYou}\n";
                 }
-                if (random.Next(1,101) <= StunHitChance)
+                if (GetRandomNumber(1, 101) <= StunHitChance)
                 {
                     target.StunCounter++;
                     MessageForAttacker += $"{attacker_user.lang.StunningHit}!\n";
@@ -162,6 +162,7 @@ namespace revcom_bot
                 MessageForAttacker += attacker_user.lang.YouMissedTheEnemy;
                 MessageForExcepter += target_user.lang.TheEnemyMissedYou;
             }
+            
 
             target.GetDamage(damage);
 
@@ -321,6 +322,17 @@ namespace revcom_bot
             GettingDamageCounter += time;
             GettingDamagePower += power;
             GettingDamageActive = true;
+        }
+
+        protected int GetRandomNumber(int min, int max)
+        {
+            byte[] bytes = new byte[4];
+            using (RandomNumberGenerator random = new RNGCryptoServiceProvider())
+            {
+                random.GetBytes(bytes);
+                UInt32 scale = BitConverter.ToUInt32(bytes, 0);
+                return (int)(min + (max - min) * (scale / (uint.MaxValue + 1.0)));
+            }
         }
 
         virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
