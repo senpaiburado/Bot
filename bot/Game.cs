@@ -61,8 +61,8 @@ namespace revcom_bot
 
                     string allHero = string.Join("\n", Game.hero_list.Select(x => x.Name));
 
-                    await player.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", game.GetKeyboardNextPage(player.User.ID));
-                    await enemyPlayer.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", game.GetKeyboardNextPage(enemyPlayer.User.ID));
+                    await player.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", GetKeyboardNextPage(player.User));
+                    await enemyPlayer.SendAsync(lang => $"{lang.StringHeroes}:\n{allHero}\n{lang.PickHero}:", GetKeyboardNextPage(enemyPlayer.User));
                 }
                 else
                 {
@@ -122,154 +122,23 @@ namespace revcom_bot
             await attacker.SendAsync(lang => string.Join("\n", attacker.hero.GetMessageAbiliesList(lang)));
             await excepter.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
         }
-    }
 
-    class Game
-    {
-        public static long IGameID = 0L;
-        public static List<IHero> hero_list = new List<IHero>();
-        public static short MaxPageValue = 3;
-        public static short MinPageValue = 1;
-
-        public static string smile_hp = "\u2764";
-        public static string smile_mp = "🔯";
-        public static string smile_dps = "🔥";
-        public static string smile_armor = "\u25FB";
-
-        public long GameID;
-        private Users.User player_one;
-        private Users.User player_two;
-        public Telegram.Bot.TelegramBotClient bot;
-
-        private PlayerController player_one_controller;
-        private PlayerController player_two_controller;
-
-        public bool isWorking = false;
-
-        public static void Initialize()
+        public async void LeaveGame()
         {
-            // main += 20
-            hero_list.Add(new IHero("Juggernaut", 200, 280, 140, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
-            hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Slardar", 230, 170, 150, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
+            player.User.AddLose();
+            enemyPlayer.User.AddWin();
+            await player.SendAsync(lang => lang.Retreat);
+            await enemyPlayer.SendAsync(lang => lang.RetreatEnemy);
+
+            game.Reset();
         }
 
-        public Game(Users.User user_one, Users.User user_two, Telegram.Bot.TelegramBotClient _bot)
+        public async Task<bool> UseAbility(int number)
         {
-            player_one = user_one;
-            player_two = user_two;
-            bot = _bot;
-            IGameID++;
-            GameID = IGameID;
-
-            player_one.ActiveGameID = GameID;
-            player_two.ActiveGameID = GameID;
-
-            player_one.status = Users.User.Status.GameConfirming;
-            player_two.status = Users.User.Status.GameConfirming;
-
-            isWorking = true;
-
-            var player_one_context = new PlayerGameContext(player_one, bot);
-            var player_two_context = new PlayerGameContext(player_two, bot);
-
-            player_one_controller = new PlayerController(player_one_context, player_two_context, this);
-            player_two_controller = new PlayerController(player_two_context, player_one_context, this);
-        }
-
-        public void PickHeroes()
-        {
-            bot.SendTextMessageAsync(player_one.ID, "Pick hero!");
-            player_one.status = Users.User.Status.Picking;
-            bot.SendTextMessageAsync(player_two.ID, "Pick hero!");
-            player_two.status = Users.User.Status.Picking;
-        }
-
-
-
-        public void Reset()
-        {
-            player_one_controller.player.hero = null;
-            player_two_controller.player.hero = null;
-
-            player_one.ActiveGameID = 0L;
-            player_two.ActiveGameID = 0L;
-            player_one.status = Users.User.Status.Default;
-            player_two.status = Users.User.Status.Default;
-            player_one.HeroName = "";
-            player_two.HeroName = "";
-
-            isWorking = false;
-        }
-
-        public PlayerController GetController(long PlayerID)
-        {
-            //сохранить в поля
-            if (PlayerID == player_one.ID)
-                return player_one_controller;
-
-            if (PlayerID == player_two.ID)
-                return player_two_controller;
-
-            Reset();
-
-            //здесь нужна какая-то общая ошибка, т.к. таких вещей по идее никогда не должно происходить
-            bot.SendTextMessageAsync(player_one.ID, player_one.lang.PickHeroError);
-            bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickHeroError);
-
-            return null;
-        }
-
-        public async void LeaveGame(long PlayerID)
-        {
-            if (PlayerID == player_one.ID)
-            {
-                player_one.AddLose();
-                await bot.SendTextMessageAsync(player_one.ID, player_one.lang.Retreat);
-                await bot.SendTextMessageAsync(player_two.ID, player_two.lang.RetreatEnemy);
-            }
-            else
-            {
-                player_one.AddWin();
-                await bot.SendTextMessageAsync(player_two.ID, player_two.lang.Retreat);
-                await bot.SendTextMessageAsync(player_one.ID, player_one.lang.RetreatEnemy);
-            }
-
-            Reset();
-        }
-
-        public async Task<bool> UseAbility(int number, long PlayerID)
-        {
-            Users.User user_attacker = null;
-            Users.User user_excepter = null;
-            IHero attacker = null;
-            IHero excepter = null;
-
-            if (player_one.ID == PlayerID)
-            {
-                user_attacker = player_one;
-                user_excepter = player_two;
-
-                attacker = player_one_controller.player.hero;
-                excepter = player_two_controller.player.hero;
-            }
-            else
-            {
-                user_attacker = player_two;
-                user_excepter = player_one;
-
-                attacker = player_two_controller.player.hero;
-                excepter = player_one_controller.player.hero;
-            }
+            Users.User user_attacker = player.User;
+            Users.User user_excepter = enemyPlayer.User;
+            IHero attacker = player.hero;
+            IHero excepter = enemyPlayer.hero;
 
             bool finished = false;
 
@@ -277,12 +146,12 @@ namespace revcom_bot
             {
                 case 1:
                     if (await attacker.Attack(excepter, user_attacker, user_excepter))
-                            finished = true;
-                        break;
+                        finished = true;
+                    break;
                 case 2:
                     if (await attacker.Heal(user_attacker, user_excepter))
-                            finished = true;
-                        break;
+                        finished = true;
+                    break;
             }
 
             if (finished)
@@ -293,49 +162,27 @@ namespace revcom_bot
                 if (Math.Floor(attacker.HP) <= 0.0f || Math.Floor(excepter.HP) <= 0.0f)
                 {
                     if (Math.Floor(attacker.HP) <= 0.0f)
-                        GameOver(excepter, attacker, user_excepter, user_attacker);
+                        await game.GameOver(excepter, attacker, user_excepter, user_attacker);
                     else
-                        GameOver(attacker, excepter, user_attacker, user_excepter);
+                        await game.GameOver(attacker, excepter, user_attacker, user_excepter);
                     return true;
                 }
 
-                await bot.SendTextMessageAsync(user_attacker.ID, $"{GetMessageForMe(user_attacker.lang, attacker)}\n\n{GetMessageForEnemy(user_attacker.lang, excepter)}");
-                await bot.SendTextMessageAsync(user_excepter.ID, $"{GetMessageForMe(user_excepter.lang, excepter)}\n\n{GetMessageForEnemy(user_excepter.lang, attacker)}");
+                await player.SendAsync(lang => $"{Game.GetMessageForMe(lang, attacker)}\n\n{Game.GetMessageForEnemy(lang, excepter)}");
+                await enemyPlayer.SendAsync(lang => $"{Game.GetMessageForMe(lang, excepter)}\n\n{Game.GetMessageForEnemy(lang, attacker)}");
 
-                //не понятный иф
-                if (player_one.status == Users.User.Status.Attacking)
+                if (excepter.StunCounter == 0)
                 {
-                    //Console.WriteLine("one");
-                    if (excepter.StunCounter == 0)
-                    {
-                        user_attacker.status = Users.User.Status.Excepting;
-                        user_excepter.status = Users.User.Status.Attacking;
+                    user_attacker.status = Users.User.Status.Excepting;
+                    user_excepter.status = Users.User.Status.Attacking;
 
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
-                            user_excepter.lang)));
-                        await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
-                    }
-                    else
-                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
-                            user_attacker.lang)));
+                    await enemyPlayer.SendAsync(lang => string.Join("\n", excepter.GetMessageAbiliesList(lang)));
+                    await player.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
                 }
                 else
-                {
-                    //Console.WriteLine("Two");
-                    if (attacker.StunCounter == 0)
-                    {
-                        user_attacker.status = Users.User.Status.Excepting;
-                        user_excepter.status = Users.User.Status.Attacking;
+                    await player.SendAsync(lang => string.Join("\n", attacker.GetMessageAbiliesList(user_attacker.lang)));
 
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
-                            user_excepter.lang)));
-                        await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
-                    }
-                    else
-                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
-                            user_attacker.lang)));
-                }
-                //Console.WriteLine("End.");
+
                 attacker.UpdateStunDuration();
                 excepter.UpdateStunDuration();
                 return true;
@@ -344,15 +191,19 @@ namespace revcom_bot
                 return false;
         }
 
-        public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage(long PlayerID)
+        private const short MaxPageValue = 3;
+
+        public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage()
         {
-            Users.User user = PlayerID == player_one.ID ? player_one : player_two;
+            return GetKeyboardNextPage(player.User);
+        }
 
-            if (user.HeroListPage >= MaxPageValue)
+        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage(Users.User user)
+        { 
+            user.HeroListPage++;
+            if (user.HeroListPage > MaxPageValue)
                 user.HeroListPage = MaxPageValue;
-            else
-                user.HeroListPage++;
-
+            
             var keyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
             keyboard.OneTimeKeyboard = true;
             keyboard.ResizeKeyboard = true;
@@ -420,8 +271,103 @@ namespace revcom_bot
             }
             return keyboard;
         }
+    }
 
-        private async void GameOver(IHero winner, IHero loser, Users.User uwinner, Users.User uloser)
+    class Game
+    {
+        public static long IGameID = 0L;
+        public static List<IHero> hero_list = new List<IHero>();
+        public static short MinPageValue = 1;
+
+        public static string smile_hp = "\u2764";
+        public static string smile_mp = "🔯";
+        public static string smile_dps = "🔥";
+        public static string smile_armor = "\u25FB";
+
+        public long GameID;
+        private Users.User player_one;
+        private Users.User player_two;
+        public Telegram.Bot.TelegramBotClient bot;
+
+        private PlayerController player_one_controller;
+        private PlayerController player_two_controller;
+
+        public bool isWorking = false;
+
+        public static void Initialize()
+        {
+            // main += 20
+            hero_list.Add(new IHero("Juggernaut", 200, 280, 140, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
+            hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Slardar", 230, 170, 150, IHero.MainFeature.Str));
+            hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
+            hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
+        }
+
+        public Game(Users.User user_one, Users.User user_two, Telegram.Bot.TelegramBotClient _bot)
+        {
+            player_one = user_one;
+            player_two = user_two;
+            bot = _bot;
+            IGameID++;
+            GameID = IGameID;
+
+            player_one.ActiveGameID = GameID;
+            player_two.ActiveGameID = GameID;
+
+            player_one.status = Users.User.Status.GameConfirming;
+            player_two.status = Users.User.Status.GameConfirming;
+
+            isWorking = true;
+
+            var player_one_context = new PlayerGameContext(player_one, bot);
+            var player_two_context = new PlayerGameContext(player_two, bot);
+
+            player_one_controller = new PlayerController(player_one_context, player_two_context, this);
+            player_two_controller = new PlayerController(player_two_context, player_one_context, this);
+        }
+
+        public void Reset()
+        {
+            player_one_controller.player.hero = null;
+            player_two_controller.player.hero = null;
+
+            player_one.ActiveGameID = 0L;
+            player_two.ActiveGameID = 0L;
+            player_one.status = Users.User.Status.Default;
+            player_two.status = Users.User.Status.Default;
+            player_one.HeroName = "";
+            player_two.HeroName = "";
+
+            isWorking = false;
+        }
+
+        public PlayerController GetController(long PlayerID)
+        {
+            //сохранить в поля
+            if (PlayerID == player_one.ID)
+                return player_one_controller;
+
+            if (PlayerID == player_two.ID)
+                return player_two_controller;
+
+            Reset();
+
+            //здесь нужна какая-то общая ошибка, т.к. таких вещей по идее никогда не должно происходить
+            bot.SendTextMessageAsync(player_one.ID, player_one.lang.PickHeroError);
+            bot.SendTextMessageAsync(player_two.ID, player_two.lang.PickHeroError);
+
+            return null;
+        }
+
+        public async Task GameOver(IHero winner, IHero loser, Users.User uwinner, Users.User uloser)
         {
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             string[] msg1 =
@@ -536,7 +482,7 @@ namespace revcom_bot
             return keyboard;
         }
 
-        private static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)
+        public static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)
         {
             string[] lines =
                 {
@@ -551,7 +497,7 @@ namespace revcom_bot
             return string.Join("\n", lines);
         }
 
-        private static string GetMessageForEnemy(Users.User.Text playerLang, IHero enemyHero)
+        public static string GetMessageForEnemy(Users.User.Text playerLang, IHero enemyHero)
         {
             string[] lines =
             {

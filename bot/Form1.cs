@@ -305,7 +305,7 @@ namespace revcom_bot
                             }
                             else if (message.IsCommand(">"))
                             {
-                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.GetKeyboardNextPage();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
                                 Console.WriteLine(">");
                             }
@@ -331,7 +331,7 @@ namespace revcom_bot
                                 {
                                     if (game.GameID == _usr.ActiveGameID)
                                     {
-                                        await game.UseAbility(Convert.ToInt32(message.Text), message.Chat.Id);
+                                        await game.GetController(message.Chat.Id).UseAbility(Convert.ToInt32(message.Text));
                                         break;
                                     }
                                 }
@@ -447,7 +447,7 @@ namespace revcom_bot
         private void CheckLeave(Users.User user, Game game, string text)
         {
             if (text == "/leavegame")
-                game.LeaveGame(user.ID);
+                game.GetController(user.ID)?.LeaveGame();
         }
     }
 
