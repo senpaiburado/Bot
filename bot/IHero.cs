@@ -200,7 +200,7 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public string GetMessageAbiliesList(Users.User user)
+        virtual public string GetMessageAbilitesList(Users.User user)
         {
             string[] list =
             {
@@ -340,6 +340,10 @@ namespace revcom_bot
             return false;
         }
         virtual async public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
+        }
+        virtual async public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
         {
             return false;
         }

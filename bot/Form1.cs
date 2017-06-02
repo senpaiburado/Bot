@@ -500,7 +500,7 @@ namespace revcom_bot
             int value = 0;
             if (int.TryParse(text, out value))
                 value = int.Parse(text);
-            if (value >= 1 && value <= 2)
+            if (value >= 1 && value <= 5)
                 return true;
             else
                 return false;

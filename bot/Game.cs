@@ -43,7 +43,7 @@ namespace revcom_bot
             // main += 20
             hero_list.Add(new IHero("Juggernaut", 200, 280, 140, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.AlchemistHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
@@ -173,7 +173,7 @@ namespace revcom_bot
 
             IHero temp = attacker.HeroName == hero_one.Name ? hero_one : hero_two;
 
-            await bot.SendTextMessageAsync(attacker.ID, string.Join("\n", temp.GetMessageAbiliesList(attacker)));
+            await bot.SendTextMessageAsync(attacker.ID, temp.GetMessageAbilitesList(attacker));
             await bot.SendTextMessageAsync(excepter.ID, excepter.lang.WaitingForAnotherPlayerAction);
         }
 
@@ -321,12 +321,12 @@ namespace revcom_bot
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
 
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbilitesList(
                             user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                     else
-                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
+                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbilitesList(
                             user_attacker)));
                 }
                 else
@@ -337,12 +337,12 @@ namespace revcom_bot
                         user_attacker.status = Users.User.Status.Excepting;
                         user_excepter.status = Users.User.Status.Attacking;
 
-                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbiliesList(
+                        await bot.SendTextMessageAsync(user_excepter.ID, string.Join("\n", excepter.GetMessageAbilitesList(
                             user_excepter)));
                         await bot.SendTextMessageAsync(user_attacker.ID, user_attacker.lang.WaitingForAnotherPlayerAction);
                     }
                     else
-                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbiliesList(
+                        await bot.SendTextMessageAsync(user_attacker.ID, string.Join("\n", attacker.GetMessageAbilitesList(
                             user_attacker)));
                 }
                 //Console.WriteLine("End.");

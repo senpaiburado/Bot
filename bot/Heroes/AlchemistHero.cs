@@ -22,8 +22,8 @@ namespace revcom_bot.Heroes
         private int AcidSprayCD = 0;
 
         // Ability Two : Unstable Concoction
-        public string AbiNameTwo => UnstableConcotionActivated ? "Unstable Concoction Throw" : "Unstable Concoction";
-        private bool UnstableConcotionActivated = false;
+        public string AbiNameTwo => UnstableConcoctionActivated ? "Unstable Concoction Throw" : "Unstable Concoction";
+        private bool UnstableConcoctionActivated = false;
         private float UnstableConcoctionDamage = 405.55f;
         private int UnstableConctionTimeToThrow = 5;
         private int UnstableConctionCounter = 0;
@@ -31,8 +31,24 @@ namespace revcom_bot.Heroes
         private const int UnstableConcoctionDefaultCD = 25;
         private float UnstableConcoctionManaPay = 200.0f;
 
-        public AlchemistHero(int str, int agi, int intel, MainFeature feat) : base("Alchemist", str, agi, intel,
-            MainFeature.Str)
+        // Passive ability: GreevilsPower
+        public string AbiNamePassive = "Greevils Power";
+        private int GreevilsPowerTime = 5;
+        private int GreevilsPowerCounter = 0;
+        private float GreevilsPowerDamage = 5.0f;
+
+        // Ability Three : Chemical Rage
+        public string AbiNameThree = "Chemical Rage";
+        private bool ChemicalRageActivated = false;
+        private int ChemicalRageCounter = 0;
+        private int ChemicalRageDuration = 15;
+        private const int ChemicalRageDefaultCD = 30;
+        private int ChemicalRageCD = 0;
+        private float ChemicalRageHpRegeneration = 25.0f;
+        private float ChemicalRageMpRegeneration = 10.0f;
+        private float ChemicalRageManaPay = 300.0f;
+
+        public AlchemistHero(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
         {
 
         }
@@ -55,7 +71,7 @@ namespace revcom_bot.Heroes
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(AcidSprayCD));
                 return false;
             }
-            UnstableConcotionActivated = true;
+            UnstableConcoctionActivated = true;
             MP -= UnstableConcoctionManaPay;
             return true;
         }
@@ -64,7 +80,7 @@ namespace revcom_bot.Heroes
         {
             string ForYouMessage = $"{attackerUser.lang.ALCHEMIST_YouHaveThrownUC}\n";
             string ForEnemyMessage = $"{targetUser.lang.ALCHEMIST_TheEnemyHasThrownUC}\n";
-            UnstableConcotionActivated = false;
+            UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
             UnstableConctionCounter = 0;
             if (base.GetRandomNumber(1, 100) > 15)
@@ -102,12 +118,74 @@ namespace revcom_bot.Heroes
 
         protected override void UpdateCounters()
         {
-
+            UpdateUnstableConcoction();
+            UpdateGreevilsPower();
+            UpdateChemicalRage();
         }
 
         public override void UpdateCountdowns()
         {
-            
+            if (AcidSprayCD > 0)
+                AcidSprayCD--;
+            if (UnstableConcoctionCD > 0)
+                UnstableConcoctionCD--;
+            if (ChemicalRageCD > 0)
+                ChemicalRageCD--;
+        }
+
+        private void UpdateGreevilsPower()
+        {
+            if (GreevilsPowerCounter < GreevilsPowerTime)
+                GreevilsPowerCounter++;
+            else
+            {
+                DPS += GreevilsPowerDamage;
+                GreevilsPowerCounter = 0;
+            }
+        }
+
+        private async void UpdateUnstableConcoction()
+        {
+            if (UnstableConctionCounter < UnstableConctionTimeToThrow && UnstableConcoctionActivated)
+                UnstableConctionCounter++;
+            else
+            {
+                if (UnstableConcoctionActivated)
+                {
+                    UnstableConcoctionActivated = false;
+                    UnstableConctionCounter = 0;
+                    await ThrowUnstableConcoction(temp_playerOne, temp_playerTwo, this);
+                }
+            }
+        }
+
+        private void UpdateChemicalRage()
+        {
+            if (ChemicalRageCounter < ChemicalRageDuration && ChemicalRageActivated)
+                ChemicalRageCounter++;
+            else
+            {
+                if (ChemicalRageActivated)
+                {
+                    ChemicalRageActivated = false;
+                    ChemicalRageCounter = 0;
+                    HPregen -= ChemicalRageHpRegeneration;
+                    MPregen -= ChemicalRageMpRegeneration;
+                }
+            }
+        }
+
+        public override string GetMessageAbilitesList(Users.User user)
+        {
+            string[] msg =
+            {
+                $"1 - {user.lang.AttackString}",
+                $"2 - {user.lang.Heal}",
+                $"3 - {AbiNameOne}",
+                $"4 - {AbiNameTwo}",
+                $"5 - {AbiNameThree}"
+            };
+            return string.Join("\n", msg);
         }
 
         override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
@@ -131,7 +209,7 @@ namespace revcom_bot.Heroes
         }
         override public async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            if (UnstableConcotionActivated)
+            if (UnstableConcoctionActivated)
                 return await ThrowUnstableConcoction(attackerUser, targetUser, target);
             else
             {
@@ -140,6 +218,32 @@ namespace revcom_bot.Heroes
                 temp_targetHero = target;
                 return await UseUnstableConcoction(attackerUser, targetUser);
             }
+        }
+        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            if (MP < ChemicalRageManaPay)
+            {
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(MP)));
+                return false;
+            }
+            if (ChemicalRageCD > 0)
+            {
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(ChemicalRageCD));
+                return false;
+            }
+            if (ChemicalRageActivated)
+            {
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                return false;
+            }
+            MP -= ChemicalRageManaPay;
+            ChemicalRageCD = ChemicalRageDefaultCD;
+            ChemicalRageActivated = true;
+            HPregen += ChemicalRageHpRegeneration;
+            MPregen += ChemicalRageMpRegeneration;
+            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
+            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            return true;
         }
     }
 }

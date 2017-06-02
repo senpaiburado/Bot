@@ -1174,6 +1174,18 @@ namespace revcom_bot
                     return "";
                 }
 
+                public string @AbilityIsAlreadyActivated
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "This ability is already activated.";
+                        else if (lang == Language.Russian)
+                            return "Эта способность уже активирована.";
+                        return "";
+                    }
+                }
+
                 public string @YouStunnedYourself
                 {
                     get
