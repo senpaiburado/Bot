@@ -82,7 +82,8 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
-    <Compile Include="Heroes\AlchemistHero.cs" />
+    <Compile Include="Heroes\Abaddon.cs" />
+    <Compile Include="Heroes\Alchemist.cs" />
     <Compile Include="Heroes\Juggernaut.cs" />
     <Compile Include="IHero.cs" />
     <Compile Include="Program.cs" />

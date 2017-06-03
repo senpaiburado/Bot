@@ -70,7 +70,7 @@
             this.ClientSize = new System.Drawing.Size(419, 105);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "бот Рев.Ком.Стих!";
+            this.Text = "Dota Text Game Bot";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

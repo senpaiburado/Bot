@@ -65,6 +65,9 @@ namespace revcom_bot
         public int HealCountdown = 0;
         public const float HealPayMana = 50.0f;
 
+
+        public List<string> EffectsList = new List<string>();
+
         public IHero(string name, int str, int agi, int itl, MainFeature feat)
         {
             this.Name = name;
@@ -139,6 +142,11 @@ namespace revcom_bot
         public virtual IHero Copy()
         {
             return new IHero(this);
+        }
+
+        protected string GetStringEffects()
+        {
+            return string.Join(", ", EffectsList.ToArray());
         }
 
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)

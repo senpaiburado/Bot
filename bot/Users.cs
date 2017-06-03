@@ -1279,6 +1279,18 @@ namespace revcom_bot
                         return "";
                     }
                 }
+
+                public string @ABADDON_AS_HasExploded
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Aphotic Shield has exploded!";
+                        else if (lang == Language.Russian)
+                            return "Aphotic Shield взорвался!";
+                        return "";
+                    }
+                }
                     
 
                 public struct InstructionText

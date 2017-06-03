@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace revcom_bot.Heroes
 {
-    class AlchemistHero : IHero
+    class Alchemist : IHero
     {
         Users.User temp_playerOne = null;
         Users.User temp_playerTwo = null;
@@ -49,12 +49,12 @@ namespace revcom_bot.Heroes
         private float ChemicalRageManaPay = 300.0f;
         private float ChemicalRageAdditionalAttackSpeed = 2.5f;
 
-        public AlchemistHero(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
+        public Alchemist(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
         {
 
         }
 
-        public AlchemistHero(IHero hero) : base(hero)
+        public Alchemist(IHero hero) : base(hero)
         {
 
         }
@@ -63,18 +63,12 @@ namespace revcom_bot.Heroes
         {
             if (MP < UnstableConcoctionManaPay)
             {
-                temp_playerOne = null;
-                temp_playerTwo = null;
-                temp_targetHero = null;
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
                     UnstableConcoctionManaPay - MP)));
                 return false;
             }
             if (UnstableConcoctionCD > 0)
             {
-                temp_playerOne = null;
-                temp_playerTwo = null;
-                temp_targetHero = null;
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(UnstableConcoctionCD));
                 return false;
             }
@@ -222,7 +216,7 @@ namespace revcom_bot.Heroes
 
         public override IHero Copy()
         {
-            return new AlchemistHero(this);
+            return new Alchemist(this);
         }
 
         override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
