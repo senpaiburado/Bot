@@ -1237,6 +1237,15 @@ namespace revcom_bot
                     return "";
                 }
 
+                public string GetMessageYouCantUseAbilityWhileAnotherWorks(string abi_name)
+                {
+                    if (lang == Language.English)
+                        return $"You can use \"Attack\" only while {abi_name} works!";
+                    else if (lang == Language.Russian)
+                        return $"Вы можете использовать только \"Атака\", пока работает способоность {abi_name}!";
+                    return "";
+                }
+
                 public string @ALCHEMIST_YouHaveThrownUC
                 {
                     get

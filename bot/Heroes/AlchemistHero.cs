@@ -47,6 +47,7 @@ namespace revcom_bot.Heroes
         private float ChemicalRageHpRegeneration = 25.0f;
         private float ChemicalRageMpRegeneration = 10.0f;
         private float ChemicalRageManaPay = 300.0f;
+        private float ChemicalRageAdditionalAttackSpeed = 2.5f;
 
         public AlchemistHero(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
         {
@@ -65,7 +66,8 @@ namespace revcom_bot.Heroes
                 temp_playerOne = null;
                 temp_playerTwo = null;
                 temp_targetHero = null;
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(MP)));
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                    UnstableConcoctionManaPay - MP)));
                 return false;
             }
             if (UnstableConcoctionCD > 0)
@@ -76,10 +78,10 @@ namespace revcom_bot.Heroes
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(UnstableConcoctionCD));
                 return false;
             }
-            UnstableConcoctionActivated = true;
             MP -= UnstableConcoctionManaPay;
             await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
+            UnstableConcoctionActivated = true;
             return true;
         }
 
@@ -89,7 +91,6 @@ namespace revcom_bot.Heroes
             string ForEnemyMessage = $"{targetUser.lang.ALCHEMIST_TheEnemyHasThrownUC}\n";
             UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
-            UnstableConcoctionCounter = 0;
             if (base.GetRandomNumber(1, 100) > 15)
             {
                 target.GetDamage(UnstableConcoctionDamage);
@@ -117,6 +118,7 @@ namespace revcom_bot.Heroes
 
             await bot.SendTextMessageAsync(attackerUser.ID, ForYouMessage);
             await bot.SendTextMessageAsync(targetUser.ID, ForEnemyMessage);
+            UnstableConcoctionCounter = 0;
             temp_playerOne = null;
             temp_playerTwo = null;
             temp_targetHero = null;
@@ -178,6 +180,8 @@ namespace revcom_bot.Heroes
                     ChemicalRageCounter = 0;
                     HPregen -= ChemicalRageHpRegeneration;
                     MPregen -= ChemicalRageMpRegeneration;
+                    AttackSpeed -= ChemicalRageAdditionalAttackSpeed;
+                    UpdateDPS();
                 }
             }
         }
@@ -216,16 +220,17 @@ namespace revcom_bot.Heroes
             return msg;
         }
 
-        public override IHero Copy(IHero hero)
+        public override IHero Copy()
         {
-            return new AlchemistHero(hero);
+            return new AlchemistHero(this);
         }
 
         override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
         {
             if (MP < AcidSprayManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(MP)));
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                    AcidSprayManaPay - MP)));
                 return false;
             }
             if (AcidSprayCD > 0)
@@ -257,7 +262,8 @@ namespace revcom_bot.Heroes
         {
             if (MP < ChemicalRageManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(MP)));
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                    ChemicalRageManaPay - MP)));
                 return false;
             }
             if (ChemicalRageCD > 0)
@@ -275,6 +281,8 @@ namespace revcom_bot.Heroes
             ChemicalRageActivated = true;
             HPregen += ChemicalRageHpRegeneration;
             MPregen += ChemicalRageMpRegeneration;
+            AttackSpeed += ChemicalRageAdditionalAttackSpeed;
+            UpdateDPS();
             await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;

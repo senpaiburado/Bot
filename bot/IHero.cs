@@ -95,20 +95,13 @@ namespace revcom_bot
             Armor = Agility * 0.14f;
             AttackSpeed = Agility * 0.02f;
 
-            MaxMP = Intelligence * 12.0f;
+            MaxMP = Intelligence * 4.5f;
             MPregen = Intelligence * 0.04f;
 
             HP = MaxHP;
             MP = MaxMP;
 
-            float damage = 0.0f;
-            if (Feature == MainFeature.Str)
-                damage = Strength * 0.4f;
-            else if (Feature == MainFeature.Agi)
-                damage = Agility * 0.3f;
-            else if (Feature == MainFeature.Intel)
-                damage = Intelligence * 0.4f;
-            DPS = damage + damage * AttackSpeed;
+            UpdateDPS();
 
             CriticalHitChance = 15.0f;
             CriticalHitMultiplier = 1.5f;
@@ -123,6 +116,18 @@ namespace revcom_bot
 
         virtual protected void InitAdditional()
         {
+            float damage = 0.0f;
+            if (Feature == MainFeature.Str)
+                damage = Strength * 0.4f;
+            else if (Feature == MainFeature.Agi)
+                damage = Agility * 0.3f;
+            else if (Feature == MainFeature.Intel)
+                damage = Intelligence * 0.4f;
+            DPS = damage + damage * AttackSpeed;
+        }
+
+        protected void UpdateDPS()
+        {
 
         }
 
@@ -131,9 +136,9 @@ namespace revcom_bot
 
         }
 
-        public virtual IHero Copy(IHero hero)
+        public virtual IHero Copy()
         {
-            return new IHero(hero);
+            return new IHero(this);
         }
 
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
@@ -142,7 +147,6 @@ namespace revcom_bot
 
             string MessageForAttacker = "";
             string MessageForExcepter = "";
-
 
             if (GetRandomNumber(1, 101) >= target.MissChance)
             {
@@ -171,7 +175,6 @@ namespace revcom_bot
                 MessageForExcepter += target_user.lang.TheEnemyMissedYou;
             }
             
-
             target.GetDamage(damage);
 
             await bot.SendTextMessageAsync(attacker_user.ID, MessageForAttacker);

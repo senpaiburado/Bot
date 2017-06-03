@@ -83,6 +83,7 @@
     </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="Heroes\AlchemistHero.cs" />
+    <Compile Include="Heroes\Juggernaut.cs" />
     <Compile Include="IHero.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
