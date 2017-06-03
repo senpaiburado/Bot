@@ -80,11 +80,6 @@ namespace revcom_bot
             player_two.status = Users.User.Status.Picking;
         }
 
-        public IHero Copy(IHero hero)
-        {
-            return new IHero(hero);
-        }
-
         private void Reset()
         {
             hero_one = null;
@@ -120,13 +115,13 @@ namespace revcom_bot
             ///// Player one
             if (PlayerID == player_one.ID)
             {
-                hero_one = Copy(hero);
+                hero_one = hero.Copy(hero);
                 PickHero(player_one, hero_one.Name, player_two);
             }
             ////Player two
             else if (PlayerID == player_two.ID)
             {
-                hero_two = Copy(hero);
+                hero_two = hero.Copy(hero);
                 PickHero(player_two, hero_two.Name, player_one);
             }
             else
@@ -293,6 +288,13 @@ namespace revcom_bot
                 case 4:
                     if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
                         finished = true;
+                    break;
+                case 5:
+                    if (await attacker.UseAbilityThree(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
+                default:
+                    Console.WriteLine("Switch bug!");
                     break;
             }
 
