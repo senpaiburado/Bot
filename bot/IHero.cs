@@ -208,13 +208,13 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public string GetMessageAbilitesList(Users.User user)
+        virtual public string GetMessageAbilitesList(Users.User.Text lang)
         {
             string[] list =
             {
-                $"1 - {user.lang.AttackString}",
-                $"2 - {user.lang.Heal} ({HealCountdown}) [{HealPayMana}]",
-                $"{user.lang.SelectAbility}:",
+                $"1 - {lang.AttackString}",
+                $"2 - {lang.Heal} ({HealCountdown}) [{HealPayMana}]",
+                $"{lang.SelectAbility}:",
             };
             return string.Join("\n", list);
         }
@@ -341,17 +341,17 @@ namespace revcom_bot
             GettingDamageActive = true;
         }
 
-        virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
-        virtual async public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
-        virtual async public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
     }
 }

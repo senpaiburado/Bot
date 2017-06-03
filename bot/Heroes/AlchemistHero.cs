@@ -182,14 +182,14 @@ namespace revcom_bot.Heroes
             }
         }
 
-        public override string GetMessageAbilitesList(Users.User user)
+        public override string GetMessageAbilitesList(Users.User.Text lang)
         {
-            string msg = $"{user.lang.List}:\n";
-            msg += $"1 - {user.lang.AttackString}\n";
+            string msg = $"{lang.List}:\n";
+            msg += $"1 - {lang.AttackString}\n";
             if (HealCountdown > 0)
-                msg += $"2 - {user.lang.Heal} ({HealCountdown}) [{HealPayMana}]\n";
+                msg += $"2 - {lang.Heal} ({HealCountdown}) [{HealPayMana}]\n";
             else
-                msg += $"2 - {user.lang.Heal} [{HealPayMana}]\n";
+                msg += $"2 - {lang.Heal} [{HealPayMana}]\n";
             if (AcidSprayCD > 0)
                 msg += $"3 - {AbiNameOne} ({AcidSprayCD}) [{AcidSprayManaPay}]\n";
             else
@@ -212,7 +212,7 @@ namespace revcom_bot.Heroes
                 else
                     msg += $"5 - {AbiNameThree} [{ChemicalRageManaPay}]\n";
             }
-            msg += $"{user.lang.SelectAbility}:";
+            msg += $"{lang.SelectAbility}:";
             return msg;
         }
 

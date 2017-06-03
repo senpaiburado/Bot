@@ -105,8 +105,7 @@ namespace revcom_bot
 
                     var updates = await Bot.GetUpdatesAsync(offset);
                     
-                    foreach(var update in updates.Where(x => x.Message != null && x.Message.Type == Telegram
-                        .Bot.Types.Enums.MessageType.TextMessage))
+                    foreach(var update in updates.Where(x => x.Message != null && x.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage))
                     {
                         var message = update.Message;
 
@@ -339,17 +338,17 @@ namespace revcom_bot
                         {
                             if (message.Text == "/stopsearching")
                             {
-                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                                GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
                             }
                             else if (message.IsCommand(">"))
                             {
-                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardNextPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.GetKeyboardNextPage();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
                                 Console.WriteLine(">");
                             }
                             else if (message.IsCommand("<"))
                             {
-                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetKeyboardPrevPage(message.Chat.Id);
+                                var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id).GetKeyboardPrevPage();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
                                 Console.WriteLine("<");
                             }
@@ -357,7 +356,7 @@ namespace revcom_bot
                             {
                                 var hero = Game.hero_list.SingleOrDefault(x => message.IsCommand(x.Name));
                                 if (hero != null)
-                                    GetActiveGame(_usr.ActiveGameID)?.PickHero(hero, message.Chat.Id);
+                                    GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.PickHero(hero);
                             }
                         }
                         else if (_usr.status == Users.User.Status.Attacking)
@@ -369,7 +368,7 @@ namespace revcom_bot
                                 {
                                     if (game.GameID == _usr.ActiveGameID)
                                     {
-                                        await game.UseAbility(Convert.ToInt32(message.Text), message.Chat.Id);
+                                        await game.GetController(message.Chat.Id).UseAbility(Convert.ToInt32(message.Text));
                                         break;
                                     }
                                 }
@@ -402,14 +401,14 @@ namespace revcom_bot
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
                                 bool isConfirm = message.IsCommand(_usr.lang.YesMessage);
-                                GetActiveGame(_usr.ActiveGameID)?.ConfirmGame(isConfirm, message.Chat.Id);
+                                GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.ConfirmGame(isConfirm);
                             }
                         }
                         else if (_usr.status == Users.User.Status.WaitingForRespond)
                         {
                             if (message.Text == "/stopsearching")
                             {
-                                GetActiveGame(_usr.ActiveGameID).LeaveConfirming(message.Chat.Id);
+                                await GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.LeaveConfirming();
                             }
                         }
                         else if (_usr.status == Users.User.Status.DeletingAccount)
@@ -485,7 +484,7 @@ namespace revcom_bot
         private void CheckLeave(Users.User user, Game game, string text)
         {
             if (text == "/leavegame")
-                game.LeaveGame(user.ID);
+                game.GetController(user.ID)?.LeaveGame();
         }
     }
 
