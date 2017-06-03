@@ -205,6 +205,14 @@ namespace revcom_bot
                     if (await attacker.Heal(user_attacker, user_excepter))
                         finished = true;
                     break;
+                case 3:
+                    if (await attacker.UseAbilityOne(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
+                case 4:
+                    if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
             }
 
             if (finished)
@@ -445,7 +453,7 @@ namespace revcom_bot
             // main += 20
             hero_list.Add(new IHero("Juggernaut", 200, 280, 140, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.AlchemistHero("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));

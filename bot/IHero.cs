@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,10 +41,18 @@ namespace revcom_bot
         public float StunDamage { get; set; }
 
         public int StunCounter = 0;
+
+        public int GettingDamageCounter = 0;
+        public float GettingDamagePower = 0.0f;
+        public bool GettingDamageActive = false;
+
         public int BurningCounter = 0;
         public float BurningDamage = 0.0f;
+        public bool BurningActive = false;
+
         public int ArmorPenetratingCounter = 0;
         public float ArmorPenetrationValue = 0.0f;
+        public bool ArmorPenetratingActive = false;
 
         // Abilities:
 
@@ -78,7 +87,7 @@ namespace revcom_bot
             Intelligence = itl;
             Feature = feat;
 
-            MaxHP = Strength * 20.0f;
+            MaxHP = Strength * 20.0f + 10000.0f;
             HPregen = Strength * 0.03f;
 
             Armor = Agility * 0.14f;
@@ -122,24 +131,23 @@ namespace revcom_bot
 
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
         {
-            Random temp_rand = new Random();
-            Random random = new Random(temp_rand.Next(1000000));
             float damage = 0.0f;
 
             string MessageForAttacker = "";
             string MessageForExcepter = "";
 
-            if (random.Next(1, 101) >= target.MissChance)
+
+            if (GetRandomNumber(1, 101) >= target.MissChance)
             {
                 damage += this.DPS;
                 damage -= target.Armor;
-                if (random.Next(1, 101) <= CriticalHitChance)
+                if (GetRandomNumber(1, 101) <= CriticalHitChance)
                 {
                     damage *= CriticalHitMultiplier;
                     MessageForAttacker += $"{attacker_user.lang.CriticalHit}!\n";
                     MessageForExcepter += $"{target_user.lang.TheEnemyDealtCriticalDamageToYou}\n";
                 }
-                if (random.Next(1,101) <= StunHitChance)
+                if (GetRandomNumber(1, 101) <= StunHitChance)
                 {
                     target.StunCounter++;
                     MessageForAttacker += $"{attacker_user.lang.StunningHit}!\n";
@@ -154,6 +162,7 @@ namespace revcom_bot
                 MessageForAttacker += attacker_user.lang.YouMissedTheEnemy;
                 MessageForExcepter += target_user.lang.TheEnemyMissedYou;
             }
+            
 
             target.GetDamage(damage);
 
@@ -211,7 +220,9 @@ namespace revcom_bot
             }
             Regeneration();
             UpdateCountdowns();
+            UpdateCounters();
             UpdateDefaultCountdowns();
+            UpdateDebuffs();
             if (Math.Ceiling(HP) >= MaxHP)
                 HP = MaxHP;
             if (Math.Ceiling(MP) >= MaxMP || Math.Floor(MP) < 0.0f)
@@ -221,6 +232,19 @@ namespace revcom_bot
                 else
                     MP = 0.0f;
             }
+        }
+
+        virtual protected void UpdateCounters()
+        {
+
+        }
+
+        virtual public void LoosenArmor(float power, int time)
+        {
+            ArmorPenetratingCounter += time;
+            ArmorPenetrationValue += power;
+            Armor -= power;
+            ArmorPenetratingActive = true;
         }
 
         virtual public void UpdateCountdowns()
@@ -239,6 +263,49 @@ namespace revcom_bot
             if (HealCountdown > 0)
                 HealCountdown--;
         }
+        virtual public void UpdateDebuffs()
+        {
+            // Armor penetration debuff
+            if (ArmorPenetratingCounter > 0)
+                ArmorPenetratingCounter--;
+            else
+            {
+                if (ArmorPenetratingActive && ArmorPenetratingCounter == 0)
+                {
+                    Armor += ArmorPenetrationValue;
+                    ArmorPenetratingActive = false;
+                    ArmorPenetrationValue = 0.0f;
+                }
+            }
+            // Burning debuff
+            if (BurningCounter > 0)
+            {
+                BurningCounter--;
+                GetDamage(BurningDamage);
+            }
+            else
+            {
+                if (BurningActive && BurningCounter == 0)
+                {
+                    BurningActive = false;
+                    BurningDamage = 0.0f;
+                }
+            }
+            //Getting damage per step
+            if (GettingDamageCounter > 0)
+            {
+                GettingDamageCounter--;
+                GetDamage(GettingDamagePower);
+            }
+            else
+            {
+                if (GettingDamageActive && GettingDamageCounter == 0)
+                {
+                    GettingDamageActive = false;
+                    GettingDamagePower = 0.0f;
+                }
+            }
+        }
 
         virtual public void GetDamage(float value)
         {
@@ -248,6 +315,37 @@ namespace revcom_bot
         {
             HP += HPregen;
             MP += MPregen;
+        }
+
+        virtual public void GetDamageByDebuffs(float power, int time)
+        {
+            GettingDamageCounter += time;
+            GettingDamagePower += power;
+            GettingDamageActive = true;
+        }
+
+        protected int GetRandomNumber(int min, int max)
+        {
+            byte[] bytes = new byte[4];
+            using (RandomNumberGenerator random = new RNGCryptoServiceProvider())
+            {
+                random.GetBytes(bytes);
+                UInt32 scale = BitConverter.ToUInt32(bytes, 0);
+                return (int)(min + (max - min) * (scale / (uint.MaxValue + 1.0)));
+            }
+        }
+
+        virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
+        }
+        virtual async public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
+        }
+        virtual async public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        {
+            return false;
         }
     }
 }

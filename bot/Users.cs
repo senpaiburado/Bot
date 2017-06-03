@@ -152,7 +152,7 @@ namespace revcom_bot
 
             public int wins = 0;
             public int loses = 0;
-            public float winrate => loses == 0 ? 0 : (wins * 100.0f) / (wins + loses);
+            public float winrate => loses + wins == 0 ? 0.0f : (wins * 100.0f) / (wins + loses);
 
             public int rate = 1000;
 
@@ -180,7 +180,7 @@ namespace revcom_bot
                     $"{lang.GamesCountString}: {wins+loses}",
                     $"{lang.WinsCountString}: {wins}",
                     $"{lang.LosesCountString}: {loses}",
-                    $"{lang.WinrateString}: {winrate}",
+                    $"{lang.WinrateString}: {winrate}%",
                     $"{lang.RatingString}: {rate}",
                 };
                 return string.Join("\n", lines);
@@ -1011,6 +1011,18 @@ namespace revcom_bot
                     }
                 }
 
+                public string @List
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "List";
+                        else if (lang == Language.Russian)
+                            return "Список";
+                        return "";
+                    }
+                }
+
                 public string @Winner
                 {
                     get
@@ -1143,6 +1155,122 @@ namespace revcom_bot
                         return $"Команда \"{command}\" была успешно выполнена.";
                     return "";
                 }
+
+                public string GetMessageYouHaveUsedAbility(string ability_name)
+                {
+                    if (lang == Language.English)
+                        return $"You have used ability {ability_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Вы использовали способность {ability_name}!";
+                    return "";
+                }
+
+                public string GetMessageEnemyHasUsedAbility(string ability_name)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy has used ability {ability_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Противник использовал способность {ability_name}!";
+                    return "";
+                }
+
+                public string @AbilityIsAlreadyActivated
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "This ability is already activated.";
+                        else if (lang == Language.Russian)
+                            return "Эта способность уже активирована.";
+                        return "";
+                    }
+                }
+
+                public string @YouStunnedYourself
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have stunned yourself.";
+                        else if (lang == Language.Russian)
+                            return "Вы оглушили себя.";
+                        return "";
+                    }
+                }
+                public string @YouStunnedEnemy
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have stunned the enemy.";
+                        else if (lang == Language.Russian)
+                            return "Вы оглушили противника.";
+                        return "";
+                    }
+                }
+                public string @TheEnemyHasStunnedItself
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy has stunned itself.";
+                        else if (lang == Language.Russian)
+                            return "Враг оглушил себя.";
+                        return "";
+                    }
+                }
+
+                public string GetMessageYouActivated(string abi_name)
+                {
+                    if (lang == Language.English)
+                        return $"You have actived {abi_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Вы активировали {abi_name}";
+                    return "";
+                }
+                public string GetMessageEnemyActivated(string abi_name)
+                {
+                    if (lang == Language.English)
+                        return $"The enemy has activated {abi_name}!";
+                    else if (lang == Language.Russian)
+                        return $"Противник активировал {abi_name}!";
+                    return "";
+                }
+
+                public string @ALCHEMIST_YouHaveThrownUC
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "You have thrown Unstable Concoction at the enemy!";
+                        else if (lang == Language.Russian)
+                            return "Вы кинули Unstable Concoction у врага!";
+                        return "";
+                    }
+                }
+                public string @ALCHEMIST_TheEnemyHasThrownUC
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "The enemy has thrown Unstable Concoction at you!\nYou are stunned.";
+                        else if (lang == Language.Russian)
+                            return "Противник бросил Unstable Concoction на вас!\nВы оглушены.";
+                        return "";
+                    }
+                }
+                public string @ALCHEMIST_UC_HasExploded
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                            return "Unstable Concocton has exploded!";
+                        else if (lang == Language.Russian)
+                            return "Unstable Concoction взорвался!";
+                        return "";
+                    }
+                }
+                    
 
                 public struct InstructionText
                 {

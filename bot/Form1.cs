@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -113,9 +114,6 @@ namespace revcom_bot
                             user.AddUser(message.Chat.Id);
                             Console.WriteLine("LOL");
                         }
-
-                        await Bot.SendTextMessageAsync(message.Chat.Id, "LOL");
-                        //return;
 
                         Users.User _usr = user.getUserByID(message.Chat.Id);
 
@@ -233,7 +231,7 @@ namespace revcom_bot
                                 Users.User find_user = null;
 
                                 string name = System.Text.RegularExpressions.Regex.Match(
-                                    message.Text, "\"(.*)\"").Groups[1].ToString();
+                                    message.Text, @"\{(.*)\}").Groups[1].ToString();
 
                                 if (name != "")
                                 {
@@ -242,6 +240,7 @@ namespace revcom_bot
                                     if (find_user != null && rating > 0)
                                     {
                                         find_user.rate = rating;
+                                        find_user.SaveToFile();
                                         await Bot.SendTextMessageAsync(message.Chat.Id,
                                             _usr.lang.GetMessageAdminCommandSuccesful(message.Text) + $" : {find_user.ID}");
                                     }
@@ -255,12 +254,18 @@ namespace revcom_bot
                                 {
                                     foreach (var item in user.GetIDs())
                                     {
-                                        await Bot.SendTextMessageAsync(item, res);
+                                        //await Bot.SendTextMessageAsync(item, res);
                                     }
                                     await Bot.SendTextMessageAsync(message.Chat.Id,
                                         _usr.lang.GetMessageAdminCommandSuccesful(message.Text));
                                 }
                                     
+                            }
+                            else if (message.IsCommand("[ADMIN] Get list of names") && message.Chat.Id ==
+                                Users.AdminID)
+                            {
+                                string msg = $"{_usr.lang.List}:\n{string.Join("\n", user.GetNames())}\n";
+                                await Bot.SendTextMessageAsync(message.Chat.Id, msg);
                             }
                             else if (message.IsCommand("[ADMIN] Send to one:") && message.Chat.Id == Users.AdminID)
                             {
@@ -275,7 +280,39 @@ namespace revcom_bot
                                 if (id != -1)
                                 {
                                     if (text != "")
+                                    {
                                         await Bot.SendTextMessageAsync(id, text);
+                                        await Bot.SendTextMessageAsync(message.Chat.Id,
+                                        _usr.lang.GetMessageAdminCommandSuccesful(message.Text));
+                                    }
+                                }
+                            }
+                            else if (message.IsCommand("[ADMIN] Get profile of user:") && message.Chat.Id ==
+                                Users.AdminID)
+                            {
+                                string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
+                                if (name != "")
+                                {
+                                    if (user.GetUserByName(name) != null)
+                                    {
+                                        await Bot.SendTextMessageAsync(message.Chat.Id, user.GetUserByName(name)
+                                            .GetStatisctisMessage());
+                                        await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang
+                                            .GetMessageAdminCommandSuccesful(message.Text));
+                                    }
+                                }
+                            }
+                            else if (message.IsCommand("[ADMIN] Delete user:") && message.Chat.Id == Users.AdminID)
+                            {
+                                string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
+                                if (name != "")
+                                {
+                                    if (user.GetUserByName(name) != null)
+                                    {
+                                        user.DeleteUser(user.GetUserByName(name).ID);
+                                        await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.GetMessageAdminCommandSuccesful(
+                                            message.Text));
+                                    }
                                 }
                             }
                             else
@@ -462,7 +499,7 @@ namespace revcom_bot
             int value = 0;
             if (int.TryParse(text, out value))
                 value = int.Parse(text);
-            if (value >= 1 && value <= 2)
+            if (value >= 1 && value <= 5)
                 return true;
             else
                 return false;
