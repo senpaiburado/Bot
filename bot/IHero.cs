@@ -15,6 +15,8 @@ namespace revcom_bot
             Str, Agi, Intel
         }
 
+        protected int NextSeed = 0;
+
         protected int Strength { get; set; }
         protected int Agility { get; set; }
         protected int Intelligence { get; set; }
@@ -129,6 +131,11 @@ namespace revcom_bot
 
         }
 
+        public virtual IHero Copy(IHero hero)
+        {
+            return new IHero(hero);
+        }
+
         virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
         {
             float damage = 0.0f;
@@ -150,6 +157,7 @@ namespace revcom_bot
                 if (GetRandomNumber(1, 101) <= StunHitChance)
                 {
                     target.StunCounter++;
+                    damage += StunDamage;
                     MessageForAttacker += $"{attacker_user.lang.StunningHit}!\n";
                     MessageForExcepter += $"{target_user.lang.TheEnemyStunnedYou}\n";
                 }
@@ -317,22 +325,20 @@ namespace revcom_bot
             MP += MPregen;
         }
 
+        protected int GetRandomNumber(int min, int max)
+        {
+            Random random = new Random((int)DateTime.Now.Ticks * NextSeed);
+            NextSeed += 3;
+            if (NextSeed > 10000)
+                NextSeed = 0;
+            return random.Next(min, max);
+        }
+
         virtual public void GetDamageByDebuffs(float power, int time)
         {
             GettingDamageCounter += time;
             GettingDamagePower += power;
             GettingDamageActive = true;
-        }
-
-        protected int GetRandomNumber(int min, int max)
-        {
-            byte[] bytes = new byte[4];
-            using (RandomNumberGenerator random = new RNGCryptoServiceProvider())
-            {
-                random.GetBytes(bytes);
-                UInt32 scale = BitConverter.ToUInt32(bytes, 0);
-                return (int)(min + (max - min) * (scale / (uint.MaxValue + 1.0)));
-            }
         }
 
         virtual public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)

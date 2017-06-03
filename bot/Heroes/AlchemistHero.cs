@@ -25,8 +25,8 @@ namespace revcom_bot.Heroes
         public string AbiNameTwo => UnstableConcoctionActivated ? "Unstable Concoction Throw" : "Unstable Concoction";
         private bool UnstableConcoctionActivated = false;
         private float UnstableConcoctionDamage = 405.55f;
-        private int UnstableConctionTimeToThrow = 5;
-        private int UnstableConctionCounter = 0;
+        private int UnstableConcoctionTimeToThrow = 7;
+        private int UnstableConcoctionCounter = 0;
         private int UnstableConcoctionCD = 0;
         private const int UnstableConcoctionDefaultCD = 25;
         private float UnstableConcoctionManaPay = 200.0f;
@@ -53,6 +53,11 @@ namespace revcom_bot.Heroes
 
         }
 
+        public AlchemistHero(IHero hero) : base(hero)
+        {
+
+        }
+
         private async Task<bool> UseUnstableConcoction(Users.User attackerUser, Users.User targetUser)
         {
             if (MP < UnstableConcoctionManaPay)
@@ -68,11 +73,13 @@ namespace revcom_bot.Heroes
                 temp_playerOne = null;
                 temp_playerTwo = null;
                 temp_targetHero = null;
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(AcidSprayCD));
+                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(UnstableConcoctionCD));
                 return false;
             }
             UnstableConcoctionActivated = true;
             MP -= UnstableConcoctionManaPay;
+            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
+            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
             return true;
         }
 
@@ -82,11 +89,11 @@ namespace revcom_bot.Heroes
             string ForEnemyMessage = $"{targetUser.lang.ALCHEMIST_TheEnemyHasThrownUC}\n";
             UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
-            UnstableConctionCounter = 0;
+            UnstableConcoctionCounter = 0;
             if (base.GetRandomNumber(1, 100) > 15)
             {
                 target.GetDamage(UnstableConcoctionDamage);
-                target.StunCounter += UnstableConctionCounter;
+                target.StunCounter += UnstableConcoctionCounter;
 
                 ForYouMessage += $"{attackerUser.lang.ALCHEMIST_UC_HasExploded}\n";
                 ForEnemyMessage += $"{targetUser.lang.ALCHEMIST_UC_HasExploded}\n";
@@ -146,14 +153,14 @@ namespace revcom_bot.Heroes
 
         private async void UpdateUnstableConcoction()
         {
-            if (UnstableConctionCounter < UnstableConctionTimeToThrow && UnstableConcoctionActivated)
-                UnstableConctionCounter++;
+            if (UnstableConcoctionCounter < UnstableConcoctionTimeToThrow && UnstableConcoctionActivated)
+                UnstableConcoctionCounter++;
             else
             {
                 if (UnstableConcoctionActivated)
                 {
                     UnstableConcoctionActivated = false;
-                    UnstableConctionCounter = 0;
+                    UnstableConcoctionCounter = 0;
                     await ThrowUnstableConcoction(temp_playerOne, temp_playerTwo, this);
                 }
             }
@@ -177,15 +184,41 @@ namespace revcom_bot.Heroes
 
         public override string GetMessageAbilitesList(Users.User.Text lang)
         {
-            string[] msg =
+            string msg = $"{lang.List}:\n";
+            msg += $"1 - {lang.AttackString}\n";
+            if (HealCountdown > 0)
+                msg += $"2 - {lang.Heal} ({HealCountdown}) [{HealPayMana}]\n";
+            else
+                msg += $"2 - {lang.Heal} [{HealPayMana}]\n";
+            if (AcidSprayCD > 0)
+                msg += $"3 - {AbiNameOne} ({AcidSprayCD}) [{AcidSprayManaPay}]\n";
+            else
+                msg += $"3 - {AbiNameOne} [{AcidSprayManaPay}]\n";
+            if (UnstableConcoctionActivated)
+                msg += $"4 - {AbiNameTwo} <<{UnstableConcoctionTimeToThrow - UnstableConcoctionCounter}>>\n";
+            else
             {
-                $"1 - {lang.AttackString}",
-                $"2 - {lang.Heal}",
-                $"3 - {AbiNameOne}",
-                $"4 - {AbiNameTwo}",
-                $"5 - {AbiNameThree}"
-            };
-            return string.Join("\n", msg);
+                if (UnstableConcoctionCD > 0)
+                    msg += $"4 - {AbiNameTwo} ({UnstableConcoctionCD}) [{UnstableConcoctionManaPay}]\n";
+                else
+                    msg += $"4 - {AbiNameTwo} [{UnstableConcoctionManaPay}]\n";
+            }
+            if (ChemicalRageActivated)
+                msg += $"5 - {AbiNameThree} <<{ChemicalRageDuration - ChemicalRageCounter}>>\n";
+            else
+            {
+                if (ChemicalRageCD > 0)
+                    msg += $"5 - {AbiNameThree} ({ChemicalRageCD}) [{ChemicalRageManaPay}]\n";
+                else
+                    msg += $"5 - {AbiNameThree} [{ChemicalRageManaPay}]\n";
+            }
+            msg += $"{lang.SelectAbility}:";
+            return msg;
+        }
+
+        public override IHero Copy(IHero hero)
+        {
+            return new AlchemistHero(hero);
         }
 
         override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
@@ -203,6 +236,7 @@ namespace revcom_bot.Heroes
             target.LoosenArmor(AcidSprayArmorPenetrate, AcidSprayDuration);
             target.GetDamageByDebuffs(AcidSprayDamage, AcidSprayDuration);
             MP -= AcidSprayManaPay;
+            AcidSprayCD = AcidSprayDefaultCD;
             await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameOne));
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;

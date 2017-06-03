@@ -93,7 +93,7 @@ namespace revcom_bot
 
         public async Task PickHero(IHero hero)
         {
-            player.hero = new IHero(hero);
+            player.hero = hero.Copy(hero);
 
 
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
@@ -212,6 +212,13 @@ namespace revcom_bot
                 case 4:
                     if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
                         finished = true;
+                    break;
+                case 5:
+                    if (await attacker.UseAbilityThree(user_attacker, user_excepter, excepter))
+                        finished = true;
+                    break;
+                default:
+                    Console.WriteLine("Switch bug!");
                     break;
             }
 
