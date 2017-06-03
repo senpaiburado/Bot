@@ -175,12 +175,12 @@ namespace revcom_bot.Heroes
             }
         }
 
-        public override string GetMessageAbilitesList(Users.User user)
+        public override string GetMessageAbilitesList(Users.User.Text lang)
         {
             string[] msg =
             {
-                $"1 - {user.lang.AttackString}",
-                $"2 - {user.lang.Heal}",
+                $"1 - {lang.AttackString}",
+                $"2 - {lang.Heal}",
                 $"3 - {AbiNameOne}",
                 $"4 - {AbiNameTwo}",
                 $"5 - {AbiNameThree}"

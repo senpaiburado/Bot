@@ -200,7 +200,7 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public string GetMessageAbiliesList(Users.User.Text lang)
+        virtual public string GetMessageAbilitesList(Users.User.Text lang)
         {
             string[] list =
             {
@@ -335,17 +335,17 @@ namespace revcom_bot
             }
         }
 
-        virtual async public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
-        virtual async public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
-        virtual async public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
         {
-            return false;
+            return Task.FromResult(false);
         }
     }
 }

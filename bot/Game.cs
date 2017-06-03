@@ -132,7 +132,7 @@ namespace revcom_bot
 
             IHero temp = attacker.hero;
 
-            await attacker.SendAsync(lang => string.Join("\n", attacker.hero.GetMessageAbiliesList(lang)));
+            await attacker.SendAsync(lang => attacker.hero.GetMessageAbilitesList(lang));
             await excepter.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
         }
 
@@ -239,11 +239,11 @@ namespace revcom_bot
                     user_attacker.status = Users.User.Status.Excepting;
                     user_excepter.status = Users.User.Status.Attacking;
 
-                    await enemyPlayer.SendAsync(lang => string.Join("\n", excepter.GetMessageAbiliesList(lang)));
+                    await enemyPlayer.SendAsync(lang => excepter.GetMessageAbilitesList(lang));
                     await player.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
                 }
                 else
-                    await player.SendAsync(lang => string.Join("\n", attacker.GetMessageAbiliesList(user_attacker.lang)));
+                    await player.SendAsync(lang => attacker.GetMessageAbilitesList(user_attacker.lang));
 
 
                 attacker.UpdateStunDuration();
