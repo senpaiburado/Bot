@@ -38,6 +38,7 @@ namespace revcom_bot
         protected float CriticalHitChance { get; set; }
         protected float CriticalHitMultiplier { get; set; }
         protected float HpStealPercent { get; set; }
+        protected float HpStealAdditional { get; set; }
         protected float StunHitChance { get; set; }
         public float MissChance { get; set; }
         public float StunDamage { get; set; }
@@ -55,6 +56,9 @@ namespace revcom_bot
         public int ArmorPenetratingCounter = 0;
         public float ArmorPenetrationValue = 0.0f;
         public bool ArmorPenetratingActive = false;
+
+        public bool HasImmuneToMagic = false;
+        public int HasImmuneToMagicCounter = 0;
 
         // Abilities:
 
@@ -110,7 +114,8 @@ namespace revcom_bot
 
             CriticalHitChance = 15.0f;
             CriticalHitMultiplier = 1.5f;
-            HpStealPercent = 5.0f;
+            HpStealPercent = 0.2f;
+            HpStealAdditional = 0.0f;
             MissChance = 10.0f;
             StunHitChance = 10.0f;
             StunDamage = DPS / 100 * 15;
@@ -146,6 +151,26 @@ namespace revcom_bot
 
         }
 
+        protected void UpdateImmuneToMagic()
+        {
+            if (HasImmuneToMagicCounter > 0)
+                HasImmuneToMagicCounter--;
+            else
+            {
+                if (HasImmuneToMagic)
+                {
+                    HasImmuneToMagicCounter = 0;
+                    HasImmuneToMagic = false;
+                }
+            }
+        }
+
+        public void AddImmuneToMagic(int time)
+        {
+            HasImmuneToMagicCounter += time;
+            HasImmuneToMagic = true;
+        }
+
         public virtual IHero Copy(Sender sender)
         {
             return new IHero(this, sender);
@@ -161,7 +186,7 @@ namespace revcom_bot
             float damage = 0.0f;
 
             var attakerMessages = Sender.CreateMessageContainer(); 
-            var excepterMessages = Sender.CreateMessageContainer(); 
+            var excepterMessages = target.Sender.CreateMessageContainer(); 
 
             if (GetRandomNumber(1, 101) >= target.MissChance)
             {
@@ -191,6 +216,7 @@ namespace revcom_bot
             }
             
             target.GetDamage(damage);
+            HP += (damage / 100 * HpStealPercent) + HpStealAdditional;
 
             await attakerMessages.SendAsync();
             await excepterMessages.SendAsync();

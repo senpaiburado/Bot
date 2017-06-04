@@ -85,6 +85,12 @@ namespace revcom_bot.Heroes
             var enemyMessages = enemyHero.Sender.CreateMessageContainer();
             enemyMessages.Add(lang => lang.ALCHEMIST_TheEnemyHasThrownUC);
 
+            if (target != this && target.HasImmuneToMagic)
+            {
+                await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
+                return false;
+            }
+
             UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
             if (base.GetRandomNumber(1, 100) > 15)
@@ -233,7 +239,8 @@ namespace revcom_bot.Heroes
                 await Sender.SendAsync(lang => lang.GetMessageCountdown(AcidSprayCD));
                 return false;
             }
-            target.LoosenArmor(AcidSprayArmorPenetrate, AcidSprayDuration);
+            if (!target.HasImmuneToMagic)
+                target.LoosenArmor(AcidSprayArmorPenetrate, AcidSprayDuration);
             target.GetDamageByDebuffs(AcidSprayDamage, AcidSprayDuration);
             MP -= AcidSprayManaPay;
             AcidSprayCD = AcidSprayDefaultCD;

@@ -159,6 +159,11 @@ namespace revcom_bot.Heroes
                 await Sender.SendAsync(lang => lang.GetMessageCountdown(BladeFuryCD));
                 return false;
             }
+            if (target.HasImmuneToMagic)
+            {
+                await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
+                return false;
+            }
             BladeFuryActivated = true;
             BladeFuryCD = BladeFuryDefaultCD;
             MP -= BladeFuryManaPay;
@@ -220,7 +225,7 @@ namespace revcom_bot.Heroes
             }
             OmnislashCD = OmnislashDefaultCD;
             MP -= OmnislashManaPay;
-            target.GetDamageByDebuffs(OmnislashDamage, OmnislashDuration);
+            target.GetDamageByDebuffs(OmnislashDamage - target.Armor, OmnislashDuration);
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;

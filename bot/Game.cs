@@ -459,7 +459,7 @@ namespace revcom_bot
         {
             // main += 20
             hero_list.Add(new Heroes.Juggernaut("Juggernaut", 215, 240, 145, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
+            hero_list.Add(new Heroes.FacelessVoid("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Abaddon("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));

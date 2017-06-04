@@ -153,7 +153,8 @@ namespace revcom_bot.Heroes
             HP += PreviousHP;
             MP -= TimeWalkManaPay;
             TimeWalkCD = TimeWalkDefaultCD;
-            target.GetDamage(TimeWalkDamage - target.Armor);
+            if (!target.HasImmuneToMagic)
+                target.GetDamage(TimeWalkDamage - target.Armor);
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
@@ -199,6 +200,7 @@ namespace revcom_bot.Heroes
             }
             MP -= ChronosphereManaPay;
             target.StunCounter += ChronosphereDuration;
+            ChronosphereActivated = true;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;

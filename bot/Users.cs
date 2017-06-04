@@ -33,7 +33,7 @@ namespace revcom_bot
 
         internal SenderContainer CreateMessageContainer()
         {
-            throw new NotImplementedException();
+            return new SenderContainer(this);
         }
     }
 
@@ -1274,6 +1274,29 @@ namespace revcom_bot
                     }
                 }
 
+            public string @YouHaveImmuneToMagic
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "You have immune to magic.";
+                    else if (lang == Language.Russian)
+                        return "У вас есть иммунитет к магии.";
+                    return "";
+                }
+            }
+            public string @EnemyHasImmuneToMagic
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "The enemy has immune to magic.";
+                    else if (lang == Language.Russian)
+                        return "Противник имеет иммунитет к магии.";
+                    return "";
+                }
+            }
+
             public string GetMessageYouActivated(string abi_name)
             {
                 if (lang == Language.English)
@@ -1291,7 +1314,7 @@ namespace revcom_bot
                 return "";
             }
 
-                public string GetMessageYouCantUseAbilityWhileAnotherWorks(string abi_name)
+            public string GetMessageYouCantUseAbilityWhileAnotherWorks(string abi_name)
                 {
                     if (lang == Language.English)
                         return $"You can use \"Attack\" only while {abi_name} works!";

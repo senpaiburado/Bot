@@ -166,7 +166,8 @@ namespace revcom_bot.Heroes
                 {
                     AphoticShieldActivated = false;
                     AphoticShieldCounter = 0;
-                    hero_target.GetDamage(AphoticShieldDamageAbsorption);
+                    if (!hero_target.HasImmuneToMagic)
+                        hero_target.GetDamage(AphoticShieldDamageAbsorption);
                     AphoticShieldDamageAbsorption = 1000.0f;
                     await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                     await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
