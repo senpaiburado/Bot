@@ -15,7 +15,7 @@ namespace revcom_bot
     public partial class Form1 : Form
     {
         BackgroundWorker bw;
-        Users user;
+        Users users;
 
         List<Game> ActiveGames = new List<Game>();
 
@@ -33,8 +33,8 @@ namespace revcom_bot
             this.bw = new BackgroundWorker();
             this.bw.DoWork += bw_DoWork;
 
-            this.user = new Users();
-            this.user.Init();
+            this.users = new Users();
+            this.users.Init();
 
             Game.Initialize();
         }
@@ -43,17 +43,17 @@ namespace revcom_bot
         {
             var worker = sender as BackgroundWorker;
             var key = e.Argument as String;
-            List<Users.User> availablePlayers = new List<Users.User>();
+            List<User> availablePlayers = new List<User>();
             try
             {
                 var Bot = new Telegram.Bot.TelegramBotClient(key);
-                IHero.bot = Bot;
+                //IHero.bot = Bot;
                 await Bot.SetWebhookAsync("");
                 //Bot.SetWebhook("");
                 int offset = 0;
                 while (true)
                 {
-                    availablePlayers.RemoveAll(x => x.status != Users.User.Status.Searching);
+                    availablePlayers.RemoveAll(x => x.status != User.Status.Searching);
                     ActiveGames.RemoveAll(x => !x.isWorking);
 
                     while (availablePlayers.Count >= 2)
@@ -109,15 +109,15 @@ namespace revcom_bot
                     {
                         var message = update.Message;
 
-                        if (!user.Contains(message.Chat.Id))
+                        if (!users.Contains(message.Chat.Id))
                         {
-                            user.AddUser(message.Chat.Id);
+                            users.AddUser  (message.Chat.Id);
                             Console.WriteLine("LOL");
                         }
 
-                        Users.User _usr = user.getUserByID(message.Chat.Id);
+                        User _usr = users.getUserByID(message.Chat.Id);
 
-                        if (_usr.status == Users.User.Status.Default)
+                        if (_usr.status == User.Status.Default)
                         {
                             if (message.Text == "/start")
                             {
@@ -137,13 +137,13 @@ namespace revcom_bot
                                 keyboard.ResizeKeyboard = true;
                                 keyboard.OneTimeKeyboard = true;
 
-                                _usr.status = Users.User.Status.LanguageChanging;
+                                _usr.status = User.Status.LanguageChanging;
 
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangeLanguage, replyMarkup: keyboard);
                             }
                             else if (message.Text == "/profile")
                             {
-                                if (_usr.net_status == Users.User.NetworkStatus.Online)
+                                if (_usr.net_status == User.NetworkStatus.Online)
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.GetStatisctisMessage());
                                 else
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ErrorByStatusOffline);
@@ -152,25 +152,25 @@ namespace revcom_bot
                             {
                                 if (_usr.Name != "")
                                 {
-                                    _usr.net_status = Users.User.NetworkStatus.Online;
+                                    _usr.net_status = User.NetworkStatus.Online;
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SetOnlineStatus);
                                 }
                                 else
                                 {
-                                    _usr.status = Users.User.Status.SettingNickname;
+                                    _usr.status = User.Status.SettingNickname;
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NeedToHaveNickname);
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NeedToSetNickname + ":");
                                 }
                             }
                             else if (message.Text == "/offline")
                             {
-                                _usr.net_status = Users.User.NetworkStatus.Offline;
+                                _usr.net_status = User.NetworkStatus.Offline;
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SetOfflineStatus);
                             }
                             else if (message.Text == "/netstatus")
                             {
                                 string msg;
-                                if (_usr.net_status == Users.User.NetworkStatus.Online)
+                                if (_usr.net_status == User.NetworkStatus.Online)
                                     msg = _usr.lang.GetOnlineStatus;
                                 else
                                     msg = _usr.lang.GetOfflineStatus;
@@ -196,9 +196,9 @@ namespace revcom_bot
                             }
                             else if (message.Text == "/startgame")
                             {
-                                if (_usr.net_status == Users.User.NetworkStatus.Online)
+                                if (_usr.net_status == User.NetworkStatus.Online)
                                 {
-                                    _usr.status = Users.User.Status.Searching;
+                                    _usr.status = User.Status.Searching;
                                     availablePlayers.Add(_usr);
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SearchingModeNotify);
                                 }
@@ -211,7 +211,7 @@ namespace revcom_bot
                             }
                             else if (message.Text == "/delete")
                             {
-                                _usr.status = Users.User.Status.DeletingAccount;
+                                _usr.status = User.Status.DeletingAccount;
                                 var kb = new ReplyKeyboardMarkup(new[]{
                                     new[]
                                     {
@@ -228,14 +228,14 @@ namespace revcom_bot
                                 if (int.TryParse(res, out rating))
                                     rating = int.Parse(res);
                                 Console.WriteLine($"Parse {rating}");
-                                Users.User find_user = null;
+                                User find_user = null;
 
                                 string name = System.Text.RegularExpressions.Regex.Match(
                                     message.Text, @"\{(.*)\}").Groups[1].ToString();
 
                                 if (name != "")
                                 {
-                                    find_user = user.GetUserByName(name);
+                                    find_user = users.GetUserByName(name);
 
                                     if (find_user != null && rating > 0)
                                     {
@@ -252,7 +252,7 @@ namespace revcom_bot
                                     .Groups[1].ToString();
                                 if (res != "")
                                 {
-                                    foreach (var item in user.GetIDs())
+                                    foreach (var item in users.GetIDs())
                                     {
                                         //await Bot.SendTextMessageAsync(item, res);
                                         //await Task.Delay(100);
@@ -265,7 +265,7 @@ namespace revcom_bot
                             else if (message.IsCommand("[ADMIN] Get list of names") && message.Chat.Id ==
                                 Users.AdminID)
                             {
-                                string msg = $"{_usr.lang.List}:\n{string.Join("\n", user.GetNames())}\n";
+                                string msg = $"{_usr.lang.List}:\n{string.Join("\n", users.GetNames())}\n";
                                 await Bot.SendTextMessageAsync(message.Chat.Id, msg);
                             }
                             else if (message.IsCommand("[ADMIN] Send to one:") && message.Chat.Id == Users.AdminID)
@@ -276,7 +276,7 @@ namespace revcom_bot
                                     .Groups[1].ToString();
 
                                 long id = 0;
-                                id = user.GetIdByName(name);
+                                id = users.GetIdByName(name);
 
                                 if (id != -1)
                                 {
@@ -294,9 +294,9 @@ namespace revcom_bot
                                 string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
                                 if (name != "")
                                 {
-                                    if (user.GetUserByName(name) != null)
+                                    if (users.GetUserByName(name) != null)
                                     {
-                                        await Bot.SendTextMessageAsync(message.Chat.Id, user.GetUserByName(name)
+                                        await Bot.SendTextMessageAsync(message.Chat.Id, users.GetUserByName(name)
                                             .GetStatisctisMessage());
                                         await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang
                                             .GetMessageAdminCommandSuccesful(message.Text));
@@ -308,9 +308,9 @@ namespace revcom_bot
                                 string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
                                 if (name != "")
                                 {
-                                    if (user.GetUserByName(name) != null)
+                                    if (users.GetUserByName(name) != null)
                                     {
-                                        user.DeleteUser(user.GetUserByName(name).ID);
+                                        users.DeleteUser(users.GetUserByName(name).ID);
                                         await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.GetMessageAdminCommandSuccesful(
                                             message.Text));
                                     }
@@ -321,21 +321,21 @@ namespace revcom_bot
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.HelloMessage);
                             }
                         }
-                        else if (_usr.status == Users.User.Status.LanguageChanging)
+                        else if (_usr.status == User.Status.LanguageChanging)
                         {
                             if (message.IsCommand("english") || message.IsCommand("русский"))
                             {
-                                _usr.status = Users.User.Status.Default;
+                                _usr.status = User.Status.Default;
                                 if (message.IsCommand("english"))
-                                    _usr.lang.lang = Users.User.Text.Language.English;
+                                    _usr.lang.lang = User.Text.Language.English;
                                 else if (message.IsCommand("русский"))
-                                    _usr.lang.lang = Users.User.Text.Language.Russian;
+                                    _usr.lang.lang = User.Text.Language.Russian;
                                 var hide_keyboard = new ReplyKeyboardHide();
                                 _usr.SaveToFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangedLanguage, replyMarkup: hide_keyboard);
                             }
                         }
-                        else if (_usr.status == Users.User.Status.Picking)
+                        else if (_usr.status == User.Status.Picking)
                         {
                             if (message.Text == "/stopsearching")
                             {
@@ -360,7 +360,7 @@ namespace revcom_bot
                                     GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.PickHero(hero);
                             }
                         }
-                        else if (_usr.status == Users.User.Status.Attacking)
+                        else if (_usr.status == User.Status.Attacking)
                         {
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.IsDigits(message.Text))
@@ -377,11 +377,11 @@ namespace revcom_bot
                             else
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.IncorrectSelection);
                         }
-                        else if (_usr.status == Users.User.Status.Excepting)
+                        else if (_usr.status == User.Status.Excepting)
                         {
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                         }
-                        else if (_usr.status == Users.User.Status.Searching)
+                        else if (_usr.status == User.Status.Searching)
                         {
                             if (message.Text == "/stopsearching")
                             {
@@ -393,11 +393,11 @@ namespace revcom_bot
                                         break;
                                     }
                                 }
-                                _usr.status = Users.User.Status.Default;
+                                _usr.status = User.Status.Default;
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SearchingModeStopped);
                             }
                         }
-                        else if (_usr.status == Users.User.Status.GameConfirming)
+                        else if (_usr.status == User.Status.GameConfirming)
                         {
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
@@ -405,14 +405,14 @@ namespace revcom_bot
                                 GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.ConfirmGame(isConfirm);
                             }
                         }
-                        else if (_usr.status == Users.User.Status.WaitingForRespond)
+                        else if (_usr.status == User.Status.WaitingForRespond)
                         {
                             if (message.Text == "/stopsearching")
                             {
                                 await GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.LeaveConfirming();
                             }
                         }
-                        else if (_usr.status == Users.User.Status.DeletingAccount)
+                        else if (_usr.status == User.Status.DeletingAccount)
                         {
                             if (message.IsCommand(_usr.lang.YesMessage) || message.IsCommand(_usr.lang.NoMessage))
                             {
@@ -420,23 +420,23 @@ namespace revcom_bot
                                 if (message.IsCommand(_usr.lang.YesMessage))
                                 {
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.AccountWasDeletedString, replyMarkup: h_kb);
-                                    user.DeleteUser(message.Chat.Id);
+                                    users.DeleteUser(message.Chat.Id);
                                 }
                                 else
                                 {
-                                    _usr.status = Users.User.Status.Default;
+                                    _usr.status = User.Status.Default;
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.YouCanceledTheActionString, replyMarkup: h_kb);
                                 }
                             }
                         }
-                        else if (_usr.status == Users.User.Status.SettingNickname)
+                        else if (_usr.status == User.Status.SettingNickname)
                         {
-                            if (user.NicknameExists(message.Text))
+                            if (users.NicknameExists(message.Text))
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameIsAlreadyExists);
                             else
                             {
                                 _usr.Name = message.Text;
-                                _usr.status = Users.User.Status.Default;
+                                _usr.status = User.Status.Default;
                                 _usr.SaveToFile();
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameSet);
                             }
@@ -444,7 +444,7 @@ namespace revcom_bot
                         else
                         {
                             var hide_keyboard = new ReplyKeyboardHide();
-                            _usr.status = Users.User.Status.Default;
+                            _usr.status = User.Status.Default;
                             await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.StatusUndefinedError, replyMarkup: hide_keyboard);
                         }
 
@@ -482,7 +482,7 @@ namespace revcom_bot
 
         }
 
-        private void CheckLeave(Users.User user, Game game, string text)
+        private void CheckLeave(User user, Game game, string text)
         {
             if (text == "/leavegame")
                 game.GetController(user.ID)?.LeaveGame();

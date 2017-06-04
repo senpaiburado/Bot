@@ -8,17 +8,17 @@ namespace revcom_bot
 {
     class PlayerGameContext
     {
-        public Users.User User;
+        public User User;
         public IHero hero;
-        private Telegram.Bot.TelegramBotClient bot;
+        public Telegram.Bot.TelegramBotClient bot;
 
-        public PlayerGameContext(Users.User user, Telegram.Bot.TelegramBotClient bot)
+        public PlayerGameContext(User user, Telegram.Bot.TelegramBotClient bot)
         {
             this.User = user;
             this.bot = bot;
         }
 
-        public async Task SendAsync(Func<Users.User.Text, string> getText, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup=null)
+        public async Task SendAsync(Func<User.Text, string> getText, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup=null)
         {
             await bot.SendTextMessageAsync(User.ID, getText(User.lang), replyMarkup: replyMarkup);
         }
@@ -27,7 +27,7 @@ namespace revcom_bot
         {
             hero = null;
             User.ActiveGameID = 0L;
-            User.status = Users.User.Status.Default;
+            User.status = User.Status.Default;
             User.HeroName = "";
         }
     }
@@ -64,10 +64,10 @@ namespace revcom_bot
             if (accepted)
             {
                 await player.SendAsync(lang => lang.GameAccepted);
-                if (enemyPlayer.User.status == Users.User.Status.WaitingForRespond)
+                if (enemyPlayer.User.status == User.Status.WaitingForRespond)
                 {
-                    player.User.status = Users.User.Status.Picking;
-                    enemyPlayer.User.status = Users.User.Status.Picking;
+                    player.User.status = User.Status.Picking;
+                    enemyPlayer.User.status = User.Status.Picking;
 
                     await player.SendAsync(lang => lang.GameStarted, kb);
                     await enemyPlayer.SendAsync(lang => lang.GameStarted, kb);
@@ -79,7 +79,7 @@ namespace revcom_bot
                 }
                 else
                 {
-                    player.User.status = Users.User.Status.WaitingForRespond;
+                    player.User.status = User.Status.WaitingForRespond;
                     await player.SendAsync(lang => lang.AnotherPlayerGameAcceptWaiting, replyMarkup: kb);
                 }
             }
@@ -93,14 +93,14 @@ namespace revcom_bot
 
         public async Task PickHero(IHero hero)
         {
-            player.hero = hero.Copy();
+            player.hero = hero.Copy(new Sender(player.User.ID, player.User.lang, player.bot));
 
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
 
             await player.SendAsync(lang => $"{lang.PickedHero} {hero.Name} !", kb);
             player.User.HeroName = hero.Name; //??
 
-            if (enemyPlayer.User.status == Users.User.Status.Picked)
+            if (enemyPlayer.User.status == User.Status.Picked)
             {
                 Random random = new Random();
                 if (random.Next(0, 2) == 0)
@@ -110,15 +110,15 @@ namespace revcom_bot
             }
             else
             {
-                player.User.status = Users.User.Status.Picked;
+                player.User.status = User.Status.Picked;
                 await player.SendAsync(lang => lang.WaitForPickOfAnotherPlayer);
             }
         }
 
         private async void SetAttackerAndExcepter(PlayerGameContext attacker, PlayerGameContext excepter)
         {
-            attacker.User.status = Users.User.Status.Attacking;
-            excepter.User.status = Users.User.Status.Excepting;
+            attacker.User.status = User.Status.Attacking;
+            excepter.User.status = User.Status.Excepting;
 
             await attacker.SendAsync(lang => lang.YourEnemyMessage + ": " + excepter.User.Name);
             await excepter.SendAsync(lang => lang.YourEnemyMessage + ": " + attacker.User.Name);
@@ -145,7 +145,7 @@ namespace revcom_bot
             await enemyPlayer.SendAsync(lang => GetMessageForEnemy(lang, player.hero));
         }
 
-        public static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)
+        public static string GetMessageForMe(User.Text playerLang, IHero playerHero)
         {
             string[] lines =
                 {
@@ -160,7 +160,7 @@ namespace revcom_bot
             return string.Join("\n", lines);
         }
 
-        public static string GetMessageForEnemy(Users.User.Text playerLang, IHero enemyHero)
+        public static string GetMessageForEnemy(User.Text playerLang, IHero enemyHero)
         {
             string[] lines =
             {
@@ -187,8 +187,8 @@ namespace revcom_bot
 
         public async Task<bool> UseAbility(int number)
         {
-            Users.User user_attacker = player.User;
-            Users.User user_excepter = enemyPlayer.User;
+            User user_attacker = player.User;
+            User user_excepter = enemyPlayer.User;
             IHero attacker = player.hero;
             IHero excepter = enemyPlayer.hero;
 
@@ -197,23 +197,23 @@ namespace revcom_bot
             switch (number)
             {
                 case 1:
-                    if (await attacker.Attack(excepter, user_attacker, user_excepter))
+                    if (await attacker.Attack(excepter))
                         finished = true;
                     break;
                 case 2:
-                    if (await attacker.Heal(user_attacker, user_excepter))
+                    if (await attacker.Heal(excepter))
                         finished = true;
                     break;
                 case 3:
-                    if (await attacker.UseAbilityOne(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityOne(excepter))
                         finished = true;
                     break;
                 case 4:
-                    if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityTwo(excepter))
                         finished = true;
                     break;
                 case 5:
-                    if (await attacker.UseAbilityThree(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityThree(excepter))
                         finished = true;
                     break;
                 default:
@@ -244,8 +244,8 @@ namespace revcom_bot
 
                 if (excepter.StunCounter == 0)
                 {
-                    user_attacker.status = Users.User.Status.Excepting;
-                    user_excepter.status = Users.User.Status.Attacking;
+                    user_attacker.status = User.Status.Excepting;
+                    user_excepter.status = User.Status.Attacking;
 
                     await enemyPlayer.SendAsync(lang => excepter.GetMessageAbilitesList(lang));
                     await player.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
@@ -261,7 +261,7 @@ namespace revcom_bot
                 return false;
         }
 
-        private static string GetWinMessage(PlayerGameContext winner, PlayerGameContext loser, Users.User.Text lang)
+        private static string GetWinMessage(PlayerGameContext winner, PlayerGameContext loser, User.Text lang)
         {
             string[] msg =
             {
@@ -278,14 +278,14 @@ namespace revcom_bot
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
 
             winner.User.AddWin();
-            winner.User.status = Users.User.Status.Default;
+            winner.User.status = User.Status.Default;
             await winner.SendAsync(lang => lang.GameFinished, kb);
             await winner.SendAsync(lang => GetWinMessage(winner, loser, lang));
             await winner.SendAsync(lang => GetMessageForMe(lang, winner.hero));
             await winner.SendAsync(lang => GetMessageForEnemy(lang, loser.hero));
 
             loser.User.AddLose();
-            loser.User.status = Users.User.Status.Default;
+            loser.User.status = User.Status.Default;
             await loser.SendAsync(lang => lang.GameFinished, kb);
             await loser.SendAsync(lang => GetWinMessage(winner, loser, lang));
             await loser.SendAsync(lang => GetMessageForMe(lang, loser.hero));
@@ -299,7 +299,7 @@ namespace revcom_bot
             return GetKeyboardNextPage(player.User);
         }
 
-        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage(Users.User user)
+        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardNextPage(User user)
         { 
             user.HeroListPage++;
             if (user.HeroListPage > MaxPageValue)
@@ -311,7 +311,7 @@ namespace revcom_bot
         public const short MinPageValue = 1;
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetKeyboardPrevPage()
         {
-            Users.User user = player.User;
+            User user = player.User;
 
             user.HeroListPage--;
             if (user.HeroListPage < MinPageValue)
@@ -405,18 +405,18 @@ namespace revcom_bot
 
         public bool isWorking = false;
 
-        public Game(Users.User user_one, Users.User user_two, Telegram.Bot.TelegramBotClient _bot)
+        public Game(User user_one, User user_two, Telegram.Bot.TelegramBotClient _bot)
         {
             bot = _bot;
             IGameID++;
             GameID = IGameID;
 
             user_one.ActiveGameID = GameID;
-            user_one.status = Users.User.Status.GameConfirming;
+            user_one.status = User.Status.GameConfirming;
 
 
             user_two.ActiveGameID = GameID;
-            user_two.status = Users.User.Status.GameConfirming;
+            user_two.status = User.Status.GameConfirming;
 
             isWorking = true;
 

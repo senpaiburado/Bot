@@ -8,9 +8,7 @@ namespace revcom_bot.Heroes
 {
     class Alchemist : IHero
     {
-        Users.User temp_playerOne = null;
-        Users.User temp_playerTwo = null;
-        IHero temp_targetHero = null;
+        IHero hero_target = null;
 
         // Ability One : Acid Spray
         public string AbiNameOne = "Acid Spray";
@@ -54,35 +52,39 @@ namespace revcom_bot.Heroes
 
         }
 
-        public Alchemist(IHero hero) : base(hero)
+        public Alchemist(IHero hero, Sender sender)
+            : base(hero, sender)
         {
 
         }
 
-        private async Task<bool> UseUnstableConcoction(Users.User attackerUser, Users.User targetUser)
+        private async Task<bool> UseUnstableConcoction(IHero excepter)
         {
             if (MP < UnstableConcoctionManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
-                    UnstableConcoctionManaPay - MP)));
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(UnstableConcoctionManaPay - MP)));
                 return false;
             }
             if (UnstableConcoctionCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(UnstableConcoctionCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(UnstableConcoctionCD));
                 return false;
             }
             MP -= UnstableConcoctionManaPay;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
+            await excepter.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
             UnstableConcoctionActivated = true;
             return true;
         }
 
-        private async Task<bool> ThrowUnstableConcoction(Users.User attackerUser, Users.User targetUser, IHero target)
+        private async Task<bool> ThrowUnstableConcoction(IHero enemyHero, IHero target)
         {
-            string ForYouMessage = $"{attackerUser.lang.ALCHEMIST_YouHaveThrownUC}\n";
-            string ForEnemyMessage = $"{targetUser.lang.ALCHEMIST_TheEnemyHasThrownUC}\n";
+            var attakerMessages = Sender.CreateMessageContainer();
+            attakerMessages.Add(lang => lang.ALCHEMIST_YouHaveThrownUC);
+
+            var enemyMessages = enemyHero.Sender.CreateMessageContainer();
+            enemyMessages.Add(lang => lang.ALCHEMIST_TheEnemyHasThrownUC);
+
             UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
             if (base.GetRandomNumber(1, 100) > 15)
@@ -90,32 +92,31 @@ namespace revcom_bot.Heroes
                 target.GetDamage(UnstableConcoctionDamage);
                 target.StunCounter += UnstableConcoctionCounter;
 
-                ForYouMessage += $"{attackerUser.lang.ALCHEMIST_UC_HasExploded}\n";
-                ForEnemyMessage += $"{targetUser.lang.ALCHEMIST_UC_HasExploded}\n";
+                attakerMessages.Add(lang => lang.ALCHEMIST_UC_HasExploded);
+                enemyMessages.Add(lang => lang.ALCHEMIST_UC_HasExploded);
 
                 if (target == this)
                 {
-                    ForYouMessage += $"{attackerUser.lang.YouStunnedYourself}";
-                    ForEnemyMessage += $"{targetUser.lang.TheEnemyHasStunnedItself}";
+                    attakerMessages.Add(lang => lang.YouStunnedYourself);
+                    enemyMessages.Add(lang => lang.TheEnemyHasStunnedItself);
                 }
                 else
                 {
-                    ForYouMessage += $"{attackerUser.lang.YouStunnedEnemy}";
-                    ForEnemyMessage += $"{targetUser.lang.TheEnemyStunnedYou}";
+                    attakerMessages.Add(lang => lang.YouStunnedEnemy);
+                    enemyMessages.Add(lang => lang.TheEnemyStunnedYou);
                 }
             }
             else
             {
-                ForYouMessage += attackerUser.lang.YouMissedTheEnemy;
-                ForEnemyMessage += targetUser.lang.TheEnemyMissedYou;
+                attakerMessages.Add(lang => lang.YouMissedTheEnemy);
+                enemyMessages.Add(lang => lang.TheEnemyMissedYou);
             }
 
-            await bot.SendTextMessageAsync(attackerUser.ID, ForYouMessage);
-            await bot.SendTextMessageAsync(targetUser.ID, ForEnemyMessage);
+            await attakerMessages.SendAsync();
+            await enemyMessages.SendAsync();
+            
             UnstableConcoctionCounter = 0;
-            temp_playerOne = null;
-            temp_playerTwo = null;
-            temp_targetHero = null;
+            hero_target = null;
             return true;
         }
 
@@ -157,7 +158,7 @@ namespace revcom_bot.Heroes
                 {
                     UnstableConcoctionActivated = false;
                     UnstableConcoctionCounter = 0;
-                    await ThrowUnstableConcoction(temp_playerOne, temp_playerTwo, this);
+                    await ThrowUnstableConcoction(hero_target, this);
                 }
             }
         }
@@ -180,7 +181,7 @@ namespace revcom_bot.Heroes
             }
         }
 
-        public override string GetMessageAbilitesList(Users.User.Text lang)
+        public override string GetMessageAbilitesList(User.Text lang)
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
@@ -214,60 +215,59 @@ namespace revcom_bot.Heroes
             return msg;
         }
 
-        public override IHero Copy()
+        public override IHero Copy(Sender sender)
         {
-            return new Alchemist(this);
+            return new Alchemist(this, sender);
         }
 
-        override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        override public async Task<bool> UseAbilityOne(IHero target)
         {
             if (MP < AcidSprayManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     AcidSprayManaPay - MP)));
                 return false;
             }
             if (AcidSprayCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(AcidSprayCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(AcidSprayCD));
                 return false;
             }
             target.LoosenArmor(AcidSprayArmorPenetrate, AcidSprayDuration);
             target.GetDamageByDebuffs(AcidSprayDamage, AcidSprayDuration);
             MP -= AcidSprayManaPay;
             AcidSprayCD = AcidSprayDefaultCD;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
+            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        override public async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+
+        public async override Task<bool> UseAbilityTwo(IHero target)
         {
             if (UnstableConcoctionActivated)
-                return await ThrowUnstableConcoction(attackerUser, targetUser, target);
+                return await ThrowUnstableConcoction(target, target);
             else
             {
-                temp_playerOne = attackerUser;
-                temp_playerTwo = targetUser;
-                temp_targetHero = target;
-                return await UseUnstableConcoction(attackerUser, targetUser);
+                hero_target = target;
+                return await UseUnstableConcoction(target);
             }
         }
-        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(IHero target)
         {
             if (MP < ChemicalRageManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     ChemicalRageManaPay - MP)));
                 return false;
             }
             if (ChemicalRageCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(ChemicalRageCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(ChemicalRageCD));
                 return false;
             }
             if (ChemicalRageActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             MP -= ChemicalRageManaPay;
@@ -277,8 +277,8 @@ namespace revcom_bot.Heroes
             MPregen += ChemicalRageMpRegeneration;
             AttackSpeed += ChemicalRageAdditionalAttackSpeed;
             UpdateDPS();
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
+            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }

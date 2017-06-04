@@ -45,7 +45,8 @@ namespace revcom_bot.Heroes
         {
 
         }
-        public Juggernaut(IHero hero) : base(hero)
+        public Juggernaut(IHero hero, Sender sender)
+            : base(hero, sender)
         {
 
         }
@@ -56,9 +57,9 @@ namespace revcom_bot.Heroes
             BladeDanceCriticalChance += BladeDanceCriticalChance;
         }
 
-        public override IHero Copy()
+        public override IHero Copy(Sender sender)
         {
-            return new Juggernaut(this);
+            return new Juggernaut(this, sender);
         }
 
         private void UpdateBladeFury()
@@ -106,7 +107,7 @@ namespace revcom_bot.Heroes
             UpdateHealingWard();
         }
 
-        public override string GetMessageAbilitesList(Users.User.Text lang)
+        public override string GetMessageAbilitesList(User.Text lang)
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
@@ -140,87 +141,88 @@ namespace revcom_bot.Heroes
             return msg;
         }
 
-        public override async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityOne(IHero target)
         {
             if (BladeFuryActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             if (MP < BladeFuryManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     BladeFuryManaPay - MP)));
                 return false;
             }
             if (BladeFuryCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(BladeFuryCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(BladeFuryCD));
                 return false;
             }
             BladeFuryActivated = true;
             BladeFuryCD = BladeFuryDefaultCD;
             MP -= BladeFuryManaPay;
             target.GetDamageByDebuffs(BladeFuryDamage, BladeFuryDuration);
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        public override async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+
+        public override async Task<bool> UseAbilityTwo(IHero target)
         {
             if (BladeFuryActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouCantUseAbilityWhileAnotherWorks
+                await Sender.SendAsync(lang => lang.GetMessageYouCantUseAbilityWhileAnotherWorks
                     (AbiNameOne));
                 return false;
             }
             if (HealingWardActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             if (MP < HealingWardManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     HealingWardManaPay - MP)));
                 return false;
             }
             if (HealingWardCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(HealingWardCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(HealingWardCD));
                 return false;
             }
             HealingWardActivated = true;
             HPregen += HealingWardHpRegeneration;
             HealingWardCD = HealingWardDefaultCD;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
             return true;
         }
-        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(IHero target)
         {
             if (BladeFuryActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouCantUseAbilityWhileAnotherWorks
+                await Sender.SendAsync(lang => lang.GetMessageYouCantUseAbilityWhileAnotherWorks
                     (AbiNameOne));
                 return false;
             }
             if (MP < OmnislashManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     OmnislashManaPay - MP)));
                 return false;
             }
             if (OmnislashCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(OmnislashCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(OmnislashCD));
                 return false;
             }
             OmnislashCD = OmnislashDefaultCD;
             MP -= OmnislashManaPay;
             target.GetDamageByDebuffs(OmnislashDamage, OmnislashDuration);
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }
