@@ -145,6 +145,8 @@ namespace revcom_bot.Heroes
         }
         private async void UpdateAphoticShield()
         {
+            if (AphoticShieldDamageAbsorption <= 0.0f)
+                AphoticShieldActivated = false;
             if (AphoticShieldCounter < AphoticShieldDuration && AphoticShieldActivated)
                 AphoticShieldCounter++;
             else
@@ -158,7 +160,7 @@ namespace revcom_bot.Heroes
                     await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
                     await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
                 }
-                else
+                else if (AphoticShieldCounter == AphoticShieldDuration)
                 {
                     AphoticShieldCounter = 0;
                     AphoticShieldDamageAbsorption = 1000.0f;
@@ -211,6 +213,8 @@ namespace revcom_bot.Heroes
             player_this = attackerUser;
             player_enemy = targetUser;
             hero_target = target;
+            AphoticShieldCD = AphoticShieldDefaultCD;
+            MP -= AphoticShieldManaPay;
             await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouActivated(AbiNameTwo));
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyActivated(AbiNameTwo));
             return true;

@@ -139,10 +139,10 @@ namespace revcom_bot
         {
             //временно
             await player.SendAsync(lang => GetMessageForMe(lang, player.hero));
-            await player.SendAsync(lang => GetMessageForEnemy(lang, player.hero));
+            await player.SendAsync(lang => GetMessageForEnemy(lang, enemyPlayer.hero));
 
             await enemyPlayer.SendAsync(lang => GetMessageForMe(lang, enemyPlayer.hero));
-            await enemyPlayer.SendAsync(lang => GetMessageForEnemy(lang, enemyPlayer.hero));
+            await enemyPlayer.SendAsync(lang => GetMessageForEnemy(lang, player.hero));
         }
 
         public static string GetMessageForMe(Users.User.Text playerLang, IHero playerHero)
