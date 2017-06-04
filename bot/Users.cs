@@ -65,7 +65,7 @@ namespace revcom_bot
     {
         private Dictionary<long, User> users = new Dictionary<long, User>();
 
-        public static long AdminID = 295568848;
+        public static long AdminID = 295568848L;
 
         public async void Init()
         {

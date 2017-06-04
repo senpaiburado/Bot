@@ -40,7 +40,7 @@ namespace revcom_bot.Heroes
         private int ChronosphereCounter = 0;
         private bool ChronosphereActivated = false;
 
-        public FacelessVoid(IHero hero) : base(hero)
+        public FacelessVoid(IHero hero, Sender sender) : base(hero, sender)
         {
 
         }
@@ -48,9 +48,9 @@ namespace revcom_bot.Heroes
         {
 
         }
-        public override IHero Copy()
+        public override IHero Copy(Sender sender)
         {
-            return new FacelessVoid(this);
+            return new FacelessVoid(this, sender);
         }
         protected override void InitPassiveAbilities()
         {
@@ -104,7 +104,7 @@ namespace revcom_bot.Heroes
         {
             PreviousHP = HP;
         }
-        public override string GetMessageAbilitesList(Users.User.Text lang)
+        public override string GetMessageAbilitesList(User.Text lang)
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
@@ -137,70 +137,70 @@ namespace revcom_bot.Heroes
             msg += $"{lang.SelectAbility}:";
             return msg;
         }
-        public override async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityOne(IHero target)
         {
             if (MP < TimeWalkManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     TimeWalkManaPay - MP)));
                 return false;
             }
             if (TimeWalkCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(TimeWalkCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(TimeWalkCD));
                 return false;
             }
             HP += PreviousHP;
             MP -= TimeWalkManaPay;
             TimeWalkCD = TimeWalkDefaultCD;
             target.GetDamage(TimeWalkDamage - target.Armor);
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        public override async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityTwo(IHero target)
         {
             if (AoT_Activated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             if (MP < AoT_ManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     AoT_ManaPay - MP)));
                 return false;
             }
             if (AoT_CD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(AoT_CD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(AoT_CD));
                 return false;
             }
             AoT_Activated = true;
             AttackSpeed += AoT_AttackSpeed;
             UpdateDPS();
             MP -= AoT_ManaPay;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
             return true;
         }
-        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(IHero target)
         {
             if (MP < ChronosphereManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     ChronosphereManaPay - MP)));
                 return false;
             }
             if (ChronosphereCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(ChronosphereCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(ChronosphereCD));
                 return false;
             }
             MP -= ChronosphereManaPay;
             target.StunCounter += ChronosphereDuration;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }
