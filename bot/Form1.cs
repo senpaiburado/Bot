@@ -15,7 +15,7 @@ namespace revcom_bot
     public partial class Form1 : Form
     {
         BackgroundWorker bw;
-        Users user;
+        Users users;
 
         List<Game> ActiveGames = new List<Game>();
 
@@ -33,8 +33,8 @@ namespace revcom_bot
             this.bw = new BackgroundWorker();
             this.bw.DoWork += bw_DoWork;
 
-            this.user = new Users();
-            this.user.Init();
+            this.users = new Users();
+            this.users.Init();
 
             Game.Initialize();
         }
@@ -47,7 +47,7 @@ namespace revcom_bot
             try
             {
                 var Bot = new Telegram.Bot.TelegramBotClient(key);
-                IHero.bot = Bot;
+                //IHero.bot = Bot;
                 await Bot.SetWebhookAsync("");
                 //Bot.SetWebhook("");
                 int offset = 0;
@@ -109,13 +109,13 @@ namespace revcom_bot
                     {
                         var message = update.Message;
 
-                        if (!user.Contains(message.Chat.Id))
+                        if (!users.Contains(message.Chat.Id))
                         {
-                            user.AddUser(message.Chat.Id);
+                            users.AddUser  (message.Chat.Id);
                             Console.WriteLine("LOL");
                         }
 
-                        User _usr = user.getUserByID(message.Chat.Id);
+                        User _usr = users.getUserByID(message.Chat.Id);
 
                         if (_usr.status == User.Status.Default)
                         {
@@ -235,7 +235,7 @@ namespace revcom_bot
 
                                 if (name != "")
                                 {
-                                    find_user = user.GetUserByName(name);
+                                    find_user = users.GetUserByName(name);
 
                                     if (find_user != null && rating > 0)
                                     {
@@ -252,7 +252,7 @@ namespace revcom_bot
                                     .Groups[1].ToString();
                                 if (res != "")
                                 {
-                                    foreach (var item in user.GetIDs())
+                                    foreach (var item in users.GetIDs())
                                     {
                                         //await Bot.SendTextMessageAsync(item, res);
                                     }
@@ -264,7 +264,7 @@ namespace revcom_bot
                             else if (message.IsCommand("[ADMIN] Get list of names") && message.Chat.Id ==
                                 Users.AdminID)
                             {
-                                string msg = $"{_usr.lang.List}:\n{string.Join("\n", user.GetNames())}\n";
+                                string msg = $"{_usr.lang.List}:\n{string.Join("\n", users.GetNames())}\n";
                                 await Bot.SendTextMessageAsync(message.Chat.Id, msg);
                             }
                             else if (message.IsCommand("[ADMIN] Send to one:") && message.Chat.Id == Users.AdminID)
@@ -275,7 +275,7 @@ namespace revcom_bot
                                     .Groups[1].ToString();
 
                                 long id = 0;
-                                id = user.GetIdByName(name);
+                                id = users.GetIdByName(name);
 
                                 if (id != -1)
                                 {
@@ -293,9 +293,9 @@ namespace revcom_bot
                                 string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
                                 if (name != "")
                                 {
-                                    if (user.GetUserByName(name) != null)
+                                    if (users.GetUserByName(name) != null)
                                     {
-                                        await Bot.SendTextMessageAsync(message.Chat.Id, user.GetUserByName(name)
+                                        await Bot.SendTextMessageAsync(message.Chat.Id, users.GetUserByName(name)
                                             .GetStatisctisMessage());
                                         await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang
                                             .GetMessageAdminCommandSuccesful(message.Text));
@@ -307,9 +307,9 @@ namespace revcom_bot
                                 string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
                                 if (name != "")
                                 {
-                                    if (user.GetUserByName(name) != null)
+                                    if (users.GetUserByName(name) != null)
                                     {
-                                        user.DeleteUser(user.GetUserByName(name).ID);
+                                        users.DeleteUser(users.GetUserByName(name).ID);
                                         await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.GetMessageAdminCommandSuccesful(
                                             message.Text));
                                     }
@@ -419,7 +419,7 @@ namespace revcom_bot
                                 if (message.IsCommand(_usr.lang.YesMessage))
                                 {
                                     await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.AccountWasDeletedString, replyMarkup: h_kb);
-                                    user.DeleteUser(message.Chat.Id);
+                                    users.DeleteUser(message.Chat.Id);
                                 }
                                 else
                                 {
@@ -430,7 +430,7 @@ namespace revcom_bot
                         }
                         else if (_usr.status == User.Status.SettingNickname)
                         {
-                            if (user.NicknameExists(message.Text))
+                            if (users.NicknameExists(message.Text))
                                 await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameIsAlreadyExists);
                             else
                             {

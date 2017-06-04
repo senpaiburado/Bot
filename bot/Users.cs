@@ -7,6 +7,60 @@ using System.IO;
 
 namespace revcom_bot
 {
+    //Пока дублирует похожий класс в Game
+    class Sender
+    {
+        private Telegram.Bot.TelegramBotClient bot;
+        private long userID;
+        public User.Text lang;
+
+        public Sender(long userID, User.Text lang, Telegram.Bot.TelegramBotClient bot)
+        {
+            this.userID = userID;
+            this.bot = bot;
+            this.lang = lang;
+        }
+
+        public async Task SendAsync(Func<User.Text, string> getText, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup = null)
+        {
+            await SendAsync(getText(lang), replyMarkup);
+        }
+
+        public async Task SendAsync(string text, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup = null)
+        {
+            await bot.SendTextMessageAsync(userID, text, replyMarkup: replyMarkup);
+        }
+
+        internal SenderContainer CreateMessageContainer()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class SenderContainer
+    {
+        private List<string> lines = new List<string>();
+        private Sender sender;
+
+        public SenderContainer(Sender sender)
+        {
+            this.sender = sender;
+        }
+
+        public void Add(Func<User.Text, string> getText)
+        {
+            lines.Add(getText(sender.lang));
+        }
+
+        public async Task SendAsync(Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup = null)
+        {
+            var message = string.Join("\n", lines);
+            lines.Clear();
+
+            await sender.SendAsync(message, replyMarkup);
+        }
+    }
+
     class Users
     {
         private Dictionary<long, User> users = new Dictionary<long, User>();
@@ -144,7 +198,7 @@ namespace revcom_bot
         public string Name { get; set; }
         public Status status { get; set; }
         public NetworkStatus net_status { get; set; }
-        public Text lang;
+        public Text lang = new Text();
 
         public long ActiveGameID = 0L;
         public short HeroListPage = 0;
@@ -226,7 +280,7 @@ namespace revcom_bot
             }
         }
 
-        public struct Text
+        public class Text
         {
             public enum Language
             {

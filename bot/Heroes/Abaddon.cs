@@ -8,8 +8,6 @@ namespace revcom_bot.Heroes
 {
     class Abaddon : IHero
     {
-        private User player_this = null;
-        private User player_enemy = null;
         private IHero hero_target = null;
 
         // Ability One : Mist Coil
@@ -48,14 +46,15 @@ namespace revcom_bot.Heroes
         {
 
         }
-        public Abaddon(IHero hero) : base(hero)
+        public Abaddon(IHero hero, Sender sender)
+            : base(hero, sender)
         {
 
         }
 
-        public override IHero Copy()
+        public override IHero Copy(Sender sender)
         {
-            return new Abaddon(this);
+            return new Abaddon(this, sender);
         }
         public override string GetMessageAbilitesList(User.Text lang)
         {
@@ -166,36 +165,35 @@ namespace revcom_bot.Heroes
                     AphoticShieldCounter = 0;
                     hero_target.GetDamage(AphoticShieldDamageAbsorption);
                     AphoticShieldDamageAbsorption = 1000.0f;
-                    await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
-                    await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
+                    await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
+                    await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                 }
                 else if (AphoticShieldCounter == AphoticShieldDuration)
                 {
                     AphoticShieldCounter = 0;
                     AphoticShieldDamageAbsorption = 1000.0f;
-                    await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
-                    await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
+                    await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
+                    await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                 }
                 else if (AphoticShieldDamageAbsorption < 0.0f)
                 {
                     AphoticShieldCounter = 0;
                     AphoticShieldDamageAbsorption = 1000.0f;
-                    await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
-                    await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
+                    await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
+                    await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                 }
             }
         }
-        public override async Task<bool> UseAbilityOne(User attackerUser, User targetUser, IHero target)
+        public override async Task<bool> UseAbilityOne(IHero target)
         {
             if (MP < MistCoilManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
-                    MistCoilManaPay - MP)));
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(MistCoilManaPay - MP)));
                 return false;
             }
             if (MistCoilCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(MistCoilCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(MistCoilCD));
                 return false;
             }
             float power = MistCoilPower - target.Armor;
@@ -203,53 +201,51 @@ namespace revcom_bot.Heroes
             HP += power;
             MistCoilCD = MistCoilDefaultCD;
             MP -= MistCoilManaPay;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
+            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        public override async Task<bool> UseAbilityTwo(User attackerUser, User targetUser, IHero target)
+        public override async Task<bool> UseAbilityTwo(IHero target)
         {
             if (AphoticShieldActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             if (MP < AphoticShieldManaPay)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageNeedMana(Convert.ToInt32(
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
                     AphoticShieldManaPay - MP)));
                 return false;
             }
             if (AphoticShieldCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(AphoticShieldCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(AphoticShieldCD));
                 return false;
             }
             AphoticShieldActivated = true;
-            player_this = attackerUser;
-            player_enemy = targetUser;
             hero_target = target;
             AphoticShieldCD = AphoticShieldDefaultCD;
             MP -= AphoticShieldManaPay;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouActivated(AbiNameTwo));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyActivated(AbiNameTwo));
+            await Sender.SendAsync(lang => lang.GetMessageYouActivated(AbiNameTwo));
+            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameTwo));
             return true;
         }
-        public override async Task<bool> UseAbilityThree(User attackerUser, User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(IHero target)
         {
             if (BorrowedTimeActivated)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
             if (BorrowedTimeCD > 0)
             {
-                await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(BorrowedTimeCD));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(BorrowedTimeCD));
                 return false;
             }
             BorrowedTimeActivated = true;
-            await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
+            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }

@@ -9,7 +9,7 @@ namespace revcom_bot
 {
     class IHero
     {
-        public static Telegram.Bot.TelegramBotClient bot;
+        public Sender Sender { get; set; }
         public enum MainFeature
         {
             Str, Agi, Intel
@@ -74,8 +74,10 @@ namespace revcom_bot
             Init(str, agi, itl, feat);
         }
 
-        public IHero(IHero _hero)
+        public IHero(IHero _hero, Sender sender)
         {
+            this.Sender = sender;
+
             string name = _hero.Name;
             int STR = _hero.Strength;
             int AGI = _hero.Agility;
@@ -139,9 +141,9 @@ namespace revcom_bot
 
         }
 
-        public virtual IHero Copy()
+        public virtual IHero Copy(Sender sender)
         {
-            return new IHero(this);
+            return new IHero(this, sender);
         }
 
         protected string GetStringEffects()
@@ -149,12 +151,12 @@ namespace revcom_bot
             return string.Join(", ", EffectsList.ToArray());
         }
 
-        virtual public async Task<bool> Attack(IHero target, User attacker_user, User target_user)
+        virtual public async Task<bool> Attack(IHero target)
         {
             float damage = 0.0f;
 
-            string MessageForAttacker = "";
-            string MessageForExcepter = "";
+            var attakerMessages = Sender.CreateMessageContainer(); 
+            var excepterMessages = Sender.CreateMessageContainer(); 
 
             if (GetRandomNumber(1, 101) >= target.MissChance)
             {
@@ -163,45 +165,44 @@ namespace revcom_bot
                 if (GetRandomNumber(1, 101) <= CriticalHitChance)
                 {
                     damage *= CriticalHitMultiplier;
-                    MessageForAttacker += $"{attacker_user.lang.CriticalHit}!\n";
-                    MessageForExcepter += $"{target_user.lang.TheEnemyDealtCriticalDamageToYou}\n";
+                    attakerMessages.Add(lang => lang.CriticalHit);
+                    excepterMessages.Add(lang => lang.TheEnemyDealtCriticalDamageToYou);
                 }
                 if (GetRandomNumber(1, 101) <= StunHitChance)
                 {
                     target.StunCounter++;
                     damage += StunDamage;
-                    MessageForAttacker += $"{attacker_user.lang.StunningHit}!\n";
-                    MessageForExcepter += $"{target_user.lang.TheEnemyStunnedYou}\n";
+                    attakerMessages.Add(lang => $"{lang.StunningHit}!");
+                    excepterMessages.Add(lang => $"{lang.TheEnemyStunnedYou}");
                 }
-                MessageForAttacker += attacker_user.lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage));
-                MessageForExcepter += target_user.lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage));
-                Console.WriteLine(MessageForAttacker);
+                attakerMessages.Add(lang => lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage)));
+                excepterMessages.Add(lang => lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage)));
+                //Console.WriteLine(MessageForAttacker);
             }
             else
             {
-                MessageForAttacker += attacker_user.lang.YouMissedTheEnemy;
-                MessageForExcepter += target_user.lang.TheEnemyMissedYou;
+                attakerMessages.Add(lang => lang.YouMissedTheEnemy);
+                excepterMessages.Add(lang => lang.TheEnemyMissedYou);
             }
             
             target.GetDamage(damage);
 
-            await bot.SendTextMessageAsync(attacker_user.ID, MessageForAttacker);
-            await bot.SendTextMessageAsync(target_user.ID, MessageForExcepter);
+            await attakerMessages.SendAsync();
+            await excepterMessages.SendAsync();
 
             return true;
         }
 
-        virtual public async Task<bool> Heal(User attacker, User excepter)
+        virtual public async Task<bool> Heal(IHero excepter)
         {
             if (HealCountdown > 0)
             {
-                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageCountdown(HealCountdown));
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(HealCountdown));
                 return false;
             }
             if (MP < HealPayMana)
             {
-                await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageNeedMana(Convert.ToInt32(
-                    HealPayMana - MP)));
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(HealPayMana - MP)));
                 return false;
             }
             HP += HealthRestore;
@@ -212,10 +213,8 @@ namespace revcom_bot
 
             HealCountdown = HealCountdownDefault;
 
-            await bot.SendTextMessageAsync(attacker.ID, attacker.lang.GetMessageHpAndMpRestored(
-                Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
-            await bot.SendTextMessageAsync(excepter.ID, excepter.lang.GetMessageEnemyHpAndMpRestored(
-                Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
+            await Sender.SendAsync(lang => lang.GetMessageHpAndMpRestored(Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
+            await excepter.Sender.SendAsync(lang => lang.GetMessageEnemyHpAndMpRestored(Convert.ToInt32(HealthRestore), Convert.ToInt32(ManaRestore)));
             return true;
         }
 
@@ -352,15 +351,15 @@ namespace revcom_bot
             GettingDamageActive = true;
         }
 
-        virtual public Task<bool> UseAbilityOne(User attackerUser, User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityOne(IHero target)
         {
             return Task.FromResult(false);
         }
-        virtual public Task<bool> UseAbilityTwo(User attackerUser, User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityTwo(IHero target)
         {
             return Task.FromResult(false);
         }
-        virtual public Task<bool> UseAbilityThree(User attackerUser, User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityThree(IHero target)
         {
             return Task.FromResult(false);
         }

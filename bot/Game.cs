@@ -10,7 +10,7 @@ namespace revcom_bot
     {
         public User User;
         public IHero hero;
-        private Telegram.Bot.TelegramBotClient bot;
+        public Telegram.Bot.TelegramBotClient bot;
 
         public PlayerGameContext(User user, Telegram.Bot.TelegramBotClient bot)
         {
@@ -93,7 +93,7 @@ namespace revcom_bot
 
         public async Task PickHero(IHero hero)
         {
-            player.hero = hero.Copy();
+            player.hero = hero.Copy(new Sender(player.User.ID, player.User.lang, player.bot));
 
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
 
@@ -197,23 +197,23 @@ namespace revcom_bot
             switch (number)
             {
                 case 1:
-                    if (await attacker.Attack(excepter, user_attacker, user_excepter))
+                    if (await attacker.Attack(excepter))
                         finished = true;
                     break;
                 case 2:
-                    if (await attacker.Heal(user_attacker, user_excepter))
+                    if (await attacker.Heal(excepter))
                         finished = true;
                     break;
                 case 3:
-                    if (await attacker.UseAbilityOne(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityOne(excepter))
                         finished = true;
                     break;
                 case 4:
-                    if (await attacker.UseAbilityTwo(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityTwo(excepter))
                         finished = true;
                     break;
                 case 5:
-                    if (await attacker.UseAbilityThree(user_attacker, user_excepter, excepter))
+                    if (await attacker.UseAbilityThree(excepter))
                         finished = true;
                     break;
                 default:
