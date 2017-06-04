@@ -145,6 +145,7 @@ namespace revcom_bot.Heroes
             if (BladeFuryActivated)
             {
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.AbilityIsAlreadyActivated);
+                return false;
             }
             if (MP < BladeFuryManaPay)
             {
@@ -210,7 +211,7 @@ namespace revcom_bot.Heroes
                     OmnislashManaPay - MP)));
                 return false;
             }
-            if (HealingWardCD > 0)
+            if (OmnislashCD > 0)
             {
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(OmnislashCD));
                 return false;

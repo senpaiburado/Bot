@@ -35,7 +35,6 @@ namespace revcom_bot.Heroes
         private float CoA_DpsPerAttack = 20.0f;
         private int CoA_Counter = 0;
         private int CoA_Limit = 6;
-        private float CoA_AdditionalDPS = 0.0f;
 
         // Ability Three : Borrowed Time
         public string AbiNameThree = "Borrowed Time";
@@ -77,7 +76,7 @@ namespace revcom_bot.Heroes
                     msg += $"4 - {AbiNameTwo} [{AphoticShieldManaPay}]\n";
             }
             if (BorrowedTimeActivated)
-                msg += $"5 - {AbiNameThree} <<{AphoticShieldDuration - AphoticShieldCounter}>>\n";
+                msg += $"5 - {AbiNameThree} <<{BorrowedTimeDuration - BorrowedTimeCounter}>>\n";
             else
             {
                 if (BorrowedTimeCD > 0)
@@ -91,7 +90,16 @@ namespace revcom_bot.Heroes
         public override void GetDamage(float value)
         {
             if (AphoticShieldActivated)
-                AphoticShieldDamageAbsorption -= value;
+            {
+                if (AphoticShieldDamageAbsorption > value)
+                    AphoticShieldDamageAbsorption -= value;
+                else
+                {
+                    float temp = value - AphoticShieldDamageAbsorption;
+                    AphoticShieldDamageAbsorption = 0.0f;
+                    base.GetDamage(temp);
+                }
+            }
             else if (BorrowedTimeActivated)
                 HP += value;
             else
@@ -117,6 +125,7 @@ namespace revcom_bot.Heroes
                 {
                     BorrowedTimeActivated = false;
                     BorrowedTimeCounter = 0;
+                    BorrowedTimeCD = BorrowedTimeDefaultCD;
                 }
             }
         }
@@ -189,7 +198,7 @@ namespace revcom_bot.Heroes
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(MistCoilCD));
                 return false;
             }
-            float power = DPS - target.Armor;
+            float power = MistCoilPower - target.Armor;
             target.GetDamage(power);
             HP += power;
             MistCoilCD = MistCoilDefaultCD;
@@ -238,7 +247,6 @@ namespace revcom_bot.Heroes
                 await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageCountdown(BorrowedTimeCD));
                 return false;
             }
-            BorrowedTimeCD = BorrowedTimeDefaultCD;
             BorrowedTimeActivated = true;
             await bot.SendTextMessageAsync(attackerUser.ID, attackerUser.lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
