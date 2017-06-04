@@ -223,6 +223,8 @@ namespace revcom_bot
 
             if (finished)
             {
+                attacker.UpdatePerStep();
+                excepter.UpdatePerStep();
                 attacker.Update();
                 excepter.Update();
 
@@ -250,7 +252,6 @@ namespace revcom_bot
                 }
                 else
                     await player.SendAsync(lang => attacker.GetMessageAbilitesList(user_attacker.lang));
-
 
                 attacker.UpdateStunDuration();
                 excepter.UpdateStunDuration();

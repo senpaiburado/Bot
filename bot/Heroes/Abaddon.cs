@@ -61,7 +61,10 @@ namespace revcom_bot.Heroes
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
-            msg += $"2 - {lang.Heal}\n";
+            if (HealCountdown > 0)
+                msg += $"2 - {lang.Heal} ({HealCountdown}) [{HealPayMana}]\n";
+            else
+                msg += $"2 - {lang.Heal} [{HealPayMana}]\n";
             if (MistCoilCD > 0)
                 msg += $"3 - {AbiNameOne} ({MistCoilCD}) [{MistCoilManaPay}]\n";
             else

@@ -119,6 +119,11 @@ namespace revcom_bot
 
         virtual protected void InitAdditional()
         {
+
+        }
+
+        protected void UpdateDPS()
+        {
             float damage = 0.0f;
             if (Feature == MainFeature.Str)
                 damage = Strength * 0.4f;
@@ -129,7 +134,7 @@ namespace revcom_bot
             DPS = damage + damage * AttackSpeed;
         }
 
-        protected void UpdateDPS()
+        virtual public void UpdatePerStep()
         {
 
         }

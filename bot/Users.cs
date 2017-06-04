@@ -1242,7 +1242,7 @@ namespace revcom_bot
                     if (lang == Language.English)
                         return $"You can use \"Attack\" only while {abi_name} works!";
                     else if (lang == Language.Russian)
-                        return $"Вы можете использовать только \"Атака\", пока работает способоность {abi_name}!";
+                        return $"Вы можете использовать только \"Атака\", пока работает способность {abi_name}!";
                     return "";
                 }
 

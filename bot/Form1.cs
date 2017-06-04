@@ -255,6 +255,7 @@ namespace revcom_bot
                                     foreach (var item in user.GetIDs())
                                     {
                                         //await Bot.SendTextMessageAsync(item, res);
+                                        //await Task.Delay(100);
                                     }
                                     await Bot.SendTextMessageAsync(message.Chat.Id,
                                         _usr.lang.GetMessageAdminCommandSuccesful(message.Text));

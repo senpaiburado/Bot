@@ -30,7 +30,7 @@ namespace revcom_bot.Heroes
 
         // Ability Passive : Blade Dance
         public string AbiNamePassive = "Blade Dance";
-        private float BladeDanceCriticalMult = 1.0f;
+        private float BladeDanceCriticalMult = 1.2f;
         private float BladeDanceCriticalChance = 25.0f;
 
         // Ability Three : Omnislash
