@@ -229,9 +229,9 @@ namespace revcom_bot
                 if (Math.Floor(attacker.HP) <= 0.0f || Math.Floor(excepter.HP) <= 0.0f)
                 {
                     if (Math.Floor(attacker.HP) <= 0.0f)
-                        await GameOver(player, enemyPlayer);
-                    else
                         await GameOver(enemyPlayer, player);
+                    else
+                        await GameOver(player, enemyPlayer);
 
                     game.isWorking = false;
                     return true;
