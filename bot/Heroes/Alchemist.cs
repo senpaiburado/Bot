@@ -8,8 +8,8 @@ namespace revcom_bot.Heroes
 {
     class Alchemist : IHero
     {
-        Users.User temp_playerOne = null;
-        Users.User temp_playerTwo = null;
+        User temp_playerOne = null;
+        User temp_playerTwo = null;
         IHero temp_targetHero = null;
 
         // Ability One : Acid Spray
@@ -59,7 +59,7 @@ namespace revcom_bot.Heroes
 
         }
 
-        private async Task<bool> UseUnstableConcoction(Users.User attackerUser, Users.User targetUser)
+        private async Task<bool> UseUnstableConcoction(User attackerUser, User targetUser)
         {
             if (MP < UnstableConcoctionManaPay)
             {
@@ -79,7 +79,7 @@ namespace revcom_bot.Heroes
             return true;
         }
 
-        private async Task<bool> ThrowUnstableConcoction(Users.User attackerUser, Users.User targetUser, IHero target)
+        private async Task<bool> ThrowUnstableConcoction(User attackerUser, User targetUser, IHero target)
         {
             string ForYouMessage = $"{attackerUser.lang.ALCHEMIST_YouHaveThrownUC}\n";
             string ForEnemyMessage = $"{targetUser.lang.ALCHEMIST_TheEnemyHasThrownUC}\n";
@@ -180,7 +180,7 @@ namespace revcom_bot.Heroes
             }
         }
 
-        public override string GetMessageAbilitesList(Users.User.Text lang)
+        public override string GetMessageAbilitesList(User.Text lang)
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
@@ -219,7 +219,7 @@ namespace revcom_bot.Heroes
             return new Alchemist(this);
         }
 
-        override public async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        override public async Task<bool> UseAbilityOne(User attackerUser, User targetUser, IHero target)
         {
             if (MP < AcidSprayManaPay)
             {
@@ -240,7 +240,7 @@ namespace revcom_bot.Heroes
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        override public async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        override public async Task<bool> UseAbilityTwo(User attackerUser, User targetUser, IHero target)
         {
             if (UnstableConcoctionActivated)
                 return await ThrowUnstableConcoction(attackerUser, targetUser, target);
@@ -252,7 +252,7 @@ namespace revcom_bot.Heroes
                 return await UseUnstableConcoction(attackerUser, targetUser);
             }
         }
-        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(User attackerUser, User targetUser, IHero target)
         {
             if (MP < ChemicalRageManaPay)
             {

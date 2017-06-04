@@ -8,8 +8,8 @@ namespace revcom_bot.Heroes
 {
     class Abaddon : IHero
     {
-        private Users.User player_this = null;
-        private Users.User player_enemy = null;
+        private User player_this = null;
+        private User player_enemy = null;
         private IHero hero_target = null;
 
         // Ability One : Mist Coil
@@ -57,7 +57,7 @@ namespace revcom_bot.Heroes
         {
             return new Abaddon(this);
         }
-        public override string GetMessageAbilitesList(Users.User.Text lang)
+        public override string GetMessageAbilitesList(User.Text lang)
         {
             string msg = $"{lang.List}:\n";
             msg += $"1 - {lang.AttackString}\n";
@@ -185,7 +185,7 @@ namespace revcom_bot.Heroes
                 }
             }
         }
-        public override async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityOne(User attackerUser, User targetUser, IHero target)
         {
             if (MP < MistCoilManaPay)
             {
@@ -207,7 +207,7 @@ namespace revcom_bot.Heroes
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
-        public override async Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityTwo(User attackerUser, User targetUser, IHero target)
         {
             if (AphoticShieldActivated)
             {
@@ -235,7 +235,7 @@ namespace revcom_bot.Heroes
             await bot.SendTextMessageAsync(targetUser.ID, targetUser.lang.GetMessageEnemyActivated(AbiNameTwo));
             return true;
         }
-        public override async Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        public override async Task<bool> UseAbilityThree(User attackerUser, User targetUser, IHero target)
         {
             if (BorrowedTimeActivated)
             {

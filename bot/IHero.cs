@@ -149,7 +149,7 @@ namespace revcom_bot
             return string.Join(", ", EffectsList.ToArray());
         }
 
-        virtual public async Task<bool> Attack(IHero target, Users.User attacker_user, Users.User target_user)
+        virtual public async Task<bool> Attack(IHero target, User attacker_user, User target_user)
         {
             float damage = 0.0f;
 
@@ -191,7 +191,7 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public async Task<bool> Heal(Users.User attacker, Users.User excepter)
+        virtual public async Task<bool> Heal(User attacker, User excepter)
         {
             if (HealCountdown > 0)
             {
@@ -219,7 +219,7 @@ namespace revcom_bot
             return true;
         }
 
-        virtual public string GetMessageAbilitesList(Users.User.Text lang)
+        virtual public string GetMessageAbilitesList(User.Text lang)
         {
             string[] list =
             {
@@ -352,15 +352,15 @@ namespace revcom_bot
             GettingDamageActive = true;
         }
 
-        virtual public Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityOne(User attackerUser, User targetUser, IHero target)
         {
             return Task.FromResult(false);
         }
-        virtual public Task<bool> UseAbilityTwo(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityTwo(User attackerUser, User targetUser, IHero target)
         {
             return Task.FromResult(false);
         }
-        virtual public Task<bool> UseAbilityThree(Users.User attackerUser, Users.User targetUser, IHero target)
+        virtual public Task<bool> UseAbilityThree(User attackerUser, User targetUser, IHero target)
         {
             return Task.FromResult(false);
         }
