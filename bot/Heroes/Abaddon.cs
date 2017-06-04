@@ -167,6 +167,13 @@ namespace revcom_bot.Heroes
                     await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
                     await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
                 }
+                else if (AphoticShieldDamageAbsorption < 0.0f)
+                {
+                    AphoticShieldCounter = 0;
+                    AphoticShieldDamageAbsorption = 1000.0f;
+                    await bot.SendTextMessageAsync(player_this.ID, player_this.lang.ABADDON_AS_HasExploded);
+                    await bot.SendTextMessageAsync(player_enemy.ID, player_enemy.lang.ABADDON_AS_HasExploded);
+                }
             }
         }
         public override async Task<bool> UseAbilityOne(Users.User attackerUser, Users.User targetUser, IHero target)
