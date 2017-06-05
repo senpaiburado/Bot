@@ -332,7 +332,7 @@ namespace DotaTextGame
             UpdateCountdowns();
             UpdateCounters();
             UpdateDefaultCountdowns();
-            UpdateDebuffs();
+            UpdateEffects();
             if (Math.Ceiling(HP) >= MaxHP)
                 HP = MaxHP;
             if (Math.Ceiling(MP) >= MaxMP || Math.Floor(MP) < 0.0f)
@@ -373,8 +373,9 @@ namespace DotaTextGame
             if (HealCountdown > 0)
                 HealCountdown--;
         }
-        virtual public void UpdateDebuffs()
+        virtual public void UpdateEffects()
         {
+            UpdateImmuneToMagic();
             // Armor penetration debuff
             if (ArmorPenetratingCounter > 0)
                 ArmorPenetratingCounter--;
@@ -415,6 +416,7 @@ namespace DotaTextGame
                     GettingDamagePower = 0.0f;
                 }
             }
+            UpdateSilence();
         }
 
         virtual public void GetDamage(float value)

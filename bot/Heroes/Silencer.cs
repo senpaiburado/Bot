@@ -28,7 +28,7 @@ namespace DotaTextGame.Heroes
 
         // Ability Passive: Glaives of Wisdom
         public string AbiNamePassive = "Glaives of Wisdom";
-        private float GoW_Percent = 45;
+        private float GoW_Percent = 35;
 
         // Ability Three - Global Silence
         public string AbiNameThree = "Global Silence";
@@ -143,7 +143,7 @@ namespace DotaTextGame.Heroes
         {
             if (!await CheckSilence())
                 return false;
-            if (!await CheckManaAndCD(LastWordManaPay, LastWordCD))
+            if (!await CheckManaAndCD(GlobalSilenceManaPay, GlobalSilenceCD))
                 return false;
             MP -= GlobalSilenceDuration;
             Silence(GlobalSilenceDuration, target);

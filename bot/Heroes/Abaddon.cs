@@ -98,7 +98,7 @@ namespace DotaTextGame.Heroes
                 else
                 {
                     float temp = value - AphoticShieldDamageAbsorption;
-                    AphoticShieldDamageAbsorption = 0.0f;
+                    AphoticShieldDamageAbsorption = -1f;
                     base.GetDamage(temp);
                 }
             }
@@ -156,32 +156,17 @@ namespace DotaTextGame.Heroes
         }
         private async void UpdateAphoticShield()
         {
-            if (AphoticShieldDamageAbsorption <= 0.0f)
-                AphoticShieldActivated = false;
-            if (AphoticShieldCounter < AphoticShieldDuration && AphoticShieldActivated)
+            if (AphoticShieldCounter < AphoticShieldDuration && AphoticShieldActivated && Convert.ToInt32(
+                AphoticShieldDamageAbsorption) > 0)
                 AphoticShieldCounter++;
             else
             {
                 if (AphoticShieldActivated)
                 {
+                    AphoticShieldCounter = 0;
+                    if (AphoticShieldDamageAbsorption > 0.0f)
+                        hero_target.GetDamage(AphoticShieldDamageAbsorption);
                     AphoticShieldActivated = false;
-                    AphoticShieldCounter = 0;
-                    if (!hero_target.HasImmuneToMagic)
-                        hero_target.GetDamage(hero_target.CompileMagicDamage(AphoticShieldDamageAbsorption));
-                    AphoticShieldDamageAbsorption = 1000.0f;
-                    await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
-                    await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
-                }
-                else if (AphoticShieldCounter == AphoticShieldDuration)
-                {
-                    AphoticShieldCounter = 0;
-                    AphoticShieldDamageAbsorption = 1000.0f;
-                    await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
-                    await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
-                }
-                else if (AphoticShieldDamageAbsorption < 0.0f)
-                {
-                    AphoticShieldCounter = 0;
                     AphoticShieldDamageAbsorption = 1000.0f;
                     await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                     await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
@@ -215,9 +200,11 @@ namespace DotaTextGame.Heroes
             if (!await CheckManaAndCD(AphoticShieldManaPay, AphoticShieldCD))
                 return false;
             AphoticShieldActivated = true;
-            hero_target = target;
+            if (hero_target == null)
+                hero_target = target;
             AphoticShieldCD = AphoticShieldDefaultCD;
             MP -= AphoticShieldManaPay;
+            AphoticShieldDamageAbsorption = 1000.0f;
             await Sender.SendAsync(lang => lang.GetMessageYouActivated(AbiNameTwo));
             await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameTwo));
             return true;

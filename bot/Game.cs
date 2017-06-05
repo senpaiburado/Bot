@@ -194,6 +194,8 @@ namespace DotaTextGame
 
             bool finished = false;
 
+            excepter.UpdatePerStep();
+
             switch (number)
             {
                 case 1:
@@ -223,8 +225,7 @@ namespace DotaTextGame
 
             if (finished)
             {
-                attacker.UpdatePerStep();
-                excepter.UpdatePerStep();
+                //attacker.UpdatePerStep();
                 attacker.Update();
                 excepter.Update();
 
@@ -463,7 +464,7 @@ namespace DotaTextGame
             hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Abaddon("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Lifestealer("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
+            hero_list.Add(new Heroes.Silencer("Silencer", 185, 220, 245, IHero.MainFeature.Intel));
             hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
