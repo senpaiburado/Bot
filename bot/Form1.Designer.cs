@@ -1,4 +1,4 @@
-﻿namespace revcom_bot
+﻿namespace DotaTextGame
 {
     partial class Form1
     {

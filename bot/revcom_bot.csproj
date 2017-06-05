@@ -7,8 +7,8 @@
     <ProjectGuid>{375F3C17-5976-4E00-BC99-06FC77AE2594}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>revcom_bot</RootNamespace>
-    <AssemblyName>revcom_bot</AssemblyName>
+    <RootNamespace>DotaTextGame</RootNamespace>
+    <AssemblyName>DotaTextGameBot</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -87,6 +87,7 @@
     <Compile Include="Heroes\FacelessVoid.cs" />
     <Compile Include="Heroes\Juggernaut.cs" />
     <Compile Include="Heroes\Lifestealer.cs" />
+    <Compile Include="Heroes\Silencer.cs" />
     <Compile Include="IHero.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

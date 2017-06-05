@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace revcom_bot
+namespace DotaTextGame
 {
     //Пока дублирует похожий класс в Game
     class Sender
@@ -1281,7 +1281,7 @@ namespace revcom_bot
                     if (lang == Language.English)
                         return "You have immune to magic.";
                     else if (lang == Language.Russian)
-                        return "У вас есть иммунитет к магии.";
+                        return "Вы неуязвимы к магии.";
                     return "";
                 }
             }
@@ -1292,7 +1292,7 @@ namespace revcom_bot
                     if (lang == Language.English)
                         return "The enemy has immune to magic.";
                     else if (lang == Language.Russian)
-                        return "Противник имеет иммунитет к магии.";
+                        return "Противник неуязвим к магии.";
                     return "";
                 }
             }
@@ -1312,6 +1312,30 @@ namespace revcom_bot
                 else if (lang == Language.Russian)
                     return $"Противник активировал {abi_name}!";
                 return "";
+            }
+
+            public string @YouCantPronounceAbilities
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "You can't pronounce abilities.";
+                    else if (lang == Language.Russian)
+                        return "Вы не можете произносить заклинания.";
+                    return "";
+                }
+            }
+
+            public string @YouAreSilenced
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "You are silenced!";
+                    else if (lang == Language.Russian)
+                        return "Вы замолчали!";
+                    return "";
+                }
             }
 
             public string GetMessageYouCantUseAbilityWhileAnotherWorks(string abi_name)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot.Heroes
+namespace DotaTextGame.Heroes
 {
     class Abaddon : IHero
     {
@@ -69,7 +69,7 @@ namespace revcom_bot.Heroes
             else
                 msg += $"3 - {AbiNameOne} [{MistCoilManaPay}]\n";
             if (AphoticShieldActivated)
-                msg += $"4 - {AbiNameTwo} <<{AphoticShieldDuration - AphoticShieldCounter}>>\n";
+                msg += $"4 - {AbiNameTwo} <<{AphoticShieldDuration - AphoticShieldCounter + 1}>>\n";
             else
             {
                 if (AphoticShieldCD > 0)
@@ -78,7 +78,7 @@ namespace revcom_bot.Heroes
                     msg += $"4 - {AbiNameTwo} [{AphoticShieldManaPay}]\n";
             }
             if (BorrowedTimeActivated)
-                msg += $"5 - {AbiNameThree} <<{BorrowedTimeDuration - BorrowedTimeCounter}>>\n";
+                msg += $"5 - {AbiNameThree} <<{BorrowedTimeDuration - BorrowedTimeCounter + 1}>>\n";
             else
             {
                 if (BorrowedTimeCD > 0)
@@ -167,7 +167,7 @@ namespace revcom_bot.Heroes
                     AphoticShieldActivated = false;
                     AphoticShieldCounter = 0;
                     if (!hero_target.HasImmuneToMagic)
-                        hero_target.GetDamage(AphoticShieldDamageAbsorption);
+                        hero_target.GetDamage(hero_target.CompileMagicDamage(AphoticShieldDamageAbsorption));
                     AphoticShieldDamageAbsorption = 1000.0f;
                     await Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
                     await hero_target.Sender.SendAsync(lang => lang.ABADDON_AS_HasExploded);
@@ -190,16 +190,10 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityOne(IHero target)
         {
-            if (MP < MistCoilManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(MistCoilManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (MistCoilCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(MistCoilCD));
+            if (!await CheckManaAndCD(MistCoilManaPay, MistCoilCD))
                 return false;
-            }
             float power = MistCoilPower - target.Armor;
             target.GetDamage(power);
             HP += power;
@@ -211,22 +205,15 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityTwo(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (AphoticShieldActivated)
             {
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
-            if (MP < AphoticShieldManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    AphoticShieldManaPay - MP)));
+            if (!await CheckManaAndCD(AphoticShieldManaPay, AphoticShieldCD))
                 return false;
-            }
-            if (AphoticShieldCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(AphoticShieldCD));
-                return false;
-            }
             AphoticShieldActivated = true;
             hero_target = target;
             AphoticShieldCD = AphoticShieldDefaultCD;
@@ -237,16 +224,15 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityThree(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (BorrowedTimeActivated)
             {
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
-            if (BorrowedTimeCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(BorrowedTimeCD));
+            if (!await CheckManaAndCD(0, BorrowedTimeCD))
                 return false;
-            }
             BorrowedTimeActivated = true;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));

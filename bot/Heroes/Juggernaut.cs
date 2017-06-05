@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot.Heroes
+namespace DotaTextGame.Heroes
 {
     class Juggernaut : IHero
     {
@@ -116,7 +116,7 @@ namespace revcom_bot.Heroes
             else
                 msg += $"2 - {lang.Heal} [{HealPayMana}]\n";
             if (BladeFuryActivated)
-                msg += $"3 - {AbiNameOne} <<{BladeFuryDuration - BladeFuryCounter}>>\n";
+                msg += $"3 - {AbiNameOne} <<{BladeFuryDuration - BladeFuryCounter + 1}>>\n";
             else
             {
                 if (BladeFuryCD > 0)
@@ -125,7 +125,7 @@ namespace revcom_bot.Heroes
                     msg += $"3 - {AbiNameOne} [{BladeFuryManaPay}]\n";
             }
             if (HealingWardActivated)
-                msg += $"4 - {AbiNameTwo} <<{HealingWardDuration - HealingWardCounter}>>\n";
+                msg += $"4 - {AbiNameTwo} <<{HealingWardDuration - HealingWardCounter + 1}>>\n";
             else
             {
                 if (HealingWardCD > 0)
@@ -143,22 +143,15 @@ namespace revcom_bot.Heroes
 
         public override async Task<bool> UseAbilityOne(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (BladeFuryActivated)
             {
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
-            if (MP < BladeFuryManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    BladeFuryManaPay - MP)));
+            if (!await CheckManaAndCD(BladeFuryManaPay, BladeFuryCD))
                 return false;
-            }
-            if (BladeFuryCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(BladeFuryCD));
-                return false;
-            }
             if (target.HasImmuneToMagic)
             {
                 await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
@@ -167,14 +160,18 @@ namespace revcom_bot.Heroes
             BladeFuryActivated = true;
             BladeFuryCD = BladeFuryDefaultCD;
             MP -= BladeFuryManaPay;
-            target.GetDamageByDebuffs(BladeFuryDamage, BladeFuryDuration);
-            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            target.GetDamageByDebuffs(target.CompileMagicDamage(BladeFuryDamage), BladeFuryDuration);
+            AddImmuneToMagic(BladeFuryDuration);
+            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne) + "\n" + lang.YouHaveImmuneToMagic);
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne) +
+                "\n" + lang.EnemyHasImmuneToMagic);
             return true;
         }
 
         public override async Task<bool> UseAbilityTwo(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (BladeFuryActivated)
             {
                 await Sender.SendAsync(lang => lang.GetMessageYouCantUseAbilityWhileAnotherWorks
@@ -186,17 +183,8 @@ namespace revcom_bot.Heroes
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
-            if (MP < HealingWardManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    HealingWardManaPay - MP)));
+            if (!await CheckManaAndCD(HealingWardManaPay, HealingWardCD))
                 return false;
-            }
-            if (HealingWardCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(HealingWardCD));
-                return false;
-            }
             HealingWardActivated = true;
             HPregen += HealingWardHpRegeneration;
             HealingWardCD = HealingWardDefaultCD;
@@ -206,23 +194,16 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityThree(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (BladeFuryActivated)
             {
                 await Sender.SendAsync(lang => lang.GetMessageYouCantUseAbilityWhileAnotherWorks
                     (AbiNameOne));
                 return false;
             }
-            if (MP < OmnislashManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    OmnislashManaPay - MP)));
+            if (!await CheckManaAndCD(OmnislashManaPay, OmnislashCD))
                 return false;
-            }
-            if (OmnislashCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(OmnislashCD));
-                return false;
-            }
             OmnislashCD = OmnislashDefaultCD;
             MP -= OmnislashManaPay;
             target.GetDamageByDebuffs(OmnislashDamage - target.Armor, OmnislashDuration);

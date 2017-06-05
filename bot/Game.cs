@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot
+namespace DotaTextGame
 {
     class PlayerGameContext
     {
@@ -462,7 +462,7 @@ namespace revcom_bot
             hero_list.Add(new Heroes.FacelessVoid("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Abaddon("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.Lifestealer("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Silencer", 170, 220, 270, IHero.MainFeature.Intel));
             hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
@@ -471,6 +471,5 @@ namespace revcom_bot
             hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
         }
-
     }
 }

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot
+namespace DotaTextGame
 {
     class IHero
     {
@@ -58,7 +58,12 @@ namespace revcom_bot
         public bool ArmorPenetratingActive = false;
 
         public bool HasImmuneToMagic = false;
-        public int HasImmuneToMagicCounter = 0;
+        protected int HasImmuneToMagicCounter = 0;
+
+        public bool IsSilenced = false;
+        protected int SilenceCounter = 0;
+
+        protected float MagicResistance = 25.0f;
 
         // Abilities:
 
@@ -171,6 +176,36 @@ namespace revcom_bot
             HasImmuneToMagic = true;
         }
 
+        public void Silence(int time, IHero target)
+        {
+            target.IsSilenced = true;
+            target.SilenceCounter = time;
+        }
+
+        protected void UpdateSilence()
+        {
+            if (SilenceCounter > 0 && IsSilenced)
+                SilenceCounter--;
+            else
+            {
+                if (IsSilenced)
+                {
+                    IsSilenced = false;
+                    SilenceCounter = 0;
+                }
+            }
+        }
+
+        protected async Task<bool> CheckSilence()
+        {
+            if (IsSilenced)
+            {
+                await Sender.SendAsync(lang => lang.YouCantPronounceAbilities);
+                return false;
+            }
+            return true;
+        }
+
         public virtual IHero Copy(Sender sender)
         {
             return new IHero(this, sender);
@@ -179,6 +214,11 @@ namespace revcom_bot
         protected string GetStringEffects()
         {
             return string.Join(", ", EffectsList.ToArray());
+        }
+
+        public float CompileMagicDamage(float damage)
+        {
+            return damage - (damage / 100 * MagicResistance);
         }
 
         virtual public async Task<bool> Attack(IHero target)
@@ -226,16 +266,10 @@ namespace revcom_bot
 
         virtual public async Task<bool> Heal(IHero excepter)
         {
-            if (HealCountdown > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(HealCountdown));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (MP < HealPayMana)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(HealPayMana - MP)));
+            if (!await CheckManaAndCD(HealPayMana, HealCountdown))
                 return false;
-            }
             HP += HealthRestore;
             MP += ManaRestore;
 
@@ -258,6 +292,21 @@ namespace revcom_bot
                 $"{lang.SelectAbility}:",
             };
             return string.Join("\n", list);
+        }
+
+        protected async Task<bool> CheckManaAndCD(float NeedMP, int CD)
+        {
+            if (MP < NeedMP)
+            {
+                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(NeedMP - MP)));
+                return false;
+            }
+            if (CD > 0)
+            {
+                await Sender.SendAsync(lang => lang.GetMessageCountdown(CD));
+                return false;
+            }
+            return true;
         }
 
         virtual public void Update()

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace revcom_bot
+namespace DotaTextGame
 {
     static class Program
     {

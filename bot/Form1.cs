@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace revcom_bot
+namespace DotaTextGame
 {
     public partial class Form1 : Form
     {

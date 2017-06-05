@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot.Heroes
+namespace DotaTextGame.Heroes
 {
     class Alchemist : IHero
     {
@@ -12,8 +12,8 @@ namespace revcom_bot.Heroes
 
         // Ability One : Acid Spray
         public string AbiNameOne = "Acid Spray";
-        private float AcidSprayArmorPenetrate = 16.5f;
-        private float AcidSprayDamage = 15.8f;
+        private float AcidSprayArmorPenetrate = 17.0f;
+        private float AcidSprayDamage = 35.0f;
         private int AcidSprayDuration = 9;
         private float AcidSprayManaPay = 150.0f;
         private const int AcidSprayDefaultCD = 17;
@@ -60,16 +60,10 @@ namespace revcom_bot.Heroes
 
         private async Task<bool> UseUnstableConcoction(IHero excepter)
         {
-            if (MP < UnstableConcoctionManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(UnstableConcoctionManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (UnstableConcoctionCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(UnstableConcoctionCD));
+            if (!await CheckManaAndCD(UnstableConcoctionManaPay, UnstableConcoctionCD))
                 return false;
-            }
             MP -= UnstableConcoctionManaPay;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
             await excepter.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
@@ -79,23 +73,25 @@ namespace revcom_bot.Heroes
 
         private async Task<bool> ThrowUnstableConcoction(IHero enemyHero, IHero target)
         {
-            var attakerMessages = Sender.CreateMessageContainer();
-            attakerMessages.Add(lang => lang.ALCHEMIST_YouHaveThrownUC);
-
-            var enemyMessages = enemyHero.Sender.CreateMessageContainer();
-            enemyMessages.Add(lang => lang.ALCHEMIST_TheEnemyHasThrownUC);
-
+            if (!await CheckSilence())
+                return false;
             if (target != this && target.HasImmuneToMagic)
             {
                 await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
                 return false;
             }
 
+            var attakerMessages = Sender.CreateMessageContainer();
+            attakerMessages.Add(lang => lang.ALCHEMIST_YouHaveThrownUC);
+
+            var enemyMessages = enemyHero.Sender.CreateMessageContainer();
+            enemyMessages.Add(lang => lang.ALCHEMIST_TheEnemyHasThrownUC);
+
             UnstableConcoctionActivated = false;
             UnstableConcoctionCD = UnstableConcoctionDefaultCD;
             if (base.GetRandomNumber(1, 100) > 15)
             {
-                target.GetDamage(UnstableConcoctionDamage);
+                target.GetDamage(target.CompileMagicDamage(UnstableConcoctionDamage));
                 target.StunCounter += UnstableConcoctionCounter;
 
                 attakerMessages.Add(lang => lang.ALCHEMIST_UC_HasExploded);
@@ -163,8 +159,8 @@ namespace revcom_bot.Heroes
                 if (UnstableConcoctionActivated)
                 {
                     UnstableConcoctionActivated = false;
-                    UnstableConcoctionCounter = 0;
                     await ThrowUnstableConcoction(hero_target, this);
+                    UnstableConcoctionCounter = 0;
                 }
             }
         }
@@ -200,7 +196,7 @@ namespace revcom_bot.Heroes
             else
                 msg += $"3 - {AbiNameOne} [{AcidSprayManaPay}]\n";
             if (UnstableConcoctionActivated)
-                msg += $"4 - {AbiNameTwo} <<{UnstableConcoctionTimeToThrow - UnstableConcoctionCounter}>>\n";
+                msg += $"4 - {AbiNameTwo} <<{UnstableConcoctionTimeToThrow - UnstableConcoctionCounter + 1}>>\n";
             else
             {
                 if (UnstableConcoctionCD > 0)
@@ -209,7 +205,7 @@ namespace revcom_bot.Heroes
                     msg += $"4 - {AbiNameTwo} [{UnstableConcoctionManaPay}]\n";
             }
             if (ChemicalRageActivated)
-                msg += $"5 - {AbiNameThree} <<{ChemicalRageDuration - ChemicalRageCounter}>>\n";
+                msg += $"5 - {AbiNameThree} <<{ChemicalRageDuration - ChemicalRageCounter + 1}>>\n";
             else
             {
                 if (ChemicalRageCD > 0)
@@ -228,20 +224,13 @@ namespace revcom_bot.Heroes
 
         override public async Task<bool> UseAbilityOne(IHero target)
         {
-            if (MP < AcidSprayManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    AcidSprayManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (AcidSprayCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(AcidSprayCD));
+            if (!await CheckManaAndCD(AcidSprayManaPay, AcidSprayCD))
                 return false;
-            }
             if (!target.HasImmuneToMagic)
                 target.LoosenArmor(AcidSprayArmorPenetrate, AcidSprayDuration);
-            target.GetDamageByDebuffs(AcidSprayDamage, AcidSprayDuration);
+            target.GetDamageByDebuffs(AcidSprayDamage - target.Armor, AcidSprayDuration);
             MP -= AcidSprayManaPay;
             AcidSprayCD = AcidSprayDefaultCD;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
@@ -261,22 +250,15 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityThree(IHero target)
         {
-            if (MP < ChemicalRageManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    ChemicalRageManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (ChemicalRageCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(ChemicalRageCD));
-                return false;
-            }
             if (ChemicalRageActivated)
             {
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
+            if (!await CheckManaAndCD(ChemicalRageManaPay, ChemicalRageCD))
+                return false;
             MP -= ChemicalRageManaPay;
             ChemicalRageCD = ChemicalRageDefaultCD;
             ChemicalRageActivated = true;

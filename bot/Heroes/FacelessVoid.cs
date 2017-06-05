@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace revcom_bot.Heroes
+namespace DotaTextGame.Heroes
 {
     class FacelessVoid : IHero
     {
@@ -19,9 +19,9 @@ namespace revcom_bot.Heroes
         // Ability Two : Acceleration of Time
         public string AbiNameTwo = "Acceleration of time";
         private float AoT_ManaPay = 130.0f;
-        private float AoT_AttackSpeed = 2.5f;
+        private float AoT_AttackSpeed = 2.1f;
         private int AoT_CD = 0;
-        private const int AoT_DefaultCD = 15;
+        private const int AoT_DefaultCD = 20;
         private int AoT_Counter = 0;
         private int AoT_Duration = 5;
         private bool AoT_Activated = false;
@@ -29,11 +29,11 @@ namespace revcom_bot.Heroes
         // Ability Passive : Time Lock
         public string AbiNamePassive = "Time lock";
         private float TimeLockAddDamage = 25.0f;
-        private float TimeLockAddStunChance = 20.0f;
+        private float TimeLockAddStunChance = 15.0f;
 
         // Ability Three : Chronosphere
         public string AbiNameThree = "Chronosphere";
-        private int ChronosphereDuration = 7;
+        private int ChronosphereDuration = 5;
         private int ChronosphereCD = 0;
         private const int ChronosphereDefaultCD = 40;
         private float ChronosphereManaPay = 200.0f;
@@ -98,7 +98,8 @@ namespace revcom_bot.Heroes
         }
         protected override void UpdateCounters()
         {
-
+            UpdateAoT();
+            UpdateChronosphere();
         }
         public override void UpdatePerStep()
         {
@@ -126,7 +127,7 @@ namespace revcom_bot.Heroes
                     msg += $"4 - {AbiNameTwo} [{AoT_ManaPay}]\n";
             }
             if (ChronosphereActivated)
-                msg += $"5 - {AbiNameThree} <<{ChronosphereDuration - ChronosphereCounter}>>\n";
+                msg += $"5 - {AbiNameThree} <<{ChronosphereDuration - ChronosphereCounter + 1}>>\n";
             else
             {
                 if (ChronosphereCD > 0)
@@ -139,44 +140,30 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityOne(IHero target)
         {
-            if (MP < TimeWalkManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    TimeWalkManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (TimeWalkCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(TimeWalkCD));
+            if (!await CheckManaAndCD(TimeWalkManaPay, TimeWalkCD))
                 return false;
-            }
-            HP += PreviousHP;
+            HP = PreviousHP;
             MP -= TimeWalkManaPay;
             TimeWalkCD = TimeWalkDefaultCD;
             if (!target.HasImmuneToMagic)
-                target.GetDamage(TimeWalkDamage - target.Armor);
+                target.GetDamage(target.CompileMagicDamage(TimeWalkDamage));
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
         public override async Task<bool> UseAbilityTwo(IHero target)
         {
+            if (!await CheckSilence())
+                return false;
             if (AoT_Activated)
             {
                 await Sender.SendAsync(lang => lang.AbilityIsAlreadyActivated);
                 return false;
             }
-            if (MP < AoT_ManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    AoT_ManaPay - MP)));
+            if (!await CheckManaAndCD(AoT_ManaPay, AoT_CD))
                 return false;
-            }
-            if (AoT_CD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(AoT_CD));
-                return false;
-            }
             AoT_Activated = true;
             AttackSpeed += AoT_AttackSpeed;
             UpdateDPS();
@@ -187,17 +174,10 @@ namespace revcom_bot.Heroes
         }
         public override async Task<bool> UseAbilityThree(IHero target)
         {
-            if (MP < ChronosphereManaPay)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageNeedMana(Convert.ToInt32(
-                    ChronosphereManaPay - MP)));
+            if (!await CheckSilence())
                 return false;
-            }
-            if (ChronosphereCD > 0)
-            {
-                await Sender.SendAsync(lang => lang.GetMessageCountdown(ChronosphereCD));
+            if (!await CheckManaAndCD(ChronosphereManaPay, ChronosphereCD))
                 return false;
-            }
             MP -= ChronosphereManaPay;
             target.StunCounter += ChronosphereDuration;
             ChronosphereActivated = true;
