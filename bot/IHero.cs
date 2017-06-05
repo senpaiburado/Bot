@@ -43,6 +43,8 @@ namespace DotaTextGame
         public float MissChance { get; set; }
         public float StunDamage { get; set; }
 
+        protected float AdditionalDamage = 0.0f;
+
         public int StunCounter = 0;
 
         public int GettingDamageCounter = 0;
@@ -103,7 +105,7 @@ namespace DotaTextGame
             Intelligence = itl;
             Feature = feat;
 
-            MaxHP = Strength * 20.0f + 10000.0f;
+            MaxHP = Strength * 20.0f + 5000.0f;
             HPregen = Strength * 0.03f;
 
             Armor = Agility * 0.14f;
@@ -206,6 +208,16 @@ namespace DotaTextGame
             return true;
         }
 
+        protected async Task<bool> CheckImmuneToMagic(IHero target)
+        {
+            if (target.HasImmuneToMagic)
+            {
+                await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
+                return false;
+            }
+            return true;
+        }
+
         public virtual IHero Copy(Sender sender)
         {
             return new IHero(this, sender);
@@ -230,7 +242,7 @@ namespace DotaTextGame
 
             if (GetRandomNumber(1, 101) >= target.MissChance)
             {
-                damage += this.DPS;
+                damage += this.DPS + this.AdditionalDamage;
                 damage -= target.Armor;
                 if (GetRandomNumber(1, 101) <= CriticalHitChance)
                 {

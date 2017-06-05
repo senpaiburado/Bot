@@ -165,6 +165,8 @@ namespace DotaTextGame.Heroes
             }
             if (!await CheckManaAndCD(OW_ManaPay, OW_CD))
                 return false;
+            if (!await CheckImmuneToMagic(target))
+                return false;
             MP -= OW_ManaPay;
             HpStealPercent += OW_HpStealPercentAdditional;
             OW_Activated = true;
@@ -178,6 +180,7 @@ namespace DotaTextGame.Heroes
                 return false;
             if (!await CheckManaAndCD(HoM_ManaPay, HoM_CD))
                 return false;
+
             MP -= HoM_ManaPay;
             HoM_CD = HoM_DefaultCD;
             var HeroContainer = Sender.CreateMessageContainer();

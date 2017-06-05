@@ -75,11 +75,8 @@ namespace DotaTextGame.Heroes
         {
             if (!await CheckSilence())
                 return false;
-            if (target != this && target.HasImmuneToMagic)
-            {
-                await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
+            if(!await CheckImmuneToMagic(target) && target != this)
                 return false;
-            }
 
             var attakerMessages = Sender.CreateMessageContainer();
             attakerMessages.Add(lang => lang.ALCHEMIST_YouHaveThrownUC);

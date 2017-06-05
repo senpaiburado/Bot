@@ -152,11 +152,8 @@ namespace DotaTextGame.Heroes
             }
             if (!await CheckManaAndCD(BladeFuryManaPay, BladeFuryCD))
                 return false;
-            if (target.HasImmuneToMagic)
-            {
-                await Sender.SendAsync(lang => lang.EnemyHasImmuneToMagic);
+            if (!await CheckImmuneToMagic(target))
                 return false;
-            }
             BladeFuryActivated = true;
             BladeFuryCD = BladeFuryDefaultCD;
             MP -= BladeFuryManaPay;
