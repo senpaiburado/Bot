@@ -65,6 +65,9 @@ namespace DotaTextGame
         public bool IsSilenced = false;
         protected int SilenceCounter = 0;
 
+        public bool IsFullDisabled = false;
+        protected int FullDisableCounter = 0;
+
         protected float MagicResistance = 25.0f;
 
         // Abilities:
@@ -218,6 +221,26 @@ namespace DotaTextGame
             return true;
         }
 
+        protected void UpdateFullDisable()
+        {
+            if (FullDisableCounter > 0 && IsFullDisabled)
+                FullDisableCounter--;
+            else
+            {
+                if (IsFullDisabled)
+                {
+                    IsFullDisabled = false;
+                    FullDisableCounter = 0;
+                }
+            }
+        }
+
+        protected void DisableFull(int time, IHero target)
+        {
+            target.IsFullDisabled = true;
+            target.FullDisableCounter = time;
+        }
+
         public virtual IHero Copy(Sender sender)
         {
             return new IHero(this, sender);
@@ -362,10 +385,11 @@ namespace DotaTextGame
             
         }
 
-        virtual public void UpdateStunDuration()
+        virtual public void UpdateStunAndDisableDuration()
         {
             if (StunCounter > 0)
                 StunCounter--;
+            UpdateFullDisable();
         }
 
         virtual public void UpdateDefaultCountdowns()

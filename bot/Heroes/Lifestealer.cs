@@ -20,7 +20,7 @@ namespace DotaTextGame.Heroes
 
         // Ability Passive : Feast
         public string AbiNamePassive = "Feast";
-        private float FeastHpStealPercent = 1.0f;
+        private float FeastHpStealPercent = 2.0f;
 
         // Ability Two : Open Wounds
         public string AbiNameTwo = "Open Wounds";

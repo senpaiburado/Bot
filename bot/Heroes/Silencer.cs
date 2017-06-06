@@ -117,10 +117,18 @@ namespace DotaTextGame.Heroes
             MP -= ArcaneCurseManaPay;
             ArcaneCurseCD = ArcaneCurseDefaultCD;
             target.GetDamageByDebuffs(target.CompileMagicDamage(ArcaneCurseDamage), ArcaneCurseDuration);
+            var HeroContainer = Sender.CreateMessageContainer();
+            var EnemyContainter = target.Sender.CreateMessageContainer();
             if (GetRandomNumber(1, 100) < ArcaneCurseSilenceChance)
+            {
                 Silence(ArcaneCurseSilenceDuration, target);
-            await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+                HeroContainer.Add(lang => lang.EnemyIsSilenced);
+                EnemyContainter.Add(lang => lang.YouAreSilenced);
+            }
+            HeroContainer.Add(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
+            EnemyContainter.Add(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await HeroContainer.SendAsync();
+            await EnemyContainter.SendAsync();
             return true;
         }
         public override async Task<bool> UseAbilityTwo(IHero target)

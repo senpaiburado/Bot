@@ -13,13 +13,13 @@ namespace DotaTextGame.Heroes
         public string AbiNameOne = "Time Walk";
         private float TimeWalkDamage = 150.0f;
         private int TimeWalkCD = 0;
-        private const int TimeWalkDefaultCD = 9;
+        private const int TimeWalkDefaultCD = 12;
         private float TimeWalkManaPay = 100.0f;
 
         // Ability Two : Acceleration of Time
         public string AbiNameTwo = "Acceleration of time";
         private float AoT_ManaPay = 130.0f;
-        private float AoT_AttackSpeed = 2.1f;
+        private float AoT_AttackSpeed = 1.9f;
         private int AoT_CD = 0;
         private const int AoT_DefaultCD = 20;
         private int AoT_Counter = 0;
@@ -179,7 +179,7 @@ namespace DotaTextGame.Heroes
             if (!await CheckManaAndCD(ChronosphereManaPay, ChronosphereCD))
                 return false;
             MP -= ChronosphereManaPay;
-            target.StunCounter += ChronosphereDuration;
+            DisableFull(ChronosphereDuration, target);
             ChronosphereActivated = true;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));

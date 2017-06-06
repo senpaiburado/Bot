@@ -243,7 +243,7 @@ namespace DotaTextGame
                 await player.SendAsync(lang => $"{GetMessageForMe(lang, attacker)}\n\n{GetMessageForEnemy(lang, excepter)}");
                 await enemyPlayer.SendAsync(lang => $"{GetMessageForMe(lang, excepter)}\n\n{GetMessageForEnemy(lang, attacker)}");
 
-                if (excepter.StunCounter == 0)
+                if (excepter.StunCounter == 0 && !excepter.IsFullDisabled)
                 {
                     user_attacker.status = User.Status.Excepting;
                     user_excepter.status = User.Status.Attacking;
@@ -254,8 +254,8 @@ namespace DotaTextGame
                 else
                     await player.SendAsync(lang => attacker.GetMessageAbilitesList(user_attacker.lang));
 
-                attacker.UpdateStunDuration();
-                excepter.UpdateStunDuration();
+                attacker.UpdateStunAndDisableDuration();
+                excepter.UpdateStunAndDisableDuration();
                 return true;
             }
             else
@@ -464,8 +464,8 @@ namespace DotaTextGame
             hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Abaddon("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Lifestealer("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
-            hero_list.Add(new Heroes.Silencer("Silencer", 185, 220, 245, IHero.MainFeature.Intel));
-            hero_list.Add(new IHero("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.Silencer("Silencer", 195, 225, 230, IHero.MainFeature.Intel));
+            hero_list.Add(new Heroes.WraithKing("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Sniper", 160, 230, 150, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Slardar", 230, 170, 150, IHero.MainFeature.Str));

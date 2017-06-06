@@ -1338,6 +1338,30 @@ namespace DotaTextGame
                 }
             }
 
+            public string @EnemyIsSilenced
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "The enemy is silenced!";
+                    else if (lang == Language.Russian)
+                        return "Враг замолчал!";
+                    return "";
+                }
+            }
+
+            public string @DamageString
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Damage";
+                    else if (lang == Language.Russian)
+                        return "Урон";
+                    return "";
+                }
+            }
+
             public string GetMessageYouCantUseAbilityWhileAnotherWorks(string abi_name)
                 {
                     if (lang == Language.English)
