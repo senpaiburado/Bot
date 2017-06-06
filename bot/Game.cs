@@ -155,6 +155,7 @@ namespace DotaTextGame
                     $"{playerLang.MpText}: {Convert.ToInt32(playerHero.MP)}/{Convert.ToInt32(playerHero.MaxMP)} {smile_mp}",
                     $"{playerLang.DpsText}: {Convert.ToInt32(playerHero.DPS)} {smile_dps}",
                     $"{playerLang.ArmorText}: {Convert.ToInt32(playerHero.Armor)} {smile_armor}",
+                    $"{playerHero.GetEffects()}"
                 };
 
             return string.Join("\n", lines);
@@ -170,6 +171,7 @@ namespace DotaTextGame
                 $"{playerLang.MpText}: {Convert.ToInt32(enemyHero.MP)}/{Convert.ToInt32(enemyHero.MaxMP)} {smile_mp}",
                 $"{playerLang.DpsText}: {Convert.ToInt32(enemyHero.DPS)} {smile_dps}",
                 $"{playerLang.ArmorText}: {Convert.ToInt32(enemyHero.Armor)} {smile_armor}",
+                $"{enemyHero.GetEffects()}"
             };
 
             return string.Join("\n", lines);

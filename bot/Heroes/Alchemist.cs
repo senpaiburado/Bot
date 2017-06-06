@@ -231,7 +231,7 @@ namespace DotaTextGame.Heroes
             MP -= AcidSprayManaPay;
             AcidSprayCD = AcidSprayDefaultCD;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
 

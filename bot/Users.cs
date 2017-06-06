@@ -1417,6 +1417,83 @@ namespace DotaTextGame
                 }
             }
 
+            public string @Stun
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Stun";
+                    else if (lang == Language.Russian)
+                        return "Оглушение";
+                    return "";
+                }
+            }
+            public string @Silence
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Silence";
+                    else if (lang == Language.Russian)
+                        return "Молчание";
+                    return "";
+                }
+            }
+            public string @ArmorDecreasing
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Armor Decreasing";
+                    else if (lang == Language.Russian)
+                        return "Ослабление брони";
+                    return "";
+                }
+            }
+            public string @ImmuneToMagic
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Immune to magic";
+                    else if (lang == Language.Russian)
+                        return "Невосприимчивость к магии";
+                    return "";
+                }
+            }
+            public string @Disable
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Disable";
+                    else if (lang == Language.Russian)
+                        return "Бездействие";
+                    return "";
+                }
+            }
+            public string @Effects
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Effects";
+                    else if (lang == Language.Russian)
+                        return "Эффекты";
+                    return "";
+                }
+            }
+            public string @Effect
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Effect";
+                    else if (lang == Language.Russian)
+                        return "Эффект";
+                    return "";
+                }
+            }
 
             public struct InstructionText
             {
