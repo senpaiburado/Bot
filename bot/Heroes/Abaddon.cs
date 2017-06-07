@@ -8,7 +8,6 @@ namespace DotaTextGame.Heroes
 {
     class Abaddon : IHero
     {
-        private IHero hero_target = null;
 
         // Ability One : Mist Coil
         public string AbiNameOne = "Mist Coil";
@@ -164,7 +163,7 @@ namespace DotaTextGame.Heroes
                 if (AphoticShieldActivated)
                 {
                     AphoticShieldCounter = 0;
-                    if (AphoticShieldDamageAbsorption > 0.0f)
+                    if (AphoticShieldDamageAbsorption > 0.0f && !hero_target.HasImmuneToMagic)
                         hero_target.GetDamage(AphoticShieldDamageAbsorption);
                     AphoticShieldActivated = false;
                     AphoticShieldDamageAbsorption = 1000.0f;

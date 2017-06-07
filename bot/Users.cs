@@ -1416,6 +1416,40 @@ namespace DotaTextGame
                     return "";
                 }
             }
+            public string @CountOfHits
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Count of hits";
+                    else if (lang == Language.Russian)
+                        return "Количество попаданий";
+                    return "";
+                }
+            }
+
+            public string @YouHaveWeakenedTheEnemy
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "You have weakened the enemy.";
+                    else if (lang == Language.Russian)
+                        return "Вы обессилели врага.";
+                    return "";
+                }
+            }
+            public string @TheEnemyHasWeakenedYou
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "The enemy has weakened you.";
+                    else if (lang == Language.Russian)
+                        return "Враг обессилел вас.";
+                    return "";
+                }
+            }
 
             public string @Stun
             {
@@ -1494,6 +1528,18 @@ namespace DotaTextGame
                     return "";
                 }
             }
+            public string @AttackWeakening
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Attack Weakening";
+                    else if (lang == Language.Russian)
+                        return "Ослабление атаки";
+                    return "";
+                }
+            }
+
 
             public struct InstructionText
             {

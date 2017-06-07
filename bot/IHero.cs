@@ -70,9 +70,13 @@ namespace DotaTextGame
 
         protected float MagicResistance = 25.0f;
 
+        public bool AttackWeakening = false;
+        protected int AttackWeakeningCounter = 0;
+        protected float AttackWeakeningPower = 0.0f;
+
         // Abilities:
 
-            // Heal
+        // Heal
         private float HealthRestore = 500.0f;
         private float ManaRestore = 250.0f;
         public const int HealCountdownDefault = 20;
@@ -81,6 +85,8 @@ namespace DotaTextGame
 
 
         public List<string> EffectsList = new List<string>();
+
+        protected IHero hero_target = null;
 
         public IHero(string name, int str, int agi, int itl, MainFeature feat)
         {
@@ -161,6 +167,30 @@ namespace DotaTextGame
 
         }
 
+        protected void WeakAttack(int time, float power, IHero target)
+        {
+            target.AttackWeakening = false;
+            target.AttackWeakeningCounter += time;
+            target.AttackWeakeningPower += power;
+            target.DPS -= power;
+        }
+
+        protected void UpdateAttackWeakening()
+        {
+            if (AttackWeakeningCounter > 0)
+                AttackWeakeningCounter--;
+            else
+            {
+                if (AttackWeakening)
+                {
+                    AttackWeakening = false;
+                    AttackWeakeningCounter = 0;
+                    DPS += AttackWeakeningPower;
+                    AttackWeakeningPower = 0.0f;
+                }
+            }
+        }
+
         protected void UpdateImmuneToMagic()
         {
             if (HasImmuneToMagicCounter > 0)
@@ -179,7 +209,7 @@ namespace DotaTextGame
         {
             EffectsList.Clear();
             if (StunCounter > 0)
-                EffectsList.Add($"{lang.Stun}({StunCounter + 1})");
+                EffectsList.Add($"{lang.Stun}({StunCounter})");
             if (IsSilenced)
                 EffectsList.Add($"{lang.Silence}({SilenceCounter + 1})");
             if (HasImmuneToMagic)
@@ -187,11 +217,14 @@ namespace DotaTextGame
             if (ArmorPenetratingActive)
                 EffectsList.Add($"{lang.ArmorDecreasing}({ArmorPenetratingCounter + 1})");
             if (IsFullDisabled)
-                EffectsList.Add($"{lang.Disable}({FullDisableCounter + 1})");
+                EffectsList.Add($"{lang.Disable}({FullDisableCounter})");
+            if (AttackWeakening)
+                EffectsList.Add($"{lang.AttackWeakening}({AttackWeakeningCounter + 1})");
+
             if (EffectsList.Count > 1)
-                return $"{lang.Effects}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
+                return $"{lang.Effects}: {string.Join(", ", EffectsList.ToArray())}.";
             else if (EffectsList.Count == 1)
-                return $"{lang.Effect}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
+                return $"{lang.Effect}: {string.Join(", ", EffectsList.ToArray())}.";
             else
                 return "";
         }
@@ -205,7 +238,7 @@ namespace DotaTextGame
         public void Silence(int time, IHero target)
         {
             target.IsSilenced = true;
-            target.SilenceCounter = time;
+            target.SilenceCounter += time;
         }
 
         protected void UpdateSilence()
@@ -259,7 +292,7 @@ namespace DotaTextGame
         protected void DisableFull(int time, IHero target)
         {
             target.IsFullDisabled = true;
-            target.FullDisableCounter = time;
+            target.FullDisableCounter += time;
         }
 
         public virtual IHero Copy(Sender sender)
@@ -288,12 +321,6 @@ namespace DotaTextGame
             {
                 damage += this.DPS + this.AdditionalDamage;
                 damage -= target.Armor;
-                if (GetRandomNumber(1, 101) <= CriticalHitChance)
-                {
-                    damage *= CriticalHitMultiplier;
-                    attakerMessages.Add(lang => lang.CriticalHit);
-                    excepterMessages.Add(lang => lang.TheEnemyDealtCriticalDamageToYou);
-                }
                 if (GetRandomNumber(1, 101) <= StunHitChance)
                 {
                     target.StunCounter++;
@@ -301,9 +328,14 @@ namespace DotaTextGame
                     attakerMessages.Add(lang => $"{lang.StunningHit}!");
                     excepterMessages.Add(lang => $"{lang.TheEnemyStunnedYou}");
                 }
+                if (GetRandomNumber(1, 101) <= CriticalHitChance)
+                {
+                    damage *= CriticalHitMultiplier;
+                    attakerMessages.Add(lang => lang.CriticalHit);
+                    excepterMessages.Add(lang => lang.TheEnemyDealtCriticalDamageToYou);
+                }
                 attakerMessages.Add(lang => lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage)));
                 excepterMessages.Add(lang => lang.GetAttackedMessageForExcepter(Convert.ToInt32(damage)));
-                //Console.WriteLine(MessageForAttacker);
             }
             else
             {
@@ -462,6 +494,7 @@ namespace DotaTextGame
                 }
             }
             UpdateSilence();
+            UpdateAttackWeakening();
         }
 
         virtual public void GetDamage(float value)

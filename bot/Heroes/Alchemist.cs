@@ -8,7 +8,6 @@ namespace DotaTextGame.Heroes
 {
     class Alchemist : IHero
     {
-        IHero hero_target = null;
 
         // Ability One : Acid Spray
         public string AbiNameOne = "Acid Spray";

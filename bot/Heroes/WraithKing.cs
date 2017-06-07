@@ -163,8 +163,8 @@ namespace DotaTextGame.Heroes
             var E_Container = target.Sender.CreateMessageContainer();
             H_Container.Add(lang => lang.GetMessageYouHaveUsedAbility(AbinameThree));
             E_Container.Add(lang => lang.GetMessageEnemyHasUsedAbility(AbinameThree));
-            H_Container.Add(lang => $"{lang.DamageString}: {damage}");
-            E_Container.Add(lang => $"{lang.DamageString}: {damage}");
+            H_Container.Add(lang => $"{lang.DamageString}: {damage}.");
+            E_Container.Add(lang => $"{lang.DamageString}: {damage}.");
             await H_Container.SendAsync();
             await E_Container.SendAsync();
             return true;
