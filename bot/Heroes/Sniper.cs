@@ -179,7 +179,7 @@ namespace DotaTextGame.Heroes
                 if (GetRandomNumber(1, 101) <= CriticalHitChance)
                 {
                     damage *= CriticalHitMultiplier;
-                    attakerMessages.Add(lang => lang.CriticalHit);
+                    attakerMessages.Add(lang => $"{lang.CriticalHit}!");
                     excepterMessages.Add(lang => lang.TheEnemyDealtCriticalDamageToYou);
                 }
                 attakerMessages.Add(lang => lang.GetAttackedMessageForAttacker(Convert.ToInt32(damage)));
