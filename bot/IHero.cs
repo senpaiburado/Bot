@@ -175,23 +175,23 @@ namespace DotaTextGame
             }
         }
 
-        public string GetEffects()
+        public string GetEffects(User.Text lang)
         {
             EffectsList.Clear();
             if (StunCounter > 0)
-                EffectsList.Add($"{Sender.lang.Stun}({StunCounter + 1})");
+                EffectsList.Add($"{lang.Stun}({StunCounter + 1})");
             if (IsSilenced)
-                EffectsList.Add($"{Sender.lang.Silence}({SilenceCounter + 1})");
+                EffectsList.Add($"{lang.Silence}({SilenceCounter + 1})");
             if (HasImmuneToMagic)
-                EffectsList.Add($"{Sender.lang.ImmuneToMagic}({HasImmuneToMagicCounter + 1})");
+                EffectsList.Add($"{lang.ImmuneToMagic}({HasImmuneToMagicCounter + 1})");
             if (ArmorPenetratingActive)
-                EffectsList.Add($"{Sender.lang.ArmorDecreasing}({ArmorPenetratingCounter + 1})");
+                EffectsList.Add($"{lang.ArmorDecreasing}({ArmorPenetratingCounter + 1})");
             if (IsFullDisabled)
-                EffectsList.Add($"{Sender.lang.Disable}({FullDisableCounter + 1})");
+                EffectsList.Add($"{lang.Disable}({FullDisableCounter + 1})");
             if (EffectsList.Count > 1)
-                return $"{Sender.lang.Effects}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
+                return $"{lang.Effects}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
             else if (EffectsList.Count == 1)
-                return $"{Sender.lang.Effect}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
+                return $"{lang.Effect}: {string.Join(", ", EffectsList.ToArray()) + 1}.";
             else
                 return "";
         }

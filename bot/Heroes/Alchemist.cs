@@ -264,7 +264,7 @@ namespace DotaTextGame.Heroes
             AttackSpeed += ChemicalRageAdditionalAttackSpeed;
             UpdateDPS();
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }

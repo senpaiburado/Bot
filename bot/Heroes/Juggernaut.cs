@@ -185,6 +185,7 @@ namespace DotaTextGame.Heroes
             HealingWardActivated = true;
             HPregen += HealingWardHpRegeneration;
             HealingWardCD = HealingWardDefaultCD;
+            MP -= HealingWardManaPay;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameTwo));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameTwo));
             return true;
