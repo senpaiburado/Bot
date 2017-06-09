@@ -84,6 +84,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Heroes\Abaddon.cs" />
     <Compile Include="Heroes\Alchemist.cs" />
+    <Compile Include="Heroes\DragonKnight.cs" />
     <Compile Include="Heroes\FacelessVoid.cs" />
     <Compile Include="Heroes\Juggernaut.cs" />
     <Compile Include="Heroes\Lifestealer.cs" />

@@ -375,7 +375,7 @@ namespace DotaTextGame
                     {
                         new[]
                         {
-                            new Telegram.Bot.Types.KeyboardButton("Earthshaker"),
+                            new Telegram.Bot.Types.KeyboardButton("Dragon Knight"),
                             new Telegram.Bot.Types.KeyboardButton("Slardar")
                         },
                         new[]
@@ -460,7 +460,6 @@ namespace DotaTextGame
         public static List<IHero> hero_list = new List<IHero>();
         public static void Initialize()
         {
-            // main += 20
             hero_list.Add(new Heroes.Juggernaut("Juggernaut", 215, 240, 145, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.FacelessVoid("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
@@ -469,7 +468,7 @@ namespace DotaTextGame
             hero_list.Add(new Heroes.Silencer("Silencer", 195, 225, 230, IHero.MainFeature.Intel));
             hero_list.Add(new Heroes.WraithKing("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Sniper("Sniper", 170, 215, 155, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Earthshaker", 240, 120, 160, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.DragonKnight("Dragon Knight", 210, 190, 150, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Slardar", 230, 170, 150, IHero.MainFeature.Str));
             hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
             hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));

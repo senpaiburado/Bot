@@ -20,7 +20,7 @@ namespace DotaTextGame.Heroes
 
         // Ability Two : Last Word
         public string AbiNameTwo = "Last Word";
-        private float LastWordDamage = 800.0f;
+        private float LastWordDamage = 900.0f;
         private float LastWordManaPay = 300.0f;
         private int LastWordSilenceDuration = 6;
         private int LastWordCD = 0;
@@ -119,7 +119,7 @@ namespace DotaTextGame.Heroes
             target.GetDamageByDebuffs(target.CompileMagicDamage(ArcaneCurseDamage), ArcaneCurseDuration);
             var HeroContainer = Sender.CreateMessageContainer();
             var EnemyContainter = target.Sender.CreateMessageContainer();
-            if (GetRandomNumber(1, 100) < ArcaneCurseSilenceChance)
+            if (GetRandomNumber(1, 100) <= ArcaneCurseSilenceChance)
             {
                 Silence(ArcaneCurseSilenceDuration, target);
                 HeroContainer.Add(lang => lang.EnemyIsSilenced);
