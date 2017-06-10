@@ -35,6 +35,10 @@ namespace DotaTextGame
         {
             return new SenderContainer(this);
         }
+        internal void SetLanguage(User.Text.Language lang)
+        {
+            this.lang.lang = lang;
+        }
     }
 
     class SenderContainer
@@ -200,6 +204,8 @@ namespace DotaTextGame
         public NetworkStatus net_status { get; set; }
         public Text lang = new Text();
 
+        internal Sender Sender;
+
         public long ActiveGameID = 0L;
         public short HeroListPage = 0;
         public string HeroName = "";
@@ -256,6 +262,11 @@ namespace DotaTextGame
         {
             status = Status.Default;
             net_status = NetworkStatus.Offline;
+        }
+
+        public void InitSender(Telegram.Bot.TelegramBotClient Bot)
+        {
+            Sender = new Sender(ID, lang, Bot);
         }
 
         public async void SaveToFile()
@@ -1416,6 +1427,7 @@ namespace DotaTextGame
                     return "";
                 }
             }
+
             public string @CountOfHits
             {
                 get

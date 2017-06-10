@@ -74,6 +74,8 @@ namespace DotaTextGame
         protected int AttackWeakeningCounter = 0;
         protected float AttackWeakeningPower = 0.0f;
 
+        public bool StealingDPS = false;
+
         // Abilities:
 
         // Heal

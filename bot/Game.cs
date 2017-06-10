@@ -467,11 +467,11 @@ namespace DotaTextGame
             hero_list.Add(new Heroes.Lifestealer("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Silencer("Silencer", 195, 225, 230, IHero.MainFeature.Intel));
             hero_list.Add(new Heroes.WraithKing("Wraith King", 240, 180, 180, IHero.MainFeature.Str));
-            hero_list.Add(new Heroes.Sniper("Sniper", 170, 215, 155, IHero.MainFeature.Agi));
+            hero_list.Add(new Heroes.Sniper("Sniper", 170, 235, 155, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.DragonKnight("Dragon Knight", 210, 190, 150, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Slardar("Slardar", 245, 170, 150, IHero.MainFeature.Str));
-            hero_list.Add(new IHero("Razor", 210, 240, 210, IHero.MainFeature.Agi));
-            hero_list.Add(new IHero("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
+            hero_list.Add(new Heroes.Agility.Razor("Razor", 210, 240, 210, IHero.MainFeature.Agi));
+            hero_list.Add(new Heroes.Agility.Ursa("Ursa", 230, 200, 160, IHero.MainFeature.Agi));
         }
     }
 }

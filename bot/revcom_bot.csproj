@@ -82,15 +82,17 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
+    <Compile Include="Heroes\Agility\Razor.cs" />
+    <Compile Include="Heroes\Agility\Ursa.cs" />
+    <Compile Include="Heroes\Agility\FacelessVoid.cs" />
+    <Compile Include="Heroes\Agility\Juggernaut.cs" />
+    <Compile Include="Heroes\Intelligence\Silencer.cs" />
+    <Compile Include="Heroes\Agility\Sniper.cs" />
     <Compile Include="Heroes\Strength\Abaddon.cs" />
     <Compile Include="Heroes\Strength\Alchemist.cs" />
     <Compile Include="Heroes\Strength\DragonKnight.cs" />
-    <Compile Include="Heroes\Agility\FacelessVoid.cs" />
-    <Compile Include="Heroes\Agility\Juggernaut.cs" />
     <Compile Include="Heroes\Strength\Lifestealer.cs" />
-    <Compile Include="Heroes\Intelligence\Silencer.cs" />
     <Compile Include="Heroes\Strength\Slardar.cs" />
-    <Compile Include="Heroes\Agility\Sniper.cs" />
     <Compile Include="Heroes\Strength\WraithKing.cs" />
     <Compile Include="IHero.cs" />
     <Compile Include="Program.cs" />

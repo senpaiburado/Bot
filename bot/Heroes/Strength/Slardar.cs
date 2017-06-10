@@ -24,7 +24,7 @@ namespace DotaTextGame.Heroes
         private float SlithereenCrushDamage = 450.0f;
         private float SlithereenCrushManaPay = 150.0f;
         private int SlithereenCrushCD = 0;
-        private const int SlithereenCrushDefaultCD = 10;
+        private const int SlithereenCrushDefaultCD = 14;
         private int SlithereenCrushStunDuration = 3;
 
         // Ability Passive : Bush of the Deep

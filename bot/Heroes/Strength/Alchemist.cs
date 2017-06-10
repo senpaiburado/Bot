@@ -41,8 +41,8 @@ namespace DotaTextGame.Heroes
         private int ChemicalRageDuration = 15;
         private const int ChemicalRageDefaultCD = 30;
         private int ChemicalRageCD = 0;
-        private float ChemicalRageHpRegeneration = 25.0f;
-        private float ChemicalRageMpRegeneration = 10.0f;
+        private float ChemicalRageHpRegeneration = 75.0f;
+        private float ChemicalRageMpRegeneration = 25.0f;
         private float ChemicalRageManaPay = 300.0f;
         private float ChemicalRageAdditionalAttackSpeed = 2.5f;
 

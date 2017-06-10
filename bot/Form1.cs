@@ -111,17 +111,20 @@ namespace DotaTextGame
 
                         if (!users.Contains(message.Chat.Id))
                         {
-                            users.AddUser  (message.Chat.Id);
+                            users.AddUser(message.Chat.Id);
                             Console.WriteLine("LOL");
                         }
 
                         User _usr = users.getUserByID(message.Chat.Id);
 
+                        if (_usr.Sender == null)
+                            _usr.InitSender(Bot);
+
                         if (_usr.status == User.Status.Default)
                         {
                             if (message.Text == "/start")
                             {
-                                await Bot.SendTextMessageAsync(message.Chat.Id, "\u2764");
+                                await _usr.Sender.SendAsync(lang => "\u2764");
                             }
                             else if (message.Text == "/language")
                             {
@@ -139,33 +142,33 @@ namespace DotaTextGame
 
                                 _usr.status = User.Status.LanguageChanging;
 
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangeLanguage, replyMarkup: keyboard);
+                                await _usr.Sender.SendAsync(lang => lang.ChangeLanguage, keyboard);
                             }
                             else if (message.Text == "/profile")
                             {
                                 if (_usr.net_status == User.NetworkStatus.Online)
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.GetStatisctisMessage());
+                                    await _usr.Sender.SendAsync(lang => _usr.GetStatisctisMessage());
                                 else
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ErrorByStatusOffline);
+                                    await _usr.Sender.SendAsync(lang => lang.ErrorByStatusOffline);
                             }
                             else if (message.Text == "/online")
                             {
                                 if (_usr.Name != "")
                                 {
                                     _usr.net_status = User.NetworkStatus.Online;
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SetOnlineStatus);
+                                    await _usr.Sender.SendAsync(lang => lang.SetOnlineStatus);
                                 }
                                 else
                                 {
                                     _usr.status = User.Status.SettingNickname;
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NeedToHaveNickname);
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NeedToSetNickname + ":");
+                                    await _usr.Sender.SendAsync(lang => lang.NeedToHaveNickname);
+                                    await _usr.Sender.SendAsync(lang => $"{lang.NeedToSetNickname}:");
                                 }
                             }
                             else if (message.Text == "/offline")
                             {
                                 _usr.net_status = User.NetworkStatus.Offline;
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SetOfflineStatus);
+                                await _usr.Sender.SendAsync(lang => lang.SetOfflineStatus);
                             }
                             else if (message.Text == "/netstatus")
                             {
@@ -174,7 +177,7 @@ namespace DotaTextGame
                                     msg = _usr.lang.GetOnlineStatus;
                                 else
                                     msg = _usr.lang.GetOfflineStatus;
-                                await Bot.SendTextMessageAsync(message.Chat.Id, msg);
+                                await _usr.Sender.SendAsync(lang => msg);
                             }
                             else if (message.Text == "/instruction")
                             {
@@ -200,14 +203,14 @@ namespace DotaTextGame
                                 {
                                     _usr.status = User.Status.Searching;
                                     availablePlayers.Add(_usr);
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SearchingModeNotify);
+                                    await _usr.Sender.SendAsync(lang => lang.SearchingModeNotify);
                                 }
                                 else
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ErrorByStatusOffline);
+                                    await _usr.Sender.SendAsync(lang => lang.ErrorByStatusOffline);
                             }
                             else if (message.Text == "/stopsearching")
                             {
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SeachingModeErrorNotStarted);
+                                await _usr.Sender.SendAsync(lang => lang.SeachingModeErrorNotStarted);
                             }
                             else if (message.Text == "/delete")
                             {
@@ -219,7 +222,7 @@ namespace DotaTextGame
                                         new Telegram.Bot.Types.KeyboardButton(_usr.lang.NoMessage)
                                     }
                                 }, true, true);
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ConfirmQuestion, replyMarkup: kb);
+                                await _usr.Sender.SendAsync(lang => lang.ConfirmQuestion, kb);
                             }
                             else if (message.IsCommand("[ADMIN] Set rating:") && message.Chat.Id == Users.AdminID)
                             {
@@ -241,8 +244,8 @@ namespace DotaTextGame
                                     {
                                         find_user.rate = rating;
                                         find_user.SaveToFile();
-                                        await Bot.SendTextMessageAsync(message.Chat.Id,
-                                            _usr.lang.GetMessageAdminCommandSuccesful(message.Text) + $" : {find_user.ID}");
+                                        await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(
+                                            $"{message.Text} : {find_user.ID}"));
                                     }
                                 }
                             }
@@ -257,8 +260,7 @@ namespace DotaTextGame
                                         //await Bot.SendTextMessageAsync(item, res);
                                         //await Task.Delay(100);
                                     }
-                                    await Bot.SendTextMessageAsync(message.Chat.Id,
-                                        _usr.lang.GetMessageAdminCommandSuccesful(message.Text));
+                                    await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                 }
                                     
                             }
@@ -283,8 +285,7 @@ namespace DotaTextGame
                                     if (text != "")
                                     {
                                         await Bot.SendTextMessageAsync(id, text);
-                                        await Bot.SendTextMessageAsync(message.Chat.Id,
-                                        _usr.lang.GetMessageAdminCommandSuccesful(message.Text));
+                                        await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                     }
                                 }
                             }
@@ -296,10 +297,9 @@ namespace DotaTextGame
                                 {
                                     if (users.GetUserByName(name) != null)
                                     {
-                                        await Bot.SendTextMessageAsync(message.Chat.Id, users.GetUserByName(name)
-                                            .GetStatisctisMessage());
-                                        await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang
-                                            .GetMessageAdminCommandSuccesful(message.Text));
+                                        await _usr.Sender.SendAsync(lang => users.GetUserByName(name)
+                                            ?.GetStatisctisMessage());
+                                        await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                     }
                                 }
                             }
@@ -311,14 +311,13 @@ namespace DotaTextGame
                                     if (users.GetUserByName(name) != null)
                                     {
                                         users.DeleteUser(users.GetUserByName(name).ID);
-                                        await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.GetMessageAdminCommandSuccesful(
-                                            message.Text));
+                                        await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                     }
                                 }
                             }
                             else
                             {
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.HelloMessage);
+                                await _usr.Sender.SendAsync(lang => lang.HelloMessage);
                             }
                         }
                         else if (_usr.status == User.Status.LanguageChanging)
@@ -332,7 +331,7 @@ namespace DotaTextGame
                                     _usr.lang.lang = User.Text.Language.Russian;
                                 var hide_keyboard = new ReplyKeyboardHide();
                                 _usr.SaveToFile();
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.ChangedLanguage, replyMarkup: hide_keyboard);
+                                await _usr.Sender.SendAsync(lang => lang.ChangedLanguage, hide_keyboard);
                             }
                         }
                         else if (_usr.status == User.Status.Picking)
@@ -344,13 +343,13 @@ namespace DotaTextGame
                             else if (message.IsCommand(">"))
                             {
                                 var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.GetKeyboardNextPage();
-                                await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
+                                await _usr.Sender.SendAsync(lang => ".", kb);
                                 Console.WriteLine(">");
                             }
                             else if (message.IsCommand("<"))
                             {
                                 var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id).GetKeyboardPrevPage();
-                                await Bot.SendTextMessageAsync(message.Chat.Id, ".", replyMarkup: kb);
+                                await _usr.Sender.SendAsync(lang => ".", kb);
                                 Console.WriteLine("<");
                             }
                             else
@@ -365,17 +364,11 @@ namespace DotaTextGame
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.IsDigits(message.Text))
                             {
-                                foreach (var game in ActiveGames)
-                                {
-                                    if (game.GameID == _usr.ActiveGameID)
-                                    {
-                                        await game.GetController(message.Chat.Id).UseAbility(Convert.ToInt32(message.Text));
-                                        break;
-                                    }
-                                }
+                                await GetActiveGame(_usr.ActiveGameID)?.GetController(_usr.ID)?.UseAbility(
+                                    Convert.ToInt32(message.Text));
                             }
                             else
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.IncorrectSelection);
+                                await _usr.Sender.SendAsync(lang => lang.IncorrectSelection);
                         }
                         else if (_usr.status == User.Status.Excepting)
                         {
@@ -385,16 +378,9 @@ namespace DotaTextGame
                         {
                             if (message.Text == "/stopsearching")
                             {
-                                foreach (var player in availablePlayers)
-                                {
-                                    if (player.ID == _usr.ID)
-                                    {
-                                        availablePlayers.Remove(player);
-                                        break;
-                                    }
-                                }
+                                availablePlayers.Remove(availablePlayers.Find(x => x.ID == _usr.ID));
                                 _usr.status = User.Status.Default;
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.SearchingModeStopped);
+                                await _usr.Sender.SendAsync(lang => lang.SearchingModeStopped);
                             }
                         }
                         else if (_usr.status == User.Status.GameConfirming)
@@ -419,33 +405,33 @@ namespace DotaTextGame
                                 var h_kb = new ReplyKeyboardHide();
                                 if (message.IsCommand(_usr.lang.YesMessage))
                                 {
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.AccountWasDeletedString, replyMarkup: h_kb);
+                                    await _usr.Sender.SendAsync(lang => lang.AccountWasDeletedString, h_kb);
                                     users.DeleteUser(message.Chat.Id);
                                 }
                                 else
                                 {
                                     _usr.status = User.Status.Default;
-                                    await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.YouCanceledTheActionString, replyMarkup: h_kb);
+                                    await _usr.Sender.SendAsync(lang => lang.YouCanceledTheActionString, h_kb);
                                 }
                             }
                         }
                         else if (_usr.status == User.Status.SettingNickname)
                         {
                             if (users.NicknameExists(message.Text))
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameIsAlreadyExists);
+                                await _usr.Sender.SendAsync(lang => lang.NickNameIsAlreadyExists);
                             else
                             {
                                 _usr.Name = message.Text;
                                 _usr.status = User.Status.Default;
                                 _usr.SaveToFile();
-                                await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.NickNameSet);
+                                await _usr.Sender.SendAsync(lang => lang.NickNameSet);
                             }
                         }
                         else
                         {
                             var hide_keyboard = new ReplyKeyboardHide();
                             _usr.status = User.Status.Default;
-                            await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.StatusUndefinedError, replyMarkup: hide_keyboard);
+                            await _usr.Sender.SendAsync(lang => lang.StatusUndefinedError, hide_keyboard);
                         }
 
                         offset = update.Id + 1;
