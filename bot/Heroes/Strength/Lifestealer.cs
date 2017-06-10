@@ -81,6 +81,7 @@ namespace DotaTextGame.Heroes
                 {
                     RageActivated = false;
                     AttackSpeed -= RageAttackSpeed;
+                    UpdateDPS();
                     RageCD = RageDefaultCD;
                     RageCounter = 0;
                 }
@@ -149,6 +150,7 @@ namespace DotaTextGame.Heroes
             MP -= RageManaPay;
             AddImmuneToMagic(RageDuration);
             AttackSpeed += RageAttackSpeed;
+            UpdateDPS();
             RageActivated = true;
             await Sender.SendAsync(lang => lang.GetMessageYouActivated(AbiNameOne) + "\n" + lang.YouHaveImmuneToMagic);
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameOne) + "\n" + lang.EnemyHasImmuneToMagic);

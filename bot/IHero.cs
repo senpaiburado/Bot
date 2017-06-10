@@ -217,7 +217,7 @@ namespace DotaTextGame
             if (ArmorPenetratingActive)
                 EffectsList.Add($"{lang.ArmorDecreasing}({ArmorPenetratingCounter + 1})");
             if (IsFullDisabled)
-                EffectsList.Add($"{lang.Disable}({FullDisableCounter})");
+                EffectsList.Add($"{lang.Disable}({FullDisableCounter + 1})");
             if (AttackWeakening)
                 EffectsList.Add($"{lang.AttackWeakening}({AttackWeakeningCounter + 1})");
 

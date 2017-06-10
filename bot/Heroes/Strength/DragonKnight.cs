@@ -33,7 +33,7 @@ namespace DotaTextGame.Heroes
         // Ability Three : Dragon Fury
         public string AbiNameThree = "Dragon Fury";
         private float DragonFuryAddDamage = 50.0f;
-        private float DragonFuryAddAttackSpeedPercent = 25;
+        private float DragonFuryAddAttackSpeedPercent = 45;
         private float DragonFuryLastAttackSpeed = 0.0f;
         private float DragonFuryHpRegeneration = 20.0f;
         private float DragonFuryAddArmor = 25.0f;
@@ -87,7 +87,9 @@ namespace DotaTextGame.Heroes
                     Armor -= DragonFuryAddArmor;
                     DPS -= DragonFuryAddDamage;
                     AttackSpeed = DragonFuryLastAttackSpeed;
+                    UpdateDPS();
                     DragonFuryCD = DragonFuryDefaultCD;
+                    DragonFuryCounter = 0;
                 }
             }
         }
@@ -129,7 +131,7 @@ namespace DotaTextGame.Heroes
                 return false;
             MP -= BreatheFireManaPay;
             BreatheFireCD = BreatheFireDefaultCD;
-            target.GetDamage(BreatheFireDamage);
+            target.GetDamage(target.CompileMagicDamage(BreatheFireDamage));
             WeakAttack(BreatheFireLoseDamageDuration, (target.DPS / 100.0f * BreatheFireLoseDamagePercent), target);
             var hCon = Sender.CreateMessageContainer();
             var eCon = target.Sender.CreateMessageContainer();
@@ -174,6 +176,7 @@ namespace DotaTextGame.Heroes
             DPS += DragonFuryAddDamage;
             DragonFuryLastAttackSpeed = AttackSpeed;
             AttackSpeed += AttackSpeed / 100.0f * DragonFuryAddAttackSpeedPercent;
+            UpdateDPS();
             MP -= DragonFuryManaPay;
             await Sender.SendAsync(lang => lang.GetMessageYouActivated(AbiNameThree));
             await target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameThree));
