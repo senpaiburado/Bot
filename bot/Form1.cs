@@ -116,8 +116,8 @@ namespace DotaTextGame
                     }
 
                     var updates = await Bot.GetUpdatesAsync(offset);
-                    
-                    foreach(var update in updates.Where(x => x.Message != null && x.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage))
+
+                    foreach (var update in updates.Where(x => x.Message != null && x.Message.Type == Telegram.Bot.Types.Enums.MessageType.TextMessage))
                     {
                         var message = update.Message;
 
@@ -143,7 +143,7 @@ namespace DotaTextGame
                                 var keyboard = new ReplyKeyboardMarkup();
                                 keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                                 {
-                                    new Telegram.Bot.Types.KeyboardButton[] 
+                                    new Telegram.Bot.Types.KeyboardButton[]
                                     {
                                         new Telegram.Bot.Types.KeyboardButton("English"),
                                         new Telegram.Bot.Types.KeyboardButton("Русский")
@@ -197,13 +197,13 @@ namespace DotaTextGame
                                 //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step1_Describe);
                                 //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step2_AboutNetMode);
                                 //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step3_AboutOnlineMode);
-                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step4_AboutOfflineMode);
-                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step5_AboutLanguage);
+                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step4_AboutOfflineMode);
+                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step5_AboutLanguage);
                                 //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step6_AboutGame);
-                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step7_AboutHeroes);
+                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step7_AboutHeroes);
                                 //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step8_AboutDonate);
-                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step9_AboutDeveloper);
-                               // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step10_TheEnd);
+                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step9_AboutDeveloper);
+                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step10_TheEnd);
                             }
                             else if (message.Text == "/donate")
                             {
@@ -284,7 +284,7 @@ namespace DotaTextGame
                                     }
                                     await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                 }
-                                    
+
                             }
                             else if (message.IsCommand("[ADMIN] Get list of names") && message.Chat.Id ==
                                 Users.AdminID)
@@ -368,8 +368,6 @@ namespace DotaTextGame
                             {
                                 GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
                             }
-                            else
-                                await _usr.Sender.SendAsync(lang => lang.ErrorPickingIncorrectCommand);
                             else if (message.IsCommand(">"))
                             {
                                 var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.GetKeyboardNextPage();
@@ -483,7 +481,7 @@ namespace DotaTextGame
 
                         offset = update.Id + 1;
                     }
-
+                
                     //return;
                 }
             }
