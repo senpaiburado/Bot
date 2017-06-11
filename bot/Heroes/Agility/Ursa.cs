@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes.Agility
     class Ursa : IHero
     {
         // Ability One : Earthshok
-        public string AbiNameOne = "Earthshok";
+        public static string AbiNameOne = "Earthshok";
         private float EarthshokDamage = 400.0f;
         private float EarthshokArmorPenetrate = 7.0f;
         private float EarthshokManaPay = 100.0f;
@@ -18,7 +18,7 @@ namespace DotaTextGame.Heroes.Agility
         private int EarthshokDuration = 5;
 
         // Ability Two : Overpower
-        public string AbiNameTwo = "Overpower";
+        public static string AbiNameTwo = "Overpower";
         private float OverpowerAddDPS = 30.0f;
         private float OverpowerAddAttackSpeed = 1.0f;
         private float OverpowerManaPay = 150.0f;
@@ -29,13 +29,13 @@ namespace DotaTextGame.Heroes.Agility
         private bool OverpowerActivated = false;
 
         // Ability Passive : Fury Swipes
-        public string AbiNamePassive = "Fury Swipes";
+        public static string AbiNamePassive = "Fury Swipes";
         private float FurySwipesDamagePerHit = 20.0f;
         private float FurySwipesDamageLimit = 100.0f;
         private float FurySwipesCurrentAdditionalDamage = 0.0f;
 
         // Ability Three : Enrage
-        public string AbiNameThree = "Enrage";
+        public static string AbiNameThree = "Enrage";
         private float EnrageDamageAbsorptionPercent = 80;
         private float EnrageAddDamage = 80.0f;
         private int EnrageCD = 0;
@@ -156,9 +156,9 @@ namespace DotaTextGame.Heroes.Agility
                 {
                     OverpowerActivated = false;
                     OverpowerCounter = 0;
-                    DPS -= OverpowerAddDPS;
                     AttackSpeed -= OverpowerAddAttackSpeed;
                     UpdateDPS();
+                    DPS -= OverpowerAddDPS;
                     OverpowerCD = OverpowerDefaultCD;
                 }
             }
@@ -174,7 +174,6 @@ namespace DotaTextGame.Heroes.Agility
                     EnrageActivated = false;
                     EnrageCD = EnrageDefaultCD;
                     DPS -= EnrageAddDamage;
-                    UpdateDPS();
                     EnrageCounter = 0;
                 }
             }

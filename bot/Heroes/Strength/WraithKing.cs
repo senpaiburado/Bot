@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class WraithKing : IHero
     {
         // Ability One : Wraithfire Blast
-        public string AbiNameOne = "Wraithfire Blast";
+        public static string AbiNameOne = "Wraithfire Blast";
         private float WB_Damage = 300.0f;
         private float WB_DamagePerStep = 150.0f;
         private float WB_ManaPay = 200.0f;
@@ -18,16 +18,16 @@ namespace DotaTextGame.Heroes
         private const int WB_DefaultCD = 12;
 
         // Passive Ability One : Vampiric Aura
-        public string AbiPassiveNameOne = "Vampiric Aura";
+        public static string AbiPassiveNameOne = "Vampiric Aura";
         private float VA_HpStealByDamagePercent = 15;
 
         // Passive Ability Two : Mortal Strike
-        public string AbiPassiveNameTwo = "Mortal Strike";
+        public static string AbiPassiveNameTwo = "Mortal Strike";
         private float MS_CriticalHitMultiplier = 0.5f;
         private float MS_CriticalHitChance = 10.0f;
 
         // Ability Two : Armor Fortification
-        public string AbiNameTwo = "Armor Fortification";
+        public static string AbiNameTwo = "Armor Fortification";
         private float AF_AdditionalArmor = 50.0f;
         private float AF_ManaPay = 130.0f;
         private int AF_CD = 0;
@@ -37,7 +37,7 @@ namespace DotaTextGame.Heroes
         private bool AF_Activated = false;
 
         // Ability Three : King's Luck
-        public string AbinameThree = "King's Luck";
+        public static string AbinameThree = "King's Luck";
         private float KL_ManaPay = 350.0f;
         private int KL_CD = 0;
         private const int KL_DefaultCD = 35;

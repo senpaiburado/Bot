@@ -35,10 +35,6 @@ namespace DotaTextGame
         {
             return new SenderContainer(this);
         }
-        internal void SetLanguage(User.Text.Language lang)
-        {
-            this.lang.lang = lang;
-        }
     }
 
     class SenderContainer
@@ -215,7 +211,7 @@ namespace DotaTextGame
         internal Sender Sender;
 
         public long ActiveGameID = 0L;
-        public long LastMove = 0L;
+        public ulong LastMoveTime = 0L;
         public short HeroListPage = 0;
         public string HeroName = "";
 
@@ -276,6 +272,12 @@ namespace DotaTextGame
         public void InitSender(Telegram.Bot.TelegramBotClient Bot)
         {
             Sender = new Sender(ID, lang, Bot);
+        }
+
+        public void LanguageSet(Text.Language language)
+        {
+            lang.lang = language;
+            Sender.lang.lang = language;
         }
 
         public async void SaveToFile()
@@ -1561,6 +1563,59 @@ namespace DotaTextGame
                 }
             }
 
+            public string @TimeLeftYou
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "You weren't active for 5 minutes and were excluded from the game.";
+                    else if (lang == Language.Russian)
+                        return "Вы не были активны в течение 5 минут и были исключены из игры.";
+                    return "";
+                }
+            }
+            public string @TimeLeftEnemy
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "The enemy is expelled from the game for inaction.";
+                    else if (lang == Language.Russian)
+                        return "Противник исключён из игры за бездействие.";
+                    return "";
+                }
+            }
+            public string @GetMessageCantReportNow(int time_left)
+            {
+                if (lang == Language.English)
+                    return $"You can't report the enemy now! Time left: {time_left} seconds.";
+                else if (lang == Language.Russian)
+                    return $"Вы не можете пожаловаться на противника сейчас. Осталось: {time_left} секунд.";
+                return "";
+            }
+
+            public string @ErrorSearchingIncorrectCommand
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Incorrect command! Use /stopsearching if you want to stop searching.";
+                    else if (lang == Language.Russian)
+                        return "Неизвестная команда! Используйте /stopsearching, если Вы хотите остановить поиск.";
+                    return "";
+                }
+            }
+            public string @ErrorPickingIncorrectCommand
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Incorrect command! Use /stopsearching if you want to leave lobby.";
+                    else if (lang == Language.Russian)
+                        return "Неизвестная команда! Используйте /stopsearching, если Вы хотите покинуть комнату.";
+                    return "";
+                }
+            }
 
             public struct InstructionText
             {

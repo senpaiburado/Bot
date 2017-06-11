@@ -10,14 +10,14 @@ namespace DotaTextGame.Heroes
     {
         private float PreviousHP = 0.0f;
         // Ability One : Time Walk
-        public string AbiNameOne = "Time Walk";
+        public static string AbiNameOne = "Time Walk";
         private float TimeWalkDamage = 150.0f;
         private int TimeWalkCD = 0;
         private const int TimeWalkDefaultCD = 12;
         private float TimeWalkManaPay = 100.0f;
 
         // Ability Two : Acceleration of Time
-        public string AbiNameTwo = "Acceleration of time";
+        public static string AbiNameTwo = "Acceleration of time";
         private float AoT_ManaPay = 130.0f;
         private float AoT_AttackSpeed = 1.9f;
         private int AoT_CD = 0;
@@ -27,12 +27,12 @@ namespace DotaTextGame.Heroes
         private bool AoT_Activated = false;
 
         // Ability Passive : Time Lock
-        public string AbiNamePassive = "Time lock";
+        public static string AbiNamePassive = "Time lock";
         private float TimeLockAddDamage = 25.0f;
         private float TimeLockAddStunChance = 15.0f;
 
         // Ability Three : Chronosphere
-        public string AbiNameThree = "Chronosphere";
+        public static string AbiNameThree = "Chronosphere";
         private int ChronosphereDuration = 5;
         private int ChronosphereCD = 0;
         private const int ChronosphereDefaultCD = 40;

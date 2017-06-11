@@ -9,14 +9,14 @@ namespace DotaTextGame.Heroes.Agility
     class Razor : IHero
     {
         // Ability One : Plasma Field
-        public string AbiNameOne = "Plasma Field";
+        public static string AbiNameOne = "Plasma Field";
         private float PlasmaFieldDamage = 500.0f;
         private float PlasmaFieldManaPay = 150.0f;
         private int PlasmaFieldCD = 0;
         private const int PlasmaFieldDefaultCD = 13;
 
         // Ability Two : Static Link
-        public string AbiNameTwo = "Static Link";
+        public static string AbiNameTwo = "Static Link";
         private float StaticLinkStealDpsPercent = 35;
         private float StaticLinkLastDPS = 0.0f;
         private int StaticLinkDuration = 5;
@@ -27,12 +27,12 @@ namespace DotaTextGame.Heroes.Agility
         private bool StaticLinkActivated = false;
 
         // Ability Passive : Electrical Hit
-        public string AbiNamePassive = "Electrical Hit";
+        public static string AbiNamePassive = "Electrical Hit";
         private float ElectricalHitDamage = 150.0f;
         private float ElectricalHitChance = 15.0f;
 
         // Ability Three : Eye of the Storm
-        public string AbiNameThree = "Eye of the Storm";
+        public static string AbiNameThree = "Eye of the Storm";
         private float EotS_DamagePerHit = 85.0f;
         private float EotS_FirstDamage = 250.0f;
         private float EotS_ArmorPenetratePerHit = 1.0f;

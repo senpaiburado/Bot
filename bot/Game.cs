@@ -29,14 +29,14 @@ namespace DotaTextGame
             User.ActiveGameID = 0L;
             User.status = User.Status.Default;
             User.HeroName = "";
-            User.LastMove = 0L;
+            User.LastMoveTime = 0L;
         }
     }
 
     class PlayerController
     {
         public PlayerGameContext player;
-        private PlayerGameContext enemyPlayer;
+        public PlayerGameContext enemyPlayer;
         private Game game;
         public long LastMove = 0L;
 
@@ -120,6 +120,8 @@ namespace DotaTextGame
 
         private async void SetAttackerAndExcepter(PlayerGameContext attacker, PlayerGameContext excepter)
         {
+            attacker.User.LastMoveTime = Form1.Time;
+            excepter.User.LastMoveTime = Form1.Time;
             attacker.User.status = User.Status.Attacking;
             excepter.User.status = User.Status.Excepting;
 
@@ -191,10 +193,16 @@ namespace DotaTextGame
             game.Reset();
         }
 
-        public void CheckInactive()
+        public async void CheckInactive()
         {
-            game.GetController(enemyPlayer.User.ID).LeaveGame();
-            Console.WriteLine("Reported");
+            if (Form1.Time - enemyPlayer.User.LastMoveTime >= 500)
+            {
+                await player.SendAsync(lang => lang.TimeLeftEnemy);
+                game.GetController(enemyPlayer.User.ID)?.LeaveGame();
+            }
+            else
+                await player.SendAsync(lang => lang.GetMessageCantReportNow(Convert.ToInt32(
+                    500 - (Form1.Time - enemyPlayer.User.LastMoveTime))));
         }
 
         public async Task<bool> UseAbility(int number)
@@ -238,7 +246,8 @@ namespace DotaTextGame
             if (finished)
             {
                 //attacker.UpdatePerStep();
-                user_attacker.LastMove = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                user_attacker.LastMoveTime = Form1.Time;
+                user_excepter.LastMoveTime = Form1.Time;
                 attacker.Update();
                 excepter.Update();
 
@@ -485,12 +494,12 @@ namespace DotaTextGame
             if (PlayerID == player_two_controller.player.User.ID)
                 return player_two_controller;
 
-            Reset();
-
             //здесь нужна какая-то общая ошибка, т.к. таких вещей по идее никогда не должно происходить
             //TODO избавиться от Wait
             player_one_controller.player.SendAsync(lang => lang.PickHeroError).Wait();
             player_two_controller.player.SendAsync(lang => lang.PickHeroError).Wait();
+
+            Reset();
             
             return null;
         }

@@ -171,7 +171,7 @@ namespace DotaTextGame
 
         protected void WeakAttack(int time, float power, IHero target)
         {
-            target.AttackWeakening = false;
+            target.AttackWeakening = true;
             target.AttackWeakeningCounter += time;
             target.AttackWeakeningPower += power;
             target.DPS -= power;

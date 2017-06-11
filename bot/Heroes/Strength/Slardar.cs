@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class Slardar : IHero
     {
         // Ability One : Guardian Sprint
-        public string AbiNameOne = "Guardian Sprint";
+        public static string AbiNameOne = "Guardian Sprint";
         private float GuardianSprintAttackSpeedPercent = 75.0f;
         private float GuardianSprintLastAttackSpeed = 0.0f;
         private float GuardianSprintDeffectDamagePercent = 15.0f;
@@ -20,7 +20,7 @@ namespace DotaTextGame.Heroes
         private bool GuardianSprintActivated = false;
 
         // Ability Two : Slithereen Crush
-        public string AbiNameTwo = "Slithereen Crush";
+        public static string AbiNameTwo = "Slithereen Crush";
         private float SlithereenCrushDamage = 450.0f;
         private float SlithereenCrushManaPay = 150.0f;
         private int SlithereenCrushCD = 0;
@@ -28,12 +28,12 @@ namespace DotaTextGame.Heroes
         private int SlithereenCrushStunDuration = 3;
 
         // Ability Passive : Bush of the Deep
-        public string AbiNamePassive = "Bush of the Deep";
+        public static string AbiNamePassive = "Bush of the Deep";
         private float BotD_BushChance = 20.0f;
         private float BotD_BushDamage = 55.0f;
 
         // Ability Three : Corrosive Haze
-        public string AbiNameThree = "Corrosive Haze";
+        public static string AbiNameThree = "Corrosive Haze";
         private float CorrosiveHazeArmorPenetrate = 50.0f;
         private float CorrosiveHazeManaPay = 50.0f;
         private int CorrosiveHazeDuration = 15;

@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class Sniper : IHero
     {
         // Ability One : Shrapnel
-        public string AbiNameOne = "Shrapnel";
+        public static string AbiNameOne = "Shrapnel";
         protected float ShrapnelDamagePerStep = 100.0f;
         protected float ShrapnelAttackWeakening = 75.0f;
         protected float ShrapnelManaPay = 95.0f;
@@ -18,13 +18,13 @@ namespace DotaTextGame.Heroes
         protected const int ShrapnelDefaultCD = 20;
 
         // Ability Passive : Headshot
-        public string AbiNamePassive = "Headshot";
+        public static string AbiNamePassive = "Headshot";
         protected float HeadshotDamage = 90.0f;
         protected int HeadshotDisableDuration = 1;
         protected float HeadshotDisableChance = 25;
 
         // Ability Two : Machine Gun
-        public string AbiNameTwo = "Machine Gun";
+        public static string AbiNameTwo = "Machine Gun";
         protected float MG_Damage = 350.0f;
         protected float MG_Chance = 65.0f;
         protected float MG_ManaPay = 220.0f;
@@ -32,7 +32,7 @@ namespace DotaTextGame.Heroes
         protected const int MG_DefaultCD = 23;
 
         // Ability Three : Assassinate
-        public string AbiNameThree = "Assassinate";
+        public static string AbiNameThree = "Assassinate";
         protected float AssassinateDamage = 1000.0f;
         protected float AssassinateManaPay = 300.0f;
         protected int AssassinateCD = 0;

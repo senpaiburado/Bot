@@ -10,7 +10,7 @@ namespace DotaTextGame.Heroes
     {
 
         // Ability One : Acid Spray
-        public string AbiNameOne = "Acid Spray";
+        public static string AbiNameOne = "Acid Spray";
         private float AcidSprayArmorPenetrate = 17.0f;
         private float AcidSprayDamage = 35.0f;
         private int AcidSprayDuration = 9;
@@ -29,13 +29,13 @@ namespace DotaTextGame.Heroes
         private float UnstableConcoctionManaPay = 200.0f;
 
         // Passive ability: GreevilsPower
-        public string AbiNamePassive = "Greevils Power";
+        public static string AbiNamePassive = "Greevils Power";
         private int GreevilsPowerTime = 5;
         private int GreevilsPowerCounter = 0;
         private float GreevilsPowerDamage = 5.0f;
 
         // Ability Three : Chemical Rage
-        public string AbiNameThree = "Chemical Rage";
+        public static string AbiNameThree = "Chemical Rage";
         private bool ChemicalRageActivated = false;
         private int ChemicalRageCounter = 0;
         private int ChemicalRageDuration = 15;

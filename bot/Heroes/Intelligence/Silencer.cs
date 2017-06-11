@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class Silencer : IHero
     {
         // Ability One : Arcane Curse
-        public string AbiNameOne = "Arcane Curse";
+        public static string AbiNameOne = "Arcane Curse";
         private float ArcaneCurseDamage = 60.0f;
         private float ArcaneCurseSilenceChance = 65.0f;
         private int ArcaneCurseSilenceDuration = 4;
@@ -19,7 +19,7 @@ namespace DotaTextGame.Heroes
         private float ArcaneCurseManaPay = 180.0f;
 
         // Ability Two : Last Word
-        public string AbiNameTwo = "Last Word";
+        public static string AbiNameTwo = "Last Word";
         private float LastWordDamage = 900.0f;
         private float LastWordManaPay = 300.0f;
         private int LastWordSilenceDuration = 6;
@@ -27,11 +27,11 @@ namespace DotaTextGame.Heroes
         private const int LastWordDefaultCD = 20;
 
         // Ability Passive: Glaives of Wisdom
-        public string AbiNamePassive = "Glaives of Wisdom";
+        public static string AbiNamePassive = "Glaives of Wisdom";
         private float GoW_Percent = 35;
 
         // Ability Three - Global Silence
-        public string AbiNameThree = "Global Silence";
+        public static string AbiNameThree = "Global Silence";
         private int GlobalSilenceCD = 0;
         private const int GlobalSilenceDefaultCD = 30;
         private float GlobalSilenceManaPay = 390.0f;

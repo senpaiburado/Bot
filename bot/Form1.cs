@@ -16,6 +16,8 @@ namespace DotaTextGame
     {
         BackgroundWorker bw;
         Users users;
+        Timer timer;
+        public static ulong Time = 0L;
 
         List<Game> ActiveGames = new List<Game>();
 
@@ -35,7 +37,17 @@ namespace DotaTextGame
 
             this.users = new Users();
 
+            timer = new Timer();
+            timer.Tick += new EventHandler(AddSecondToTime);
+            timer.Interval = 1000;
+            timer.Enabled = true;
+
             Game.Initialize();
+        }
+
+        private void AddSecondToTime(object Sender, EventArgs e)
+        {
+            Time += 1L;
         }
 
         async void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -51,6 +63,7 @@ namespace DotaTextGame
                 await Bot.SetWebhookAsync("");
                 //Bot.SetWebhook("");
                 int offset = 0;
+                timer.Start();
                 while (true)
                 {
                     availablePlayers.RemoveAll(x => x.status != User.Status.Searching);
@@ -297,7 +310,7 @@ namespace DotaTextGame
                                         }
                                         catch (Telegram.Bot.Exceptions.ApiRequestException ex)
                                         {
-                                            Console.WriteLine(ex);
+                                            Console.WriteLine(ex.Message);
                                             users.GetUserList().Remove(id);
                                         }
                                         await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
@@ -341,9 +354,9 @@ namespace DotaTextGame
                             {
                                 _usr.status = User.Status.Default;
                                 if (message.IsCommand("english"))
-                                    _usr.lang.lang = User.Text.Language.English;
+                                    _usr.LanguageSet(User.Text.Language.English);
                                 else if (message.IsCommand("русский"))
-                                    _usr.lang.lang = User.Text.Language.Russian;
+                                    _usr.LanguageSet(User.Text.Language.Russian);
                                 var hide_keyboard = new ReplyKeyboardHide();
                                 _usr.SaveToFile();
                                 await _usr.Sender.SendAsync(lang => lang.ChangedLanguage, hide_keyboard);
@@ -355,6 +368,8 @@ namespace DotaTextGame
                             {
                                 GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
                             }
+                            else
+                                await _usr.Sender.SendAsync(lang => lang.ErrorPickingIncorrectCommand);
                             else if (message.IsCommand(">"))
                             {
                                 var kb = GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.GetKeyboardNextPage();
@@ -374,6 +389,15 @@ namespace DotaTextGame
                                     GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.PickHero(hero);
                             }
                         }
+                        else if (_usr.status == User.Status.Picked)
+                        {
+                            if (message.Text == "/stopsearching")
+                            {
+                                GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
+                            }
+                            else
+                                await _usr.Sender.SendAsync(lang => lang.ErrorPickingIncorrectCommand);
+                        }
                         else if (_usr.status == User.Status.Attacking)
                         {
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
@@ -390,8 +414,7 @@ namespace DotaTextGame
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.Text == "/report")
                             {
-                                Console.WriteLine("Report");
-                                GetActiveGame(message.Chat.Id)?.GetController(message.Chat.Id)?.CheckInactive();
+                                GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.CheckInactive();
                             }
                         }
                         else if (_usr.status == User.Status.Searching)
@@ -402,6 +425,8 @@ namespace DotaTextGame
                                 _usr.status = User.Status.Default;
                                 await _usr.Sender.SendAsync(lang => lang.SearchingModeStopped);
                             }
+                            else
+                                await _usr.Sender.SendAsync(lang => lang.ErrorSearchingIncorrectCommand);
                         }
                         else if (_usr.status == User.Status.GameConfirming)
                         {
@@ -417,6 +442,8 @@ namespace DotaTextGame
                             {
                                 await GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.LeaveConfirming();
                             }
+                            else
+                                await _usr.Sender.SendAsync(lang => lang.ErrorPickingIncorrectCommand);
                         }
                         else if (_usr.status == User.Status.DeletingAccount)
                         {
@@ -456,9 +483,8 @@ namespace DotaTextGame
 
                         offset = update.Id + 1;
                     }
-                    
-                    //return;
 
+                    //return;
                 }
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)

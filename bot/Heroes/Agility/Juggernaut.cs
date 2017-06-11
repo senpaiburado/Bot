@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class Juggernaut : IHero
     {
         // Ability One : Blade Fury
-        public string AbiNameOne = "Blade Fury";
+        public static string AbiNameOne = "Blade Fury";
         private float BladeFuryDamage = 80.0f;
         private int BladeFuryDuration = 5;
         private int BladeFuryCounter = 0;
@@ -19,7 +19,7 @@ namespace DotaTextGame.Heroes
         private const int BladeFuryDefaultCD = 17;
 
         // Ability Two : Healing Ward
-        public string AbiNameTwo = "Healing Ward";
+        public static string AbiNameTwo = "Healing Ward";
         private float HealingWardHpRegeneration => MaxHP / 100.0f * 0.75f;
         private int HealingWardDuration = 7;
         private int HealingWardCounter = 0;
@@ -29,12 +29,12 @@ namespace DotaTextGame.Heroes
         private bool HealingWardActivated = false;
 
         // Ability Passive : Blade Dance
-        public string AbiNamePassive = "Blade Dance";
+        public static string AbiNamePassive = "Blade Dance";
         private float BladeDanceCriticalMult = 1.2f;
         private float BladeDanceCriticalChance = 25.0f;
 
         // Ability Three : Omnislash
-        public string AbiNameThree = "Omnislash";
+        public static string AbiNameThree = "Omnislash";
         private float OmnislashDamage = 350.0f;
         private float OmnislashManaPay = 300.0f;
         private int OmnislashDuration = 5;

@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class DragonKnight : IHero
     {
         // Ability one : Breathe Fire
-        public string AbiNameOne = "Breathe Fire";
+        public static string AbiNameOne = "Breathe Fire";
         private float BreatheFireDamage = 400.0f;
         private float BreatheFireLoseDamagePercent = 35;
         private float BreatheFireManaPay = 200.0f;
@@ -18,20 +18,20 @@ namespace DotaTextGame.Heroes
         private const int BreatheFireDefaultCD = 19;
 
         // Ability Two : Dragon Tail
-        public string AbiNameTwo = "Dragon Tail";
+        public static string AbiNameTwo = "Dragon Tail";
         private float DragonTailDamage = 500.0f;
         private float DragonTailManaPay = 230.0f;
-        private int DragonTailStunDuration = 5;
+        private int DragonTailStunDuration = 3;
         private int DragonTailCD = 0;
         private const int DragonTailDefaultCD = 16;
 
         // Ability Passive : Dragon Blood
-        public string AbiNamePassive = "Dragon Blood";
+        public static string AbiNamePassive = "Dragon Blood";
         private float DragonBloodHpRegeneration = 30.0f;
         private float DragonBloodAddArmor = 25.0f;
 
         // Ability Three : Dragon Fury
-        public string AbiNameThree = "Dragon Fury";
+        public static string AbiNameThree = "Dragon Fury";
         private float DragonFuryAddDamage = 50.0f;
         private float DragonFuryAddAttackSpeedPercent = 45;
         private float DragonFuryLastAttackSpeed = 0.0f;

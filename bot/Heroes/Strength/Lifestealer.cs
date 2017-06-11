@@ -9,7 +9,7 @@ namespace DotaTextGame.Heroes
     class Lifestealer : IHero
     {
         // Ability One : Rage
-        public string AbiNameOne = "Rage";
+        public static string AbiNameOne = "Rage";
         private int RageDuration = 5;
         private int RageCounter = 0;
         private float RageAttackSpeed = 1.5f;
@@ -19,11 +19,11 @@ namespace DotaTextGame.Heroes
         private bool RageActivated = false;
 
         // Ability Passive : Feast
-        public string AbiNamePassive = "Feast";
+        public static string AbiNamePassive = "Feast";
         private float FeastHpStealPercent = 2.0f;
 
         // Ability Two : Open Wounds
-        public string AbiNameTwo = "Open Wounds";
+        public static string AbiNameTwo = "Open Wounds";
         private float OW_HpStealPercentPrev = 0.0f;
         private float OW_HpStealPercentAdditional = 1.5f;
         private float OW_ManaPay = 155.0f;
@@ -34,7 +34,7 @@ namespace DotaTextGame.Heroes
         private bool OW_Activated = false;
 
         // Hit of Monster
-        public string AbiNameThree = "Hit of Monster";
+        public static string AbiNameThree = "Hit of Monster";
         private float HoM_Damage = 600.0f;
         private float HoM_CriticalChance = 50.0f;
         private float HoM_ManaPay = 220.0f;

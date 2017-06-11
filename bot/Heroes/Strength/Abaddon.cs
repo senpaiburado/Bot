@@ -10,14 +10,14 @@ namespace DotaTextGame.Heroes
     {
 
         // Ability One : Mist Coil
-        public string AbiNameOne = "Mist Coil";
+        public static string AbiNameOne = "Mist Coil";
         private float MistCoilPower = 300.0f;
         private float MistCoilManaPay = 95.0f;
         private int MistCoilCD = 0;
         private const int MistCoilDefaultCD = 11;
 
         // Ability Two : Aphotic Shield
-        public string AbiNameTwo = "Aphotic Shield";
+        public static string AbiNameTwo = "Aphotic Shield";
         private float AphoticShieldDamageAbsorption = 1000.0f;
         private float AphoticShieldManaPay = 230.0f;
         private int AphoticShieldCD = 0;
@@ -27,14 +27,14 @@ namespace DotaTextGame.Heroes
         private int AphoticShieldCounter = 0;
 
         // Ability Passive : Curse of Avernus
-        public string AbiNamePassive = "Curse of Avernus";
+        public static string AbiNamePassive = "Curse of Avernus";
         private float CoA_AddArmor = 35.0f;
         private float CoA_DpsPerAttack = 20.0f;
         private int CoA_Counter = 0;
         private int CoA_Limit = 6;
 
         // Ability Three : Borrowed Time
-        public string AbiNameThree = "Borrowed Time";
+        public static string AbiNameThree = "Borrowed Time";
         private bool BorrowedTimeActivated = false;
         private int BorrowedTimeCD = 0;
         private int BorrowedTimeDefaultCD = 35;
