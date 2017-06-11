@@ -29,6 +29,7 @@ namespace DotaTextGame
             User.ActiveGameID = 0L;
             User.status = User.Status.Default;
             User.HeroName = "";
+            User.LastMove = 0L;
         }
     }
 
@@ -37,6 +38,7 @@ namespace DotaTextGame
         public PlayerGameContext player;
         private PlayerGameContext enemyPlayer;
         private Game game;
+        public long LastMove = 0L;
 
         public static readonly string smile_hp = "\u2764";
         public static readonly string smile_mp = "🔯";
@@ -52,8 +54,9 @@ namespace DotaTextGame
 
         public async Task LeaveConfirming()
         {
-            await player.SendAsync(lang => lang.SearchingModeStopped);
-            await enemyPlayer.SendAsync(lang => lang.PlayerLeftThisLobby);
+            var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
+            await player.SendAsync(lang => lang.SearchingModeStopped, kb);
+            await enemyPlayer.SendAsync(lang => lang.PlayerLeftThisLobby, kb);
 
             game.Reset();
         }
@@ -179,12 +182,19 @@ namespace DotaTextGame
 
         public async void LeaveGame()
         {
+            var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             player.User.AddLose();
             enemyPlayer.User.AddWin();
-            await player.SendAsync(lang => lang.Retreat);
-            await enemyPlayer.SendAsync(lang => lang.RetreatEnemy);
+            await player.SendAsync(lang => lang.Retreat, kb);
+            await enemyPlayer.SendAsync(lang => lang.RetreatEnemy, kb);
 
             game.Reset();
+        }
+
+        public void CheckInactive()
+        {
+            game.GetController(enemyPlayer.User.ID).LeaveGame();
+            Console.WriteLine("Reported");
         }
 
         public async Task<bool> UseAbility(int number)
@@ -228,6 +238,7 @@ namespace DotaTextGame
             if (finished)
             {
                 //attacker.UpdatePerStep();
+                user_attacker.LastMove = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
                 attacker.Update();
                 excepter.Update();
 
@@ -250,11 +261,11 @@ namespace DotaTextGame
                     user_attacker.status = User.Status.Excepting;
                     user_excepter.status = User.Status.Attacking;
 
-                    await enemyPlayer.SendAsync(lang => excepter.GetMessageAbilitesList(lang));
-                    await player.SendAsync(lang => lang.WaitingForAnotherPlayerAction);
+                    await enemyPlayer.SendAsync(lang => excepter.GetMessageAbilitesList(lang), GetAbilitiesKeyboard());
+                    await player.SendAsync(lang => lang.WaitingForAnotherPlayerAction, GetHideKeyboard());
                 }
                 else
-                    await player.SendAsync(lang => attacker.GetMessageAbilitesList(user_attacker.lang));
+                    await player.SendAsync(lang => attacker.GetMessageAbilitesList(user_attacker.lang), GetAbilitiesKeyboard());
 
                 attacker.UpdateStunAndDisableDuration();
                 excepter.UpdateStunAndDisableDuration();
@@ -274,6 +285,33 @@ namespace DotaTextGame
             };
 
             return string.Join("\n", msg);
+        }
+
+        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup GetAbilitiesKeyboard()
+        {
+            Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboard = new
+                Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
+            keyboard.ResizeKeyboard = true;
+            keyboard.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
+            {
+                new Telegram.Bot.Types.KeyboardButton[]
+                {
+                    new Telegram.Bot.Types.KeyboardButton("1"),
+                    new Telegram.Bot.Types.KeyboardButton("2"),
+                    new Telegram.Bot.Types.KeyboardButton("3")
+                },
+                new Telegram.Bot.Types.KeyboardButton[]
+                {
+                    new Telegram.Bot.Types.KeyboardButton("4"),
+                    new Telegram.Bot.Types.KeyboardButton("5"),
+                }
+            };
+            return keyboard;
+        }
+
+        private Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide GetHideKeyboard()
+        {
+            return new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
         }
 
         public static async Task GameOver(PlayerGameContext winner, PlayerGameContext loser)

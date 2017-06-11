@@ -71,10 +71,20 @@ namespace DotaTextGame
 
         public static long AdminID = 295568848L;
 
-        public async void Init()
+        public async Task Init(Telegram.Bot.TelegramBotClient sender)
         {
             Directory.CreateDirectory("Users");
             await InitializeFromFiles();
+            foreach (var user in users)
+            {
+                if (user.Value.Sender == null)
+                    user.Value.InitSender(sender);
+            }
+        }
+
+        public Dictionary<long, User> GetUserList()
+        {
+            return users;
         }
 
         public bool Contains(long _Id)
@@ -193,9 +203,7 @@ namespace DotaTextGame
         }
     }
 
-    /// <summary>
-    /// ///////////////////////////////////////////////////////////////////
-    /// </summary>
+  
     public class User
     {
         public long ID { get; set; }
@@ -207,6 +215,7 @@ namespace DotaTextGame
         internal Sender Sender;
 
         public long ActiveGameID = 0L;
+        public long LastMove = 0L;
         public short HeroListPage = 0;
         public string HeroName = "";
 
@@ -240,7 +249,7 @@ namespace DotaTextGame
                     $"{lang.GamesCountString}: {wins+loses}",
                     $"{lang.WinsCountString}: {wins}",
                     $"{lang.LosesCountString}: {loses}",
-                    $"{lang.WinrateString}: {winrate}%",
+                    $"{lang.WinrateString}: {winrate.ToString("#.##")}%",
                     $"{lang.RatingString}: {rate}",
                 };
             return string.Join("\n", lines);
@@ -322,9 +331,9 @@ namespace DotaTextGame
                 get
                 {
                     if (lang == Language.English)
-                        return "Available languages: English | Russian. Select one: ";
+                        return "Available languages: English | Русский. Select one: ";
                     else if (lang == Language.Russian)
-                        return "Доступные языки: Английский | Русский. Выберите: ";
+                        return "Доступные языки: English | Русский. Выберите: ";
                     return "";
                 }
             }

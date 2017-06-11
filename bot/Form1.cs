@@ -34,7 +34,6 @@ namespace DotaTextGame
             this.bw.DoWork += bw_DoWork;
 
             this.users = new Users();
-            this.users.Init();
 
             Game.Initialize();
         }
@@ -47,6 +46,7 @@ namespace DotaTextGame
             try
             {
                 var Bot = new Telegram.Bot.TelegramBotClient(key);
+                await users.Init(Bot);
                 //IHero.bot = Bot;
                 await Bot.SetWebhookAsync("");
                 //Bot.SetWebhook("");
@@ -59,9 +59,9 @@ namespace DotaTextGame
                     while (availablePlayers.Count >= 2)
                     {
                         var firstPlayer = availablePlayers[0];
-                        var seciondPlayer = availablePlayers[1];
+                        var secondPlayer = availablePlayers[1];
 
-                        ActiveGames.Add(new Game(firstPlayer, seciondPlayer, Bot));
+                        ActiveGames.Add(new Game(firstPlayer, secondPlayer, Bot));
                         var keyboard1 = new ReplyKeyboardMarkup();
                         keyboard1.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                             {
@@ -79,18 +79,18 @@ namespace DotaTextGame
                             {
                                 new Telegram.Bot.Types.KeyboardButton[] 
                                 {
-                                    new Telegram.Bot.Types.KeyboardButton(seciondPlayer.lang.YesMessage),
-                                    new Telegram.Bot.Types.KeyboardButton(seciondPlayer.lang.NoMessage)
+                                    new Telegram.Bot.Types.KeyboardButton(secondPlayer.lang.YesMessage),
+                                    new Telegram.Bot.Types.KeyboardButton(secondPlayer.lang.NoMessage)
                                 }
                             };
                         keyboard2.ResizeKeyboard = true;
                         keyboard2.OneTimeKeyboard = true;
 
                         string user1_msg = firstPlayer.lang.GameFounded + "\n" + firstPlayer.lang.AcceptGameQuestion;
-                        string user2_msg = seciondPlayer.lang.GameFounded + "\n" + seciondPlayer.lang.AcceptGameQuestion;
+                        string user2_msg = secondPlayer.lang.GameFounded + "\n" + secondPlayer.lang.AcceptGameQuestion;
 
-                        await Bot.SendTextMessageAsync(firstPlayer.ID, user1_msg, replyMarkup: keyboard1);
-                        await Bot.SendTextMessageAsync(seciondPlayer.ID, user2_msg, replyMarkup: keyboard2);
+                        await firstPlayer.Sender.SendAsync(lang => user1_msg, keyboard1);
+                        await secondPlayer.Sender.SendAsync(lang => user2_msg, keyboard2);
 
                         try
                         {
@@ -99,7 +99,6 @@ namespace DotaTextGame
                         catch (System.ArgumentOutOfRangeException ex)
                         {
                             Console.WriteLine(ex);
-                            Console.Read();
                         }
                     }
 
@@ -255,10 +254,20 @@ namespace DotaTextGame
                                     .Groups[1].ToString();
                                 if (res != "")
                                 {
-                                    foreach (var item in users.GetIDs())
+                                    int counter = 0;
+                                    var list = users.GetUserList();
+                                    for (int i = 0; i < list.Count; i++)
                                     {
-                                        //await Bot.SendTextMessageAsync(item, res);
-                                        //await Task.Delay(100);
+                                        User user = list.Values.ElementAt(i);
+                                        try
+                                        {
+                                            await user.Sender.SendAsync(lang => res);
+                                        }
+                                        catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+                                        {
+                                            Console.WriteLine(ex);
+                                            list.Remove(user.ID);
+                                        }
                                     }
                                     await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                 }
@@ -268,14 +277,12 @@ namespace DotaTextGame
                                 Users.AdminID)
                             {
                                 string msg = $"{_usr.lang.List}:\n{string.Join("\n", users.GetNames())}\n";
-                                await Bot.SendTextMessageAsync(message.Chat.Id, msg);
+                                await _usr.Sender.SendAsync(lang => msg);
                             }
                             else if (message.IsCommand("[ADMIN] Send to one:") && message.Chat.Id == Users.AdminID)
                             {
-                                string name = System.Text.RegularExpressions.Regex.Match(message.Text, @"\{(.*)\}")
-                                    .Groups[1].ToString();
-                                string text = System.Text.RegularExpressions.Regex.Match(message.Text, "\"(.*)\"")
-                                    .Groups[1].ToString();
+                                string name = Regex.Match(message.Text, @"\{(.*)\}").Groups[1].ToString();
+                                string text = Regex.Match(message.Text, "\"(.*)\"").Groups[1].ToString();
 
                                 long id = 0;
                                 id = users.GetIdByName(name);
@@ -284,7 +291,15 @@ namespace DotaTextGame
                                 {
                                     if (text != "")
                                     {
-                                        await Bot.SendTextMessageAsync(id, text);
+                                        try
+                                        {
+                                            await users.getUserByID(id)?.Sender.SendAsync(lang => text);
+                                        }
+                                        catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+                                        {
+                                            Console.WriteLine(ex);
+                                            users.GetUserList().Remove(id);
+                                        }
                                         await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                     }
                                 }
@@ -373,6 +388,11 @@ namespace DotaTextGame
                         else if (_usr.status == User.Status.Excepting)
                         {
                             CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
+                            if (message.Text == "/report")
+                            {
+                                Console.WriteLine("Report");
+                                GetActiveGame(message.Chat.Id)?.GetController(message.Chat.Id)?.CheckInactive();
+                            }
                         }
                         else if (_usr.status == User.Status.Searching)
                         {

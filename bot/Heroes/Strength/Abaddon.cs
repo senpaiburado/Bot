@@ -184,7 +184,7 @@ namespace DotaTextGame.Heroes
             MistCoilCD = MistCoilDefaultCD;
             MP -= MistCoilManaPay;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameOne));
-            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameOne));
             return true;
         }
         public override async Task<bool> UseAbilityTwo(IHero target)
@@ -205,7 +205,7 @@ namespace DotaTextGame.Heroes
             MP -= AphoticShieldManaPay;
             AphoticShieldDamageAbsorption = 1000.0f;
             await Sender.SendAsync(lang => lang.GetMessageYouActivated(AbiNameTwo));
-            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameTwo));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyActivated(AbiNameTwo));
             return true;
         }
         public override async Task<bool> UseAbilityThree(IHero target)
@@ -221,7 +221,7 @@ namespace DotaTextGame.Heroes
                 return false;
             BorrowedTimeActivated = true;
             await Sender.SendAsync(lang => lang.GetMessageYouHaveUsedAbility(AbiNameThree));
-            await hero_target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
+            await target.Sender.SendAsync(lang => lang.GetMessageEnemyHasUsedAbility(AbiNameThree));
             return true;
         }
     }
