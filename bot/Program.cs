@@ -15,7 +15,7 @@ namespace DotaTextGame
         {
             Main main = new Main();
             main.bw_DoWork();
-            Console.ReadLine();
+            if (Environment.UserInteractive) { Console.ReadLine(); }
         }
     }
 }
