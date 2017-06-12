@@ -1628,6 +1628,14 @@ namespace DotaTextGame
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+
+                        }
+                        else if (lang == Language.Russian)
+                        {
+
+                        }
                         return "";
                     }
                 }

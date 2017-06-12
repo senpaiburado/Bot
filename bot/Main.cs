@@ -1,59 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Timers;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace DotaTextGame
 {
-    public partial class Form1 : Form
+    class Main
     {
-        BackgroundWorker bw;
         Users users;
         Timer timer;
         public static ulong Time = 0L;
 
         List<Game> ActiveGames = new List<Game>();
 
-        public Form1()
+        public Main()
         {
-            //
-            // The InitializeComponent() call is required for Windows Forms designer support.
-            //
-            InitializeComponent();
-
-            //
-            // TODO: Add constructor code after the InitializeComponent() call.
-            //
-
-            this.bw = new BackgroundWorker();
-            this.bw.DoWork += bw_DoWork;
+            //this.bw = new BackgroundWorker();
 
             this.users = new Users();
 
             timer = new Timer();
-            timer.Tick += new EventHandler(AddSecondToTime);
             timer.Interval = 1000;
+            timer.Elapsed += AddSecondToTime;
             timer.Enabled = true;
 
             Game.Initialize();
         }
 
-        private void AddSecondToTime(object Sender, EventArgs e)
+        private void AddSecondToTime(Object source, ElapsedEventArgs e)
         {
             Time += 1L;
         }
 
-        async void bw_DoWork(object sender, DoWorkEventArgs e)
+        public async void bw_DoWork()
         {
-            var worker = sender as BackgroundWorker;
-            var key = e.Argument as String;
+            var key = "347404910:AAHBQ4as_Z05pDctUYD5go0rtbXM78Fk92E";
             List<User> availablePlayers = new List<User>();
             try
             {
@@ -78,7 +64,7 @@ namespace DotaTextGame
                         var keyboard1 = new ReplyKeyboardMarkup();
                         keyboard1.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                             {
-                                new Telegram.Bot.Types.KeyboardButton[] 
+                                new Telegram.Bot.Types.KeyboardButton[]
                                 {
                                     new Telegram.Bot.Types.KeyboardButton(firstPlayer.lang.YesMessage),
                                     new Telegram.Bot.Types.KeyboardButton(firstPlayer.lang.NoMessage)
@@ -90,7 +76,7 @@ namespace DotaTextGame
                         var keyboard2 = new ReplyKeyboardMarkup();
                         keyboard2.Keyboard = new Telegram.Bot.Types.KeyboardButton[][]
                             {
-                                new Telegram.Bot.Types.KeyboardButton[] 
+                                new Telegram.Bot.Types.KeyboardButton[]
                                 {
                                     new Telegram.Bot.Types.KeyboardButton(secondPlayer.lang.YesMessage),
                                     new Telegram.Bot.Types.KeyboardButton(secondPlayer.lang.NoMessage)
@@ -278,7 +264,7 @@ namespace DotaTextGame
                                         }
                                         catch (Telegram.Bot.Exceptions.ApiRequestException ex)
                                         {
-                                            Console.WriteLine(ex);
+                                            Console.WriteLine(ex.Message);
                                             list.Remove(user.ID);
                                         }
                                     }
@@ -481,13 +467,13 @@ namespace DotaTextGame
 
                         offset = update.Id + 1;
                     }
-                
+
                     //return;
                 }
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex)
             {
-                 Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.Message);
             }
 
         }
@@ -496,22 +482,6 @@ namespace DotaTextGame
         {
             return ActiveGames.SingleOrDefault(x => x.GameID == gameID);
         }
-
-        private void BtnRun_Click(object sender, EventArgs e)
-        {
-            var text = @txtKey.Text;
-            if (text != "" && this.bw.IsBusy != true)
-            {
-                this.bw.RunWorkerAsync(text);
-                BtnRun.Text = "Бот запущен...";
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void CheckLeave(User user, Game game, string text)
         {
             if (text == "/leavegame")
@@ -537,3 +507,4 @@ namespace DotaTextGame
         }
     }
 }
+

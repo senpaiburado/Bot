@@ -120,8 +120,8 @@ namespace DotaTextGame
 
         private async void SetAttackerAndExcepter(PlayerGameContext attacker, PlayerGameContext excepter)
         {
-            attacker.User.LastMoveTime = Form1.Time;
-            excepter.User.LastMoveTime = Form1.Time;
+            attacker.User.LastMoveTime = Main.Time;
+            excepter.User.LastMoveTime = Main.Time;
             attacker.User.status = User.Status.Attacking;
             excepter.User.status = User.Status.Excepting;
 
@@ -195,14 +195,14 @@ namespace DotaTextGame
 
         public async void CheckInactive()
         {
-            if (Form1.Time - enemyPlayer.User.LastMoveTime >= 500)
+            if (Main.Time - enemyPlayer.User.LastMoveTime >= 500)
             {
                 await player.SendAsync(lang => lang.TimeLeftEnemy);
                 game.GetController(enemyPlayer.User.ID)?.LeaveGame();
             }
             else
                 await player.SendAsync(lang => lang.GetMessageCantReportNow(Convert.ToInt32(
-                    500 - (Form1.Time - enemyPlayer.User.LastMoveTime))));
+                    500 - (Main.Time - enemyPlayer.User.LastMoveTime))));
         }
 
         public async Task<bool> UseAbility(int number)
@@ -246,8 +246,8 @@ namespace DotaTextGame
             if (finished)
             {
                 //attacker.UpdatePerStep();
-                user_attacker.LastMoveTime = Form1.Time;
-                user_excepter.LastMoveTime = Form1.Time;
+                user_attacker.LastMoveTime = Main.Time;
+                user_excepter.LastMoveTime = Main.Time;
                 attacker.Update();
                 excepter.Update();
 

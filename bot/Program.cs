@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace DotaTextGame
 {
@@ -14,9 +13,9 @@ namespace DotaTextGame
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Main main = new Main();
+            main.bw_DoWork();
+            Console.Read();
         }
     }
 }
