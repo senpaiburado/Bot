@@ -37,7 +37,7 @@ namespace DotaTextGame
             Time += 1L;
         }
 
-        public async void bw_DoWork()
+        public async Task bw_DoWork()
         {
             var key = "347404910:AAHBQ4as_Z05pDctUYD5go0rtbXM78Fk92E";
             List<User> availablePlayers = new List<User>();
