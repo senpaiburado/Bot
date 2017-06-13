@@ -70,7 +70,7 @@ namespace DotaTextGame
         public async Task Init(Telegram.Bot.TelegramBotClient sender)
         {
             Directory.CreateDirectory("Users");
-           // await InitializeFromFiles();
+            await InitializeFromFiles();
             foreach (var user in users)
             {
                 if (user.Value.Sender == null)
@@ -291,16 +291,16 @@ namespace DotaTextGame
                     $"{loses}",
                     $"{rate}",
                 };
-            //*
-            //using (var fileStream = File.Create($"Users/{ID}_userdata.ini"))
+            
+            using (var fileStream = File.Create($"Users/{ID}_userdata.ini"))
             {
-                //using (StreamWriter sw = new StreamWriter(fileStream))
+                using (StreamWriter sw = new StreamWriter(fileStream))
                 {
-                   // foreach (var str in text)
-                     //   await sw.WriteLineAsync(str);
+                   foreach (var str in text)
+                        await sw.WriteLineAsync(str);
                 }
             }
-            *//
+  
         }
 
         public class Text
