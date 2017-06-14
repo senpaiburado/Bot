@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+using MySql.Data.MySqlClient;
+
 namespace DotaTextGame
 {
     //Пока дублирует похожий класс в Game
     class Sender
     {
+        
         private Telegram.Bot.TelegramBotClient bot;
         private long userID;
         public User.Text lang;
@@ -19,6 +22,7 @@ namespace DotaTextGame
             this.userID = userID;
             this.bot = bot;
             this.lang = lang;
+            
         }
 
         public async Task SendAsync(Func<User.Text, string> getText, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup = null)
@@ -67,15 +71,17 @@ namespace DotaTextGame
 
         public static long AdminID = 295568848L;
 
+
+
         public async Task Init(Telegram.Bot.TelegramBotClient sender)
         {
-            Directory.CreateDirectory("Users");
-            await InitializeFromFiles();
+            InitializeFromFiles();
             foreach (var user in users)
             {
                 if (user.Value.Sender == null)
                     user.Value.InitSender(sender);
             }
+
         }
 
         public Dictionary<long, User> GetUserList()
@@ -119,33 +125,63 @@ namespace DotaTextGame
             return users.Values.Any(x => x.Name == nick);
         }
 
-        private async Task InitializeFromFiles()
+        private async void InitializeFromFiles()
         {
-            string[] files = Directory.GetFiles("Users", "*.ini");
-            foreach (var file in files)
+            List<User> list = new List<User>();
+            using (User.con)
             {
-                using (StreamReader sr = new StreamReader(@file))
+                MySql.Data.MySqlClient.MySqlCommand com = new MySql.Data.MySqlClient.MySqlCommand();
+                com.CommandText = "SELECT id, name, language, wins, loses, rating from user";
+                com.Connection = User.con;
+                await User.con.OpenAsync();
+
+                string _Name = null;
+                long _Id = 0;
+                User.Text.Language _Lang = 0;
+                int _Wines = 0;
+                int _Loses = 0;
+                int _Rate = 0;
+
+                MySqlDataReader reader = com.ExecuteReader();
+
+                if (reader.HasRows)
                 {
-                    string _Name = await sr.ReadLineAsync();
-                    long _Id = Convert.ToInt64(await sr.ReadLineAsync());
-                    User.Text.Language _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), await sr.ReadLineAsync());
-                    int _Wines = int.Parse(await sr.ReadLineAsync());
-                    int _Loses = int.Parse(await sr.ReadLineAsync());
-                    int _Rate = int.Parse(await sr.ReadLineAsync());
-
-                    User user = new User
+                    while (reader.Read())
                     {
-                        Name = _Name,
-                        ID = _Id,
-                        wins = _Wines,
-                        loses = _Loses,
-                        rate = _Rate
-                    };
-                    user.lang.lang = _Lang;
+                        try
+                        {
+                            _Id = reader.GetInt64("id");
+                            _Name = reader.GetString("name");
+                            _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), reader.GetString("language"));
+                            _Wines = reader.GetInt32("wins");
+                            _Loses = reader.GetInt32("loses");
+                            _Rate = reader.GetInt32("rating");
 
-                    user.Init();
-                    AddUser(user);
+                            User user = new User
+                            {
+                                Name = _Name,
+                                ID = _Id,
+                                wins = _Wines,
+                                loses = _Loses,
+                                rate = _Rate
+                            };
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            Console.ReadLine();
+                        }
+                        user.lang.lang = _Lang;
+                        Console.WriteLine(_Name + "\n\n\n\n");
+                        list.Add(user);
+                    }
                 }
+            }
+            await User.con.CloseAsync();
+            foreach (var x in list)
+            {
+                x.Init();
+                AddUser(x);
             }
         }
 
@@ -221,6 +257,11 @@ namespace DotaTextGame
 
         public int rate = 1000;
 
+        static string connection = "server=127.0.0.1;database=user;uid=root;password=xjkfr2017";
+        public static MySql.Data.MySqlClient.MySqlConnection con = new MySql.Data.MySqlClient.MySqlConnection(connection);
+        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand("", con);
+        bool Made = false;
+
         public void AddWin()
         {
             wins++;
@@ -265,8 +306,19 @@ namespace DotaTextGame
 
         public void Init()
         {
+            con.Open();
             status = Status.Default;
             net_status = NetworkStatus.Offline;
+
+            command.CommandText = $"SELECT EXISTS (SELECT 1 FROM user WHERE id={ID});";
+            command.ExecuteNonQuery();
+            if (!((bool)command.ExecuteScalar()))
+            {
+                Made = false;
+            }
+            else
+                Made = true;
+            con.Close();
         }
 
         public void InitSender(Telegram.Bot.TelegramBotClient Bot)
@@ -282,24 +334,19 @@ namespace DotaTextGame
 
         public async void SaveToFile()
         {
-            string[] text =
+            await con.OpenAsync();
+            if (Made)
             {
-                    $"{Name}",
-                    $"{ID}",
-                    $"{lang.lang}",
-                    $"{wins}",
-                    $"{loses}",
-                    $"{rate}",
-                };
-
-            using (var fileStream = File.Create($"Users/{ID}_userdata.ini"))
-            {
-                using (StreamWriter sw = new StreamWriter(fileStream))
-                {
-                    foreach (var str in text)
-                        await sw.WriteLineAsync(str);
-                }
+                command.CommandText = $"UPDATE user, SET id={ID}, name='{Name}', wins='{wins}', loses='{loses}', rating='{rate}' WHERE id='{ID}';";
+                await command.ExecuteNonQueryAsync();
             }
+            else
+            {
+                Made = true;
+                command.CommandText = $"INSERT INTO user VALUES ({ID}, '{Name}', '{lang.lang.ToString()}', {wins}, {loses}, {rate});";
+                await command.ExecuteNonQueryAsync();
+            }
+            await con.CloseAsync();
         }
 
         public class Text
@@ -1380,6 +1427,18 @@ namespace DotaTextGame
                         return "Damage";
                     else if (lang == Language.Russian)
                         return "Урон";
+                    return "";
+                }
+            }
+
+            public string @LengthOfNicknameError
+            {
+                get
+                {
+                    if (lang == Language.English)
+                        return "Nickname should not contain more than 10 characters!";
+                    else if (lang == Language.Russian)
+                        return "Ник не должен содержать более 10 символов!";
                     return "";
                 }
             }

@@ -14,7 +14,8 @@ namespace DotaTextGame
         static void Main()
         {
             Main main = new Main();
-            main.bw_DoWork().Wait();
+            main.bw_DoWork();
+            Console.ReadLine();
         }
     }
 }

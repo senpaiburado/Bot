@@ -37,9 +37,9 @@ namespace DotaTextGame
             Time += 1L;
         }
 
-        public async Task bw_DoWork()
+        public async void bw_DoWork()
         {
-            var key = "347404910:AAHBQ4as_Z05pDctUYD5go0rtbXM78Fk92E";
+            var key = "396638042:AAHsKPAJnosFes51c5y4LZiqK99MUJ-AH5Q";
             List<User> availablePlayers = new List<User>();
             try
             {
@@ -450,6 +450,8 @@ namespace DotaTextGame
                         {
                             if (users.NicknameExists(message.Text))
                                 await _usr.Sender.SendAsync(lang => lang.NickNameIsAlreadyExists);
+                            else if (message.Text.Length > 10)
+                                await _usr.Sender.SendAsync(lang => lang.LengthOfNicknameError);
                             else
                             {
                                 _usr.Name = message.Text;
