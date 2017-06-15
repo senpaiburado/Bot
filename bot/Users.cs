@@ -35,6 +35,11 @@ namespace DotaTextGame
             await bot.SendTextMessageAsync(userID, text, replyMarkup: replyMarkup);
         }
 
+        public async Task<Telegram.Bot.Types.Message> SendPhotoWithText(Func<User.Text, string> getText, string photo_path)
+        {
+            return await bot.SendPhotoAsync(userID, photo_path, getText(lang));
+        }
+
         internal SenderContainer CreateMessageContainer()
         {
             return new SenderContainer(this);
@@ -135,53 +140,29 @@ namespace DotaTextGame
                 com.Connection = User.con;
                 await User.con.OpenAsync();
 
-                string _Name = null;
-                long _Id = 0;
-                User.Text.Language _Lang = 0;
-                int _Wines = 0;
-                int _Loses = 0;
-                int _Rate = 0;
-
                 MySqlDataReader reader = com.ExecuteReader();
-
                 if (reader.HasRows)
                 {
                     while (reader.Read())
                     {
-                        try
+                        User user = new User
                         {
-                            _Id = reader.GetInt64("id");
-                            _Name = reader.GetString("name");
-                            _Lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), reader.GetString("language"));
-                            _Wines = reader.GetInt32("wins");
-                            _Loses = reader.GetInt32("loses");
-                            _Rate = reader.GetInt32("rating");
-
-                            User user = new User
-                            {
-                                Name = _Name,
-                                ID = _Id,
-                                wins = _Wines,
-                                loses = _Loses,
-                                rate = _Rate
-                            };
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                            Console.ReadLine();
-                        }
-                        user.lang.lang = _Lang;
-                        Console.WriteLine(_Name + "\n\n\n\n");
+                            Name = reader.GetString("name"),
+                            ID = reader.GetInt64("id"),
+                            wins = reader.GetInt32("wins"),
+                            loses = reader.GetInt32("loses"),
+                            rate = reader.GetInt32("rating")
+                        };
+                        user.lang.lang = (User.Text.Language)Enum.Parse(typeof(User.Text.Language), reader.GetString("language"));
                         list.Add(user);
                     }
                 }
-            }
-            await User.con.CloseAsync();
-            foreach (var x in list)
-            {
-                x.Init();
-                AddUser(x);
+                await User.con.CloseAsync();
+                foreach (var x in list)
+                {
+                    x.Init();
+                    AddUser(x);
+                }
             }
         }
 
@@ -218,7 +199,10 @@ namespace DotaTextGame
         {
             if (users.ContainsKey(UserID))
             {
-                File.Delete($"Users/{UserID}_userdata.ini");
+                MySqlCommand com = new MySqlCommand($"DELETE FROM user WHERE id = {UserID};", User.con);
+                User.con.Open();
+                com.ExecuteNonQuery();
+                User.con.Close();
                 users.Remove(UserID);
                 return true;
             }
@@ -310,14 +294,14 @@ namespace DotaTextGame
             status = Status.Default;
             net_status = NetworkStatus.Offline;
 
-            command.CommandText = $"SELECT EXISTS (SELECT 1 FROM user WHERE id={ID});";
+            command.CommandText = $"SELECT 1 FROM user WHERE id = {ID} limit 1;";
             command.ExecuteNonQuery();
-            if (!((bool)command.ExecuteScalar()))
+            if (command.ExecuteScalar() != DBNull.Value && command.ExecuteScalar() != null)
             {
-                Made = false;
+                Made = true;
             }
             else
-                Made = true;
+                Made = false;
             con.Close();
         }
 
@@ -337,12 +321,14 @@ namespace DotaTextGame
             await con.OpenAsync();
             if (Made)
             {
-                command.CommandText = $"UPDATE user, SET id={ID}, name='{Name}', wins='{wins}', loses='{loses}', rating='{rate}' WHERE id='{ID}';";
+                command.CommandText = $"UPDATE user SET name='{Name}', language='{lang.lang.ToString()}', wins={wins}, loses={loses}, rating={rate} WHERE id={ID};";
                 await command.ExecuteNonQueryAsync();
+                Console.WriteLine("Old user");
             }
             else
             {
                 Made = true;
+                Console.WriteLine("New user");
                 command.CommandText = $"INSERT INTO user VALUES ({ID}, '{Name}', '{lang.lang.ToString()}', {wins}, {loses}, {rate});";
                 await command.ExecuteNonQueryAsync();
             }
@@ -375,6 +361,21 @@ namespace DotaTextGame
                     return "";
                 }
             }
+
+            public string GetAds()
+            {
+                if (lang == Language.English)
+                {
+                    return "Advertisement\n" +
+                        "Would you like to make money? BestChange will help you! - http://bit.ly/2sxvDaK";
+                }
+                else if (lang == Language.Russian)
+                {
+                    return "Реклама\n" + "Хотите заработать денег? BestChange Вам поможет! - http://bit.ly/2sxvDaK";
+                }
+                return "";
+            }
+
             public string @ChangeLanguage
             {
                 get
