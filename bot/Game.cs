@@ -91,6 +91,7 @@ namespace DotaTextGame
                 game.Reset();
                 await player.SendAsync(lang => lang.GameCanceled + "\n" + lang.GameNotAccepted, replyMarkup: kb);
                 await enemyPlayer.SendAsync(lang => lang.GameCanceled + "\n" + lang.AnotherPlayerDidntAcceptGame, kb);
+                //end
             }
         }
 
