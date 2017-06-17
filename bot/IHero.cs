@@ -17,9 +17,9 @@ namespace DotaTextGame
 
         protected int NextSeed = 0;
 
-        protected int Strength { get; set; }
-        protected int Agility { get; set; }
-        protected int Intelligence { get; set; }
+        public int Strength { get; set; }
+        public int Agility { get; set; }
+        public int Intelligence { get; set; }
         protected MainFeature Feature { get; set; }
 
         public string Name { get; set; }
@@ -117,7 +117,7 @@ namespace DotaTextGame
             Feature = feat;
 
             MaxHP = Strength * 20.0f + 5000.0f;
-            HPregen = Strength * 0.03f;
+            HPregen = Strength * 0.07f;
 
             Armor = Agility * 0.14f;
             AttackSpeed = Agility * 0.02f;
@@ -151,11 +151,11 @@ namespace DotaTextGame
         {
             float damage = 0.0f;
             if (Feature == MainFeature.Str)
-                damage = Strength * 0.4f;
+                damage = Strength * 0.25f;
             else if (Feature == MainFeature.Agi)
-                damage = Agility * 0.3f;
+                damage = Agility * 0.25f;
             else if (Feature == MainFeature.Intel)
-                damage = Intelligence * 0.4f;
+                damage = Intelligence * 0.25f;
             DPS = damage + damage * AttackSpeed;
         }
 

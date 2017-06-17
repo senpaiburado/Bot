@@ -13,17 +13,17 @@ namespace DotaTextGame.Heroes
         private float WB_Damage = 300.0f;
         private float WB_DamagePerStep = 150.0f;
         private float WB_ManaPay = 200.0f;
-        private int WB_Duration = 3;
+        private int WB_Duration = 2;
         private int WB_CD = 0;
-        private const int WB_DefaultCD = 12;
+        private const int WB_DefaultCD = 18;
 
         // Passive Ability One : Vampiric Aura
         public static string AbiPassiveNameOne = "Vampiric Aura";
-        private float VA_HpStealByDamagePercent = 15;
+        private float VA_HpStealByDamagePercent = 10;
 
         // Passive Ability Two : Mortal Strike
         public static string AbiPassiveNameTwo = "Mortal Strike";
-        private float MS_CriticalHitMultiplier = 0.5f;
+        private float MS_CriticalHitMultiplier = 0.45f;
         private float MS_CriticalHitChance = 10.0f;
 
         // Ability Two : Armor Fortification
@@ -40,7 +40,7 @@ namespace DotaTextGame.Heroes
         public static string AbinameThree = "King's Luck";
         private float KL_ManaPay = 350.0f;
         private int KL_CD = 0;
-        private const int KL_DefaultCD = 35;
+        private const int KL_DefaultCD = 40;
 
         public WraithKing(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
         {

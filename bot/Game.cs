@@ -183,7 +183,7 @@ namespace DotaTextGame
             return string.Join("\n", lines);
         }
 
-        public async void LeaveGame()
+        public async Task LeaveGame()
         {
             var kb = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardHide();
             player.User.AddLose();

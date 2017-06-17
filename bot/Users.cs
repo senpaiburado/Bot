@@ -80,7 +80,7 @@ namespace DotaTextGame
 
         public async Task Init(Telegram.Bot.TelegramBotClient sender)
         {
-            InitializeFromFiles();
+            await InitializeFromFiles();
             foreach (var user in users)
             {
                 if (user.Value.Sender == null)
@@ -130,7 +130,7 @@ namespace DotaTextGame
             return users.Values.Any(x => x.Name == nick);
         }
 
-        private async void InitializeFromFiles()
+        private async Task InitializeFromFiles()
         {
             List<User> list = new List<User>();
             using (User.con)
@@ -160,13 +160,13 @@ namespace DotaTextGame
                 await User.con.CloseAsync();
                 foreach (var x in list)
                 {
-                    x.Init();
+                    await x.Init();
                     AddUser(x);
                 }
             }
         }
 
-        public bool AddUser(long _Id)
+        public async Task<bool> AddUser(long _Id)
         {
             if (users.ContainsKey(_Id))
                 return false;
@@ -177,8 +177,8 @@ namespace DotaTextGame
                 ID = _Id
             };
 
-            user.Init();
-            user.SaveToFile();
+            await user.Init();
+            await user.SaveToFile();
 
             users[_Id] = user;
 
@@ -195,14 +195,14 @@ namespace DotaTextGame
             return true;
         }
 
-        public bool DeleteUser(long UserID)
+        public async Task<bool> DeleteUser(long UserID)
         {
             if (users.ContainsKey(UserID))
             {
                 MySqlCommand com = new MySqlCommand($"DELETE FROM user WHERE id = {UserID};", User.con);
-                User.con.Open();
-                com.ExecuteNonQuery();
-                User.con.Close();
+                await User.con.OpenAsync();
+                await com.ExecuteNonQueryAsync();
+                await User.con.CloseAsync();
                 users.Remove(UserID);
                 return true;
             }
@@ -246,20 +246,20 @@ namespace DotaTextGame
         MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand("", con);
         bool Made = false;
 
-        public void AddWin()
+        public async void AddWin()
         {
             wins++;
             rate += 25;
-            SaveToFile();
+            await SaveToFile();
         }
 
-        public void AddLose()
+        public async void AddLose()
         {
             loses++;
             rate -= 25;
             if (rate < 0)
                 rate = 0;
-            SaveToFile();
+            await SaveToFile();
         }
 
         public string GetStatisctisMessage()
@@ -288,21 +288,21 @@ namespace DotaTextGame
             Online, Offline
         }
 
-        public void Init()
+        public async Task Init()
         {
-            con.Open();
+            await con.OpenAsync();
             status = Status.Default;
             net_status = NetworkStatus.Offline;
 
             command.CommandText = $"SELECT 1 FROM user WHERE id = {ID} limit 1;";
-            command.ExecuteNonQuery();
-            if (command.ExecuteScalar() != DBNull.Value && command.ExecuteScalar() != null)
+            await command.ExecuteNonQueryAsync();
+            if (await command.ExecuteScalarAsync() != DBNull.Value && await command.ExecuteScalarAsync() != null)
             {
                 Made = true;
             }
             else
                 Made = false;
-            con.Close();
+            await con.CloseAsync();
         }
 
         public void InitSender(Telegram.Bot.TelegramBotClient Bot)
@@ -316,19 +316,17 @@ namespace DotaTextGame
             Sender.lang.lang = language;
         }
 
-        public async void SaveToFile()
+        public async Task SaveToFile()
         {
             await con.OpenAsync();
             if (Made)
             {
                 command.CommandText = $"UPDATE user SET name='{Name}', language='{lang.lang.ToString()}', wins={wins}, loses={loses}, rating={rate} WHERE id={ID};";
                 await command.ExecuteNonQueryAsync();
-                Console.WriteLine("Old user");
             }
             else
             {
                 Made = true;
-                Console.WriteLine("New user");
                 command.CommandText = $"INSERT INTO user VALUES ({ID}, '{Name}', '{lang.lang.ToString()}', {wins}, {loses}, {rate});";
                 await command.ExecuteNonQueryAsync();
             }
@@ -1677,6 +1675,147 @@ namespace DotaTextGame
                 }
             }
 
+            public string @JUGGERNAUT_DESCRIBTION
+            {
+                get
+                {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Juggernaut is a hero whose main characteristic is agility.\n";
+                        msg += "Juggernaut's features:\n";
+                        msg += "Strength - 215\n";
+                        msg += "Agility - 240\n";
+                        msg += "Intelligence - 145\n";
+                        msg += "Juggernaut's abilities:\n";
+                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut deals 80 magic damage each step for 5 steps, gets immune to magic and cannot use other abilities.\n";
+                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut calls Ward, which recovers 0.75% health from the maximum score every step for 7 steps.\n";
+                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Passive)\nJuggernaut gets an additional 15% chance to critically hit, and also raises the critical strike multiplier by 1.1.\n";
+                        msg += $"4 - {Heroes.Juggernaut.AbiNameThree}\nJuggernaut deals 420 physical damage each step for 5 steps.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Juggernaut - герой, основная характеристика которого - ловкость.\n";
+                        msg += "Характеристики Juggernaut:\n";
+                        msg += "Сила - 215\n";
+                        msg += "Ловкость - 240\n";
+                        msg += "Интеллект - 145\n";
+                        msg += "Способности Juggernaut:\n";
+                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut наносит 80 магического урона каждый шаг на протяжении 5 шагов, получает неуязвимость к магии и не может использовать другие способности.\n";
+                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut вызывает Ward, который восстанавливает 0.75% здоровья от максимального показателя каждый шаг в течении 7 шагов.\n";
+                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Пассивная)\nJuggernaut получает допольнительные 15% шанса нанести критический удар, а также повышает множитель критического удара на 1.1.\n";
+                        msg += $"4 - {Heroes.Juggernaut.AbiNameThree}\nJuggernaut наносит 450 физического урона противнику каждый шаг на протяжении 5 шагов.\n";
+                        return msg;
+                    }
+                    return "";
+                }
+            }
+            public string @FACELESSVOID_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @ALCHEMIST_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @ABADDON_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @LIFESTEALER_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @SILENCER_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @WRAITHKING_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @SNIPER_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @DRAGONKNIGHT_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @SLARDAR_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @RAZOR_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+            public string @URSA_DESCRIBTION
+            {
+                get
+                {
+                    return "";
+                }
+            }
+
+            public string @Donate
+            {
+                get
+                {
+                    if (lang == Language.English)
+                    {
+                        string msg = "";
+                        msg += "Qiwi - 380666122552 (RUB)\n";
+                        msg += "PrivatBank - 5168757311202479 (UAH)\n";
+                        msg += "Webmoney WMU - U202606251553 (UAH)\n";
+                        msg += "Webmoney WMZ - Z378442228645 (USD)\n";
+                        msg += "Webmoney WME - E090510764182 (EURO)\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "";
+                        msg += "Qiwi - 380666122552 (Рубли)\n";
+                        msg += "ПриватБанк - 5168757311202479 (Гривны)\n";
+                        msg += "Webmoney WMU - U202606251553 (Гривы)\n";
+                        msg += "Webmoney WMZ - Z378442228645 (Доллары)\n";
+                        msg += "Webmoney WME - E090510764182 (Евро)\n";
+                        return msg;
+                    }
+                    return "";
+                }
+            }
+
             public struct InstructionText
             {
                 private Language lang;
@@ -1690,11 +1829,17 @@ namespace DotaTextGame
                     {
                         if (lang == Language.English)
                         {
-
+                            string msg = "\tGame\n";
+                            msg += "DotA Text - (free to play) step-by-step text multiplayer game, where 2 players battle each ";
+                            msg += "other using heroes from the DotA 2 universe.";
+                            return msg;
                         }
                         else if (lang == Language.Russian)
                         {
-
+                            string msg = "\tИгра\n";
+                            msg += "DotA Text - (free to play) пошаговая текстовая мультиплеерная игра, где 2 игрока сражаются между собой ";
+                            msg += "с помощью героев из вселенной DotA 2.";
+                            return msg;
                         }
                         return "";
                     }
@@ -1703,62 +1848,239 @@ namespace DotaTextGame
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tNetwork Modes\n";
+                            msg += "There are 2 network modes in the game - offline and online.\n";
+                            msg += "In offline mode you cannot be called to a duel, but you also can't use many functions.\n";
+                            msg += "In online mode you can use all functions and can be called to a duel.";
+                            msg += "Use /online to be online.\n";
+                            msg += "Use /offline to be offine.\n";
+                            msg += "Use /netstatus to get your current network mode.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tСетевые режимы\n";
+                            msg += "В игре есть два сетевых режима - автономный режим и режим 'В сети'.\n";
+                            msg += "В автономном режиме Вас не могут позвать на дуэли (в разработке), но и вы не можете использовать большиство функций.\n";
+                            msg += "В режиме 'В сети' Вам доступны все функции, и Вас могут позвать на дуэль (в разработке).\n";
+                            msg += "Используйте /online, чтобы быть в сети.\n";
+                            msg += "Используйте /offline, чтобы перейти в автономный режим.\n";
+                            msg += "Используйте /netstatus, чтобы получить текущий сетевой режим.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step3_AboutOnlineMode
+                public string @step3_AboutLanguage
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tLanguages\n";
+                            msg += "There are 2 languages in the game - English and Russian.\n";
+                            msg += "If you want to change language, use /language and select language you want.";
+                            return msg; ;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tЯзыки\n";
+                            msg += "В игре есть 2 языка - Английский и Русский\n";
+                            msg += "Если Вы хотите изменить язык, используйте /language и выберите который хотите.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step4_AboutOfflineMode
+                public string @step4_AboutBattle
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tBattle\n";
+                            msg += "To start the game, use /startgame and wait for the game to pick up your enemy.";
+                            msg += "Use /stopsearching to stop searching enemy.\n";
+                            msg += "Then accept the game by clicking the button or writing 'Yes', or if you change your mind to play - 'No'.\n";
+                            msg += "If the enemy doesn't accept or reject the game, write /stopsearching, and you will leave the room.\n";
+                            msg += "Select the hero you want to play. You can do this by writing the name of the hero or clicking on the button with his name.\n";
+                            msg += "If the enemy doesn't choose a hero or you change your mind, use /stopsearching.\n";
+                            msg += "The game has begun. Now you are fighting the enemy hero. At your disposal are different abilities and ordinary attacks.\n";
+                            msg += "More details about the possibilities and the ordinary attacks can be found below.\n";
+                            msg += "The battle goes on step by step. However, stun and disables can give the attacking hero additional steps.\n";
+                            msg += "The winner is the one who kills the enemy first. To do this, you must lower the enemy's health to zero.\n";
+                            msg += "For the victory you will get 25 points of the rating, for the defeat - will lose 25 points.\n";
+                            msg += "Use /leavegame if you want to leave the game. In this case, you will lose, and the enemy will win.\n";
+                            msg += "Use /report if the opponent is not active for more than 5 minutes. You will win, and the enemy will be defeated.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tБитва\n";
+                            msg += "Чтобы начать игру, используйте /startgame и ждите, пока игра подберёт Вам противника.\n";
+                            msg += "Используйте /stopsearching, чтобы остановить поиск противника.\n";
+                            msg += "Затем примите игру, нажав кнопку или написав 'Да', или если Вы передумали играть - 'Нет'\n";
+                            msg += "Если противник не принимает и не отклоняет игру, то напишите /stopsearching, и вы выйдете из комнаты.\n";
+                            msg += "Выберите героя, на котором хотите сыграть. Сделать это можно написав имя героя или нажав на кнопку с его именем.\n";
+                            msg += "Если противник не выбирает героя или Вы передумали играть, используйте /stopsearching.";
+                            msg += "Игра началась. Теперь Вы сражаетесь против героя противника. В Вашем распоряжении разные способности и обычные удары.\n";
+                            msg += "Более подробно о способностях и ударах можно узнать ниже.";
+                            msg += "Битва идёт пошагово. Однако оглушения и обездвиживания могут дать атакующему герою дополнительные шаги.\n";
+                            msg += "Выиграет тот, кто первый убьёт противника. Для этого нужно опустить здоровье противника к нулю.\n";
+                            msg += "За победу Вам начисляется 25 очков рейтинга, за поражение - отбирается 25.";
+                            msg += "Используйте /leavegame, если Вы хотите покинуть игру. В таком случае Вам засчитается поражение, а противнику - победа.\n";
+                            msg += "Используйте /report, если противник не активен более 5 минут. Вам засчитается победа, а ему - поражение.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step5_AboutLanguage
+                public string @step5_AboutHeroes
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tHeroes\n";
+                            msg += "Heroes are creatures fighting in battles. Each hero has unique abilities that differ from the abilities of other heroes.\n";
+                            msg += "Heroes have 3 characteristics: strength, agility and intelligence. And one of them is basic.\n";
+                            msg += "Strength adds 20 health and 0.07 health regeneration per point.\n";
+                            msg += "Agility adds 0.14 armor and 0.02 attack speed per point.\n";
+                            msg += "Intelligence adds 4.5 mana and 0.04 mana regeneration per point.\n";
+                            msg += "The hero's damage is equal to the product of the main characteristic by 0.25 and the attack speed.\n";
+                            msg += "Mana is needed to use the abilities of the hero.\n";
+                            msg += "Armor blocks a certain amount of damage from the enemy.\n";
+                            msg += "To get information about the hero and his abilities, use the '/' + hero name. For example: /juggernaut.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tГерои\n";
+                            msg += "Герои - существа, которые сражаются в битвах. Каждый герой имеет уникальные способности, которые разнятся от способностей других героев.\n";
+                            msg += "У героев есть 3 характеристики: сила, ловкость и интеллект. И одна из них - основная.\n";
+                            msg += "Сила прибавляет 20 единиц здоровья и 0.07 регенерации здоровья за каждое очко.\n";
+                            msg += "Ловкость прибавляет 0.14 брони и 0.02 скорости атаки за каждое очко.\n";
+                            msg += "Интеллект прибавляет 4.5 маны и 0.04 регенерации маны за каждое очко.\n";
+                            msg += "Урон героя равен произведению основной характеристики на 0.25 и на скорость атаки.\n";
+                            msg += "Мана нужна для использования способностей героя.\n";
+                            msg += "Броня блокирует определённое количество урона от противника.\n";
+                            msg += "Чтобы получить информацию о герое и его способностях, используйте '/' + имя героя. Например: /juggernaut.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step6_AboutGame
+                public string @step6_AboutAbilities
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tAbilities\n";
+                            msg += "Each hero has 5 abilities. Two of them are common, and three are unique.\n";
+                            msg += "There are also three types of damage: physical, magical and pure.\n";
+                            msg += "Physical damage is the damage done to the target, given its armor (unique indicators).\n";
+                            msg += "Magical damage is the damage done to the target, given its magical resistance (usually 25%).";
+                            msg += "Pure damage is the damage done to target, ignoring all its protective properties.\n";
+                            msg += "Abilities can deal any of the three types of damage, and some abilities deal several types of damage at the same time.\n";
+                            msg += "They can also have other functions. For example, to strengthen the armor, heal health, improve the regeneration of health, increase the damage to the hero, etc.\n";
+                            msg += "The first general ability - Attack - deals the enemy physical damage depending on the damage of the hero.\n";
+                            msg += "The second general ability - Heal - restores 500 health and 250 mana.\n";
+                            msg += "In addition, the abilities can be of two types: active and passive.\n";
+                            msg += "Active abilities are abilities that need to be activated by the player.\n";
+                            msg += "Passive abilities are abilities that work independently of the player's actions.\n";
+                            msg += "In parentheses () you can see the countdown of ability, in square [] - the needed amount of mana.\n";
+                            msg += "To select a method, click or write the corresponding number. More information about the unique abilities can be found in the description of the hero who uses it.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tСпособности\n";
+                            msg += "У каждого героя есть 5 способностей. Две из которых общие, и три - уникальные.\n";
+                            msg += "Так же есть три типа урона: физический, магический и чистый.\n";
+                            msg += "Физический урон - урон, который наносится цели, учитывая её броню (уникальные показатели).\n";
+                            msg += "Магический урон - урон, который наносится цели, учитывая её магическое сопротивление (обычно - 25%).\n";
+                            msg += "Чистый урон - урон, который наносится цели, игнорируя все защитные свойства.\n";
+                            msg += "Способности могут наносить любой из трёх типов урона, причём некоторые способности могут наносить несколько типов урона одновременно.\n";
+                            msg += "Также способности могут иметь и другие функции. К примеру, укреплять броню, лечить здоровье, повышать регенерацию здоровья, повышать урон героя и т.д.\n";
+                            msg += "Первая общая способность - Атака - наносит врагу физический урон, зависящий от урона героя.\n";
+                            msg += "Вторая общая способность - Лечение - восстанавливает 500 здоровья и 250 маны.\n";
+                            msg += "Также способности могут быть двух видов: Активная и Пассивная.";
+                            msg += "Активные способности - способности, которые нуждаются в активировании игроком.\n";
+                            msg += "Пассивные способности - способности, которые работают независимо от действий игрока.";
+                            msg += "В круглых скобках () можно увидеть откат способности, в квадратных [] - нужное количество маны.\n";
+                            msg += "Чтобы выбрать способность, нажмите или напишите соотвутствующую цифру. Подробнее об уникальных способностях можно узнать в описании героя, который её использует.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step7_AboutHeroes
+                public string @step7_AboutDonate
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tDonate\n";
+                            msg += "At the moment there is no donat in the game. There is only an opportunity to donate money to develop a project.\n";
+                            msg += "To learn more about donate, use /donate\n";
+                            msg += "You can also help the project by clicking on ads.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tДонат\n";
+                            msg += "На данный момент в игре нет доната. Есть только возможность пожертвовать деньги на развитие проекта.\n";
+                            msg += "Чтобы подробнее узнать о донате, используйте /donate\n";
+                            msg += "Также Вы можете помочь проекту, кликая на рекламу.";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step8_AboutDonate
+                public string @step8_AboutDeveloper
                 {
                     get
                     {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tDevelopers\n";
+                            msg += "In the development involved 2 people: Vladislav Cholak and Roman Rusnakov.\n";
+                            msg += "Vladislav Cholak - @BuradoSenpai\n";
+                            msg += "Roman Rusnakov - @Mblkolo";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tРазработчики\n";
+                            msg += "В разработке участвовали 2 человека: Владислав Чолак и Роман Руснаков.\n";
+                            msg += "Владислав Чолак - @BuradoSenpai\n";
+                            msg += "Роман Руснаков - @Mblkolo";
+                            return msg;
+                        }
                         return "";
                     }
                 }
-                public string @step9_AboutDeveloper
+                public string @step9_TheEnd
                 {
                     get
                     {
-                        return "";
-                    }
-                }
-                public string @step10_TheEnd
-                {
-                    get
-                    {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tSupport and Feedbacks\n";
+                            msg += "If you want to suggest something or complain about the game's failure, write dotatextgame@gmail.com\n";
+                            msg += "In addition, if you like the game, do not forget to call your friends! :)";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tПоддержка и отзывы\n";
+                            msg += "Если хотите что-то предложить или пожаловаться на недоработку игры, пишите на dotatextgame@gmail.com\n";
+                            msg += "Также, если Вам понравилась игра, не забудьте позвать друзей! :)";
+                            return msg;
+                        }
                         return "";
                     }
                 }

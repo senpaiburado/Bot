@@ -30,8 +30,8 @@ namespace DotaTextGame.Heroes
 
         // Ability Passive : Blade Dance
         public static string AbiNamePassive = "Blade Dance";
-        private float BladeDanceCriticalMult = 1.2f;
-        private float BladeDanceCriticalChance = 25.0f;
+        private float BladeDanceCriticalMult = 1.1f;
+        private float BladeDanceCriticalChance = 15.0f;
 
         // Ability Three : Omnislash
         public static string AbiNameThree = "Omnislash";
@@ -54,7 +54,7 @@ namespace DotaTextGame.Heroes
         protected override void InitPassiveAbilities()
         {
             CriticalHitMultiplier += BladeDanceCriticalMult;
-            BladeDanceCriticalChance += BladeDanceCriticalChance;
+            CriticalHitChance += BladeDanceCriticalChance;
         }
 
         public override IHero Copy(Sender sender)

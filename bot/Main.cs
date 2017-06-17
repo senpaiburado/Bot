@@ -109,8 +109,7 @@ namespace DotaTextGame
 
                         if (!users.Contains(message.Chat.Id))
                         {
-                            users.AddUser(message.Chat.Id);
-                            Console.WriteLine("LOL");
+                            await users.AddUser(message.Chat.Id);
                         }
 
                         User _usr = users.getUserByID(message.Chat.Id);
@@ -180,20 +179,16 @@ namespace DotaTextGame
                             else if (message.Text == "/instruction")
                             {
                                 _usr.lang.instruction.SetLanguage(_usr.lang.lang);
-                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step1_Describe);
-                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step2_AboutNetMode);
-                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step3_AboutOnlineMode);
-                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step4_AboutOfflineMode);
-                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step5_AboutLanguage);
-                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step6_AboutGame);
-                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step7_AboutHeroes);
-                                //await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step8_AboutDonate);
-                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step9_AboutDeveloper);
-                                // await Bot.SendTextMessageAsync(message.Chat.Id, _usr.lang.instruction.step10_TheEnd);
+                                var text = _usr.lang.instruction;
+                                string message_one = text.step1_Describe + "\n\n" + text.step2_AboutNetMode + "\n\n" + text.step3_AboutLanguage + "\n\n";
+                                message_one += text.step4_AboutBattle + "\n\n" + text.step5_AboutHeroes;
+                                string message_two = text.step6_AboutAbilities + "\n\n" + text.step7_AboutDonate + "\n\n" + text.step8_AboutDeveloper + "\n\n" + text.step9_TheEnd;
+                                await _usr.Sender.SendAsync(lang => message_one);
+                                await _usr.Sender.SendAsync(lang => message_two);
                             }
                             else if (message.Text == "/donate")
                             {
-
+                                await _usr.Sender.SendAsync(lang => lang.Donate);
                             }
                             else if (message.Text == "/startgame")
                             {
@@ -241,7 +236,7 @@ namespace DotaTextGame
                                     if (find_user != null && rating > 0)
                                     {
                                         find_user.rate = rating;
-                                        find_user.SaveToFile();
+                                        await find_user.SaveToFile();
                                         await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(
                                             $"{message.Text} : {find_user.ID}"));
                                     }
@@ -253,7 +248,6 @@ namespace DotaTextGame
                                     .Groups[1].ToString();
                                 if (res != "")
                                 {
-                                    int counter = 0;
                                     var list = users.GetUserList();
                                     for (int i = 0; i < list.Count; i++)
                                     {
@@ -324,7 +318,7 @@ namespace DotaTextGame
                                 {
                                     if (users.GetUserByName(name) != null)
                                     {
-                                        users.DeleteUser(users.GetUserByName(name).ID);
+                                        await users.DeleteUser(users.GetUserByName(name).ID);
                                         await _usr.Sender.SendAsync(lang => lang.GetMessageAdminCommandSuccesful(message.Text));
                                     }
                                 }
@@ -344,7 +338,7 @@ namespace DotaTextGame
                                 else if (message.IsCommand("русский"))
                                     _usr.LanguageSet(User.Text.Language.Russian);
                                 var hide_keyboard = new ReplyKeyboardHide();
-                                _usr.SaveToFile();
+                                await _usr.SaveToFile();
                                 await _usr.Sender.SendAsync(lang => lang.ChangedLanguage, hide_keyboard);
                             }
                         }
@@ -384,7 +378,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Attacking)
                         {
-                            CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
+                            await CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.IsDigits(message.Text))
                             {
                                 await GetActiveGame(_usr.ActiveGameID)?.GetController(_usr.ID)?.UseAbility(
@@ -395,7 +389,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Excepting)
                         {
-                            CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
+                            await CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.Text == "/report")
                             {
                                 GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.CheckInactive();
@@ -437,7 +431,7 @@ namespace DotaTextGame
                                 if (message.IsCommand(_usr.lang.YesMessage))
                                 {
                                     await _usr.Sender.SendAsync(lang => lang.AccountWasDeletedString, h_kb);
-                                    users.DeleteUser(message.Chat.Id);
+                                    await users.DeleteUser(message.Chat.Id);
                                 }
                                 else
                                 {
@@ -456,7 +450,7 @@ namespace DotaTextGame
                             {
                                 _usr.Name = message.Text;
                                 _usr.status = User.Status.Default;
-                                _usr.SaveToFile();
+                                await _usr.SaveToFile();
                                 await _usr.Sender.SendAsync(lang => lang.NickNameSet);
                             }
                         }
@@ -484,10 +478,10 @@ namespace DotaTextGame
         {
             return ActiveGames.SingleOrDefault(x => x.GameID == gameID);
         }
-        private void CheckLeave(User user, Game game, string text)
+        private async Task CheckLeave(User user, Game game, string text)
         {
             if (text == "/leavegame")
-                game.GetController(user.ID)?.LeaveGame();
+                await game.GetController(user.ID)?.LeaveGame();
         }
     }
 

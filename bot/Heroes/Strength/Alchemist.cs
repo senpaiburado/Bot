@@ -20,9 +20,11 @@ namespace DotaTextGame.Heroes
 
         // Ability Two : Unstable Concoction
         public string AbiNameTwo => UnstableConcoctionActivated ? "Unstable Concoction Throw" : "Unstable Concoction";
+        public static string AbiNameTwoDefault = "Unstable Concoction";
+        public static string AbiNameTwoActivated = "Unstable Concoction Throw";
         private bool UnstableConcoctionActivated = false;
         private float UnstableConcoctionDamage = 405.55f;
-        private int UnstableConcoctionTimeToThrow = 7;
+        private int UnstableConcoctionTimeToThrow = 6;
         private int UnstableConcoctionCounter = 0;
         private int UnstableConcoctionCD = 0;
         private const int UnstableConcoctionDefaultCD = 25;
