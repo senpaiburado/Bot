@@ -342,8 +342,8 @@ namespace DotaTextGame
             await loser.SendAsync(lang => GetMessageForMe(lang, loser.hero));
             await loser.SendAsync(lang => GetMessageForEnemy(lang, winner.hero));
 
-            await winner.User.Sender.SendPhotoWithText(lang => lang.GetAds(), "http://cdn1.savepice.ru/uploads/2017/6/15/b917e0586ec5955f539c8a5dd7c681e0-full.png");
-            await loser.User.Sender.SendPhotoWithText(lang => lang.GetAds(), "http://cdn1.savepice.ru/uploads/2017/6/15/b917e0586ec5955f539c8a5dd7c681e0-full.png");
+            await winner.User.Sender.SendPhotoWithText(lang => lang.GetAds(), "http://cdn1.savepice.ru/uploads/2017/6/18/f3a68821810058281cb2e19aa0dd1bc0-full.png");
+            await loser.User.Sender.SendPhotoWithText(lang => lang.GetAds(), "http://cdn1.savepice.ru/uploads/2017/6/18/f3a68821810058281cb2e19aa0dd1bc0-full.png");
         }
 
         private const short MaxPageValue = 3;

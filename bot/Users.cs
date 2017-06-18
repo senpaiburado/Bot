@@ -32,12 +32,27 @@ namespace DotaTextGame
 
         public async Task SendAsync(string text, Telegram.Bot.Types.ReplyMarkups.IReplyMarkup replyMarkup = null)
         {
-            await bot.SendTextMessageAsync(userID, text, replyMarkup: replyMarkup);
+            try
+            {
+                await bot.SendTextMessageAsync(userID, text, replyMarkup: replyMarkup);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public async Task<Telegram.Bot.Types.Message> SendPhotoWithText(Func<User.Text, string> getText, string photo_path)
         {
-            return await bot.SendPhotoAsync(userID, photo_path, getText(lang));
+            try
+            {
+                return await bot.SendPhotoAsync(userID, photo_path, getText(lang));
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         internal SenderContainer CreateMessageContainer()

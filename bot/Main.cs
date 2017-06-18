@@ -39,7 +39,7 @@ namespace DotaTextGame
 
         public async void bw_DoWork()
         {
-            var key = "347404910:AAHBQ4as_Z05pDctUYD5go0rtbXM78Fk92E";
+            var key = "xxxxxxxxxxxx";
             List<User> availablePlayers = new List<User>();
             try
             {
@@ -121,7 +121,7 @@ namespace DotaTextGame
                         {
                             if (message.Text == "/start")
                             {
-                                await _usr.Sender.SendAsync(lang => "\u2764");
+                                await _usr.Sender.SendAsync(lang => "Welcome to DotA Text!\n/language - Change language\n/instruction - Get instruction");
                             }
                             else if (message.Text == "/language")
                             {
