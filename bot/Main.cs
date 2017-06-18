@@ -39,7 +39,7 @@ namespace DotaTextGame
 
         public async void bw_DoWork()
         {
-            var key = "396638042:AAHsKPAJnosFes51c5y4LZiqK99MUJ-AH5Q";
+            var key = "347404910:AAHBQ4as_Z05pDctUYD5go0rtbXM78Fk92E";
             List<User> availablePlayers = new List<User>();
             try
             {
