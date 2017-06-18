@@ -10,7 +10,7 @@ namespace DotaTextGame.Heroes.Agility
     {
         // Ability One : Plasma Field
         public static string AbiNameOne = "Plasma Field";
-        private float PlasmaFieldDamage = 500.0f;
+        private float PlasmaFieldDamage = 650.0f;
         private float PlasmaFieldManaPay = 150.0f;
         private int PlasmaFieldCD = 0;
         private const int PlasmaFieldDefaultCD = 13;
@@ -28,7 +28,7 @@ namespace DotaTextGame.Heroes.Agility
 
         // Ability Passive : Electrical Hit
         public static string AbiNamePassive = "Electrical Hit";
-        private float ElectricalHitDamage = 150.0f;
+        private float ElectricalHitDamage = 200.0f;
         private float ElectricalHitChance = 15.0f;
 
         // Ability Three : Eye of the Storm

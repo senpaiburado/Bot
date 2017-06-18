@@ -1686,10 +1686,10 @@ namespace DotaTextGame
                         msg += "Strength - 215\n";
                         msg += "Agility - 240\n";
                         msg += "Intelligence - 145\n";
-                        msg += "Juggernaut's abilities:\n";
-                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut deals 80 magic damage each step for 5 steps, gets immune to magic and cannot use other abilities.\n";
-                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut calls Ward, which recovers 0.75% health from the maximum score every step for 7 steps.\n";
-                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Passive)\nJuggernaut gets an additional 15% chance to critically hit, and also raises the critical strike multiplier by 1.1.\n";
+                        msg += "Juggernaut's abilities:\n\n";
+                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut deals 80 magic damage each step for 5 steps, gets immune to magic and cannot use other abilities. Cannot use if the enemy has immune to magic.\n\n";
+                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut calls Ward, which recovers 0.75% health from the maximum score every step for 7 steps.\n\n";
+                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Passive)\nJuggernaut gets an additional 15% chance to critically hit, and also raises the critical strike multiplier by 1.1.\n\n";
                         msg += $"4 - {Heroes.Juggernaut.AbiNameThree}\nJuggernaut deals 420 physical damage each step for 5 steps.\n";
                         return msg;
                     }
@@ -1700,10 +1700,10 @@ namespace DotaTextGame
                         msg += "Сила - 215\n";
                         msg += "Ловкость - 240\n";
                         msg += "Интеллект - 145\n";
-                        msg += "Способности Juggernaut:\n";
-                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut наносит 80 магического урона каждый шаг на протяжении 5 шагов, получает неуязвимость к магии и не может использовать другие способности.\n";
-                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut вызывает Ward, который восстанавливает 0.75% здоровья от максимального показателя каждый шаг в течении 7 шагов.\n";
-                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Пассивная)\nJuggernaut получает допольнительные 15% шанса нанести критический удар, а также повышает множитель критического удара на 1.1.\n";
+                        msg += "Способности Juggernaut:\n\n";
+                        msg += $"1 - {Heroes.Juggernaut.AbiNameOne}\nJuggernaut наносит 80 магического урона каждый шаг на протяжении 5 шагов, получает неуязвимость к магии и не может использовать другие способности. Невозможно использовать, если противник невосприимчив к магии.\n\n";
+                        msg += $"2 - {Heroes.Juggernaut.AbiNameTwo}\nJuggernaut вызывает Ward, который восстанавливает 0.75% здоровья от максимального показателя каждый шаг в течении 7 шагов.\n\n";
+                        msg += $"3 - {Heroes.Juggernaut.AbiNamePassive} (Пассивная)\nJuggernaut получает допольнительные 15% шанса нанести критический удар, а также повышает множитель критического удара на 1.1.\n\n";
                         msg += $"4 - {Heroes.Juggernaut.AbiNameThree}\nJuggernaut наносит 450 физического урона противнику каждый шаг на протяжении 5 шагов.\n";
                         return msg;
                     }
@@ -1714,6 +1714,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Faceless Void is a hero whose main characteristic is agility.\n";
+                        msg += "Strength - 230\n";
+                        msg += "Agility - 250\n";
+                        msg += "Intelligence - 150\n";
+                        msg += "Abilities of Faceless Void:\n\n";
+                        msg += $"1 - {Heroes.FacelessVoid.AbiNameOne}\nFaceless Void restores itself a level of health that was a step back and deals 150 magical damage.\n\n";
+                        msg += $"2 - {Heroes.FacelessVoid.AbiNameTwo}\nFaceless Void accelerates its attack speed by 1.9 for 5 steps.\n\n";
+                        msg += $"3 - {Heroes.FacelessVoid.AbiNamePassive} (Passive)\nFaceless Void gets an additional 15% chance of stun and an additional 25 damage to it.\n\n";
+                        msg += $"4 - {Heroes.FacelessVoid.AbiNameThree}\nFaceless Void sets the Chronosphere, which imposes a 5-step disable on the target.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Faceless Void - герой, основная характеристика которого - ловкость.\n";
+                        msg += "Сила - 230\n";
+                        msg += "Ловкость - 250\n";
+                        msg += "Интеллект - 150\n";
+                        msg += "Способности Faceless Void:\n\n";
+                        msg += $"1 - {Heroes.FacelessVoid.AbiNameOne}\nFaceless Void возвращает себе уровень здоровья, который был шаг назад, и наносит цели 150 магического урона.\n\n";
+                        msg += $"2 - {Heroes.FacelessVoid.AbiNameTwo}\nFaceless Void ускоряет свою скорость атаки на 1.9 на 5 шагов.\n\n";
+                        msg += $"3 - {Heroes.FacelessVoid.AbiNamePassive} (Пассивная)\nFaceless Void получает дополнительные 15% шанса олушения и дополнительно 25 урона к нему.\n\n";
+                        msg += $"4 - {Heroes.FacelessVoid.AbiNameThree}\nFaceless Void ставит Chronosphere, которая накладывает на цель обездвиживание на 5 шагов.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1721,6 +1747,34 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Alchemist is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 270\n";
+                        msg += "Agility - 110\n";
+                        msg += "Intelligence - 200\n";
+                        msg += "Alchemist's abilities:\n\n";
+                        msg += $"1 - {Heroes.Alchemist.AbiNameOne}\nAlchemist pours on the enemy an acid that deals 45 physical damage to him, and if the target is susceptible to magic, reduces armor by 17, for 9 steps.\n\n";
+                        msg += $"2 - {Heroes.Alchemist.AbiNameTwoDefault}\nAlchemist activates an unstable explosive concoction that he can throw at the enemy. The application of the ability turns it into the ability {Heroes.Alchemist.AbiNameTwoActivated}.\n\n";
+                        msg += $"3 - {Heroes.Alchemist.AbiNameTwoActivated}\nAlchemist can throw the concoction at the enemy for 6 steps. The enemy will be stunned as many steps as the concoction was prepared. If Alchemist does not throw the concoction for 6 steps, it will blow itself up.\n\n";
+                        msg += $"4 - {Heroes.Alchemist.AbiNamePassive} (Passive)\nAlchemist raises its damage by 5 points every 5 steps.\n\n";
+                        msg += $"5 - {Heroes.Alchemist.AbiNameThree}\nAlchemist drinks a potion that makes it stronger! The hero receives +75 health regeneration, +25 mana regeneration and 2.1 attack speed for 11 steps.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Alchemist - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 270\n";
+                        msg += "Ловкость - 110\n";
+                        msg += "Интеллект - 200\n";
+                        msg += "Способности Alchemist:\n\n";
+                        msg += $"1 - {Heroes.Alchemist.AbiNameOne}\nAlchemist выливает на противника кислоту, которая наносит ему 45 физического урона, и, если цель восприимчива к магии, снижает броню на 17 единиц, и действует 9 шагов.\n\n";
+                        msg += $"2 - {Heroes.Alchemist.AbiNameTwoDefault}\nAlchemist активирует нестабильную взрывную смесь, которую может кинуть у врага. Применение способности превращает её в способность {Heroes.Alchemist.AbiNameTwoActivated}.\n\n";
+                        msg += $"3 - {Heroes.Alchemist.AbiNameTwoActivated}\nAlchemist на протяжении 6 шагов может кинуть смесь у противника. Враг будет оглушён на столько шагов, сколько готовилась смесь. Если на протяжении 6 шагов Alchemist не кинет смесь, он взорвёт сам себя.\n\n";
+                        msg += $"4 - {Heroes.Alchemist.AbiNamePassive} (Пассивная)\nAlchemist повышает свой урон на 5 единиц каждые 5 шагов.\n\n";
+                        msg += $"5 - {Heroes.Alchemist.AbiNameThree}\nAlchemist выпивает зелье, которое делает его сильнее! Герой получает +75 регенерации здоровья, +25 регенерации маны и 2.1 к скорости атаки на 11 шагов.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1728,6 +1782,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Abaddon is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 250\n";
+                        msg += "Agility - 170\n";
+                        msg += "Intelligence - 210\n";
+                        msg += "Abaddon's abilities:\n\n";
+                        msg += $"1 - {Heroes.Abaddon.AbiNameOne}\nAbaddon deals 300 damage to the target, and restores his health, depending on the damage dealt.\n\n";
+                        msg += $"2 - {Heroes.Abaddon.AbiNameTwo}\nAbaddon creates a shield around himself that blocks 1000 damage to the hero, and also explodes if it is not broken, and then inflicts magical damage to the enemy, depending on the remaining shield strength.\n\n";
+                        msg += $"3 - {Heroes.Abaddon.AbiNamePassive} (Passive)\nAbaddon receives an additional 35 armor, and each attack increases damage by 20. After the 6th attack, damage is reset, and everything goes first.\n\n";
+                        msg += $"4 - {Heroes.Abaddon.AbiNameThree}\nFor 6 steps, Abaddon turns the received damage to health, healing himself this way.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Abaddon - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 250\n";
+                        msg += "Ловкость - 110\n";
+                        msg += "Интеллект - 200\n";
+                        msg += "Способности Abaddon:\n\n";
+                        msg += $"1 - {Heroes.Abaddon.AbiNameOne}\nAbaddon наносит цели 300 физического урона, а также восстанавливает ему здоровье зависимо от нанесённого урона.\n\n";
+                        msg += $"2 - {Heroes.Abaddon.AbiNameTwo}\nAbaddon создаёт вокруг себя щит, который блокирует 1000 урона по герою, а также взрывается, если его не сломать, после чего наносит магический урон врагу зависимо от оставшиеся прочности щита.\n\n";
+                        msg += $"3 - {Heroes.Abaddon.AbiNamePassive} (Пассивная)\nAbaddon получает дополнительные 35 брони, и каждую атаку увеличивает урон на 20. После 6-й атаки урон сбрасывается, и всё идёт сначала.\n\n";
+                        msg += $"4 - {Heroes.Abaddon.AbiNameThree}\nНа протяжении 6 шагов Abaddon превращает получаемый урон в здоровье, исцеляя себя таким образом.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1735,6 +1815,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Lifestealer is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 250\n";
+                        msg += "Agility - 180\n";
+                        msg += "Intelligence - 150\n";
+                        msg += "Lifestealer's abilities:\n\n";
+                        msg += $"1 - {Heroes.Lifestealer.AbiNameOne}\nLifestealer abuses, becomes immune to magic and gets 1.5 to attack speed for 5 steps.\n\n";
+                        msg += $"2 - {Heroes.Lifestealer.AbiNamePassive} (Пассивная)\nAttacking, Lifestealer restores health - 2% of the current health of the enemy.\n\n";
+                        msg += $"3 - {Heroes.Lifestealer.AbiNameTwo}\nLifestealer every hit for 5 steps restores health - + 5% of the damage dealt.\n\n";
+                        msg += $"4 - {Heroes.Lifestealer.AbiNameThree}\nLifestealer rips the enemy, causing him 600 pure damage, and doubling it with a 50% chance\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Lifestealer - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 250\n";
+                        msg += "Ловкость - 180\n";
+                        msg += "Интеллект - 150\n";
+                        msg += "Способности Lifestealer:\n\n";
+                        msg += $"1 - {Heroes.Lifestealer.AbiNameOne}\nLifestealer озверевает, становится невосприимчивым к магии и получает 1.5 к скорости атаки на 5 шагов.\n\n";
+                        msg += $"2 - {Heroes.Lifestealer.AbiNamePassive} (Пассивная)\nАтакуя, Lifestealer восстанавливает здоровье - 2% от текущего здоровья противника.\n\n";
+                        msg += $"3 - {Heroes.Lifestealer.AbiNameTwo}\nLifestealer каждый удар на протяжении 5 шагов восстанавливает здоровье - +5% от нанесённого урона.\n\n";
+                        msg += $"4 - {Heroes.Lifestealer.AbiNameThree}\nLifestealer разрывает противника, нанося ему 600 чистого урона, и с шансом 50% удвоит его.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1742,6 +1848,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Silencer is a hero whose main characteristic is intelligence.\n";
+                        msg += "Strength - 195\n";
+                        msg += "Agility - 225\n";
+                        msg += "Intelligence - 230\n";
+                        msg += "Abilities of Silencer:\n\n";
+                        msg += $"1 - {Heroes.Silencer.AbiNameOne}\nSilencer curses the enemy, inflicting 60 magical damage every step for 10 steps. Also with a 35% chance, you can silence your enemy for 4 steps.\n\n";
+                        msg += $"2 - {Heroes.Silencer.AbiNameTwo}\nNSilencer steals from the enemy voice, deals him 900 magical damage and silences him for 6 steps.\n\n";
+                        msg += $"3 - {Heroes.Silencer.AbiNamePassive} (Passive)\nIf the opponent is susceptible to magic, Silencer deals him (+35% of intelligence) additional damage.\n\n";
+                        msg += $"4 - {Heroes.Silencer.AbiNameThree}\nSilencer closes his mouth to the enemy, the same imposes a silence on him for 10 steps.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Silencer - герой, основая характеристика которого - интеллект.\n";
+                        msg += "Сила - 195\n";
+                        msg += "Ловкость - 225\n";
+                        msg += "Интеллект - 230\n";
+                        msg += "Способности Silencer:\n\n";
+                        msg += $"1 - {Heroes.Silencer.AbiNameOne}\nSilencer проклинает противника, нанося ему 60 магического урона каждый шаг на протяжении 10 шагов. Также с шансом 35% может заставить противника замолчать на 4 шага.\n\n";
+                        msg += $"2 - {Heroes.Silencer.AbiNameTwo}\nSilencer ворует у противника голос, наносит ему 900 магического урона и заставляет его замолчать на 6 шагов.\n\n";
+                        msg += $"3 - {Heroes.Silencer.AbiNamePassive} (Пассивная)\nЕсли противник восприимчив к магии, Silencer наносит ему дополнительно (+35% от интеллекта) урона с атаки.\n\n";
+                        msg += $"4 - {Heroes.Silencer.AbiNameThree}\nSilencer закрывает рот врагу, тем же накладывая на него молчание на 10 шагов.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1749,6 +1881,34 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Wraith King is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 250\n";
+                        msg += "Agility - 180\n";
+                        msg += "Intelligence - 180\n";
+                        msg += "Abilities of Wraith King:\n\n";
+                        msg += $"1 - {Heroes.WraithKing.AbiNameOne}\nWraith King stuns the enemy for 2 steps, inflicting 300 magical damage.\n\n";
+                        msg += $"2 - {Heroes.WraithKing.AbiPassiveNameOne} (Passive)\nПризрачный король получает еще 10% кражи здоровья.\n\n";
+                        msg += $"3 - {Heroes.WraithKing.AbiPassiveNameTwo} (Passive)\nWright King adds a 10% chance of critical strike and adds 0.45 to the critical hit multiplier.\n\n";
+                        msg += $"4 - {Heroes.WraithKing.AbiNameTwo}\nWraith King strengthens its armor by 50 units for 5 steps.\n\n";
+                        msg += $"5 - {Heroes.WraithKing.AbinameThree}\nNWraith King deals its strongest blow, inflicting 100 to 1000 magic damage to the enemy, and restoring damage done to the enemy as health.";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Wraith King - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 250\n";
+                        msg += "Ловкость - 180\n";
+                        msg += "Интеллект - 180\n";
+                        msg += "Способности Wraith King:\n\n";
+                        msg += $"1 - {Heroes.WraithKing.AbiNameOne}\nWraith King оглушает противника на 2 шага, нанося ему 300 магического урона.\n\n";
+                        msg += $"2 - {Heroes.WraithKing.AbiPassiveNameOne} (Пассивная)\nWraith King получает дополнительно 10% кражи здоровья.\n\n";
+                        msg += $"3 - {Heroes.WraithKing.AbiPassiveNameTwo} (Пассивная)\nWraith King получает дополнительно 10% шанса критического удара и прибавляет 0,45 к множителю критического удара.\n\n";
+                        msg += $"4 - {Heroes.WraithKing.AbiNameTwo}\nWraith King укрепляет свою броню на 50 единиц на 5 шагов.\n\n";
+                        msg += $"5 - {Heroes.WraithKing.AbinameThree}\nWraith King наносит свой сильнейший удар, нанося противнику от 100 до 1000 магического урона, и восстанавливая себе нанесённый урон как здоровье.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1756,6 +1916,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Sniper is a hero whose main characteristic is agility.\n";
+                        msg += "Strength - 170\n";
+                        msg += "Agility - 235\n";
+                        msg += "Intelligence - 155\n";
+                        msg += "Sniper's abilities:\n\n";
+                        msg += $"1 - {Heroes.Sniper.AbiNameOne}\nSniper releases a charge of shrapnel, inflicting 100 magical damage each step for 8 steps, and also weakening the enemy by 75 for 8 steps.\n\n";
+                        msg += $"2 - {Heroes.Sniper.AbiNamePassive}\nThe sniper gets the opportunity to hit the enemy's head, disabling him for 1-2 steps.\n\n";
+                        msg += $"3 - {Heroes.Sniper.AbiNameTwo}\nSniper makes 5 shots, each shot with a 65% chance hits the enemy, causing him 350 physical damage.\n\n";
+                        msg += $"4 - {Heroes.Sniper.AbiNameThree}\nSniper takes the strongest charge and accurately targets the enemy, inflicting 1000 magical damage to him.";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Sniper - герой, основая характеристика которого - ловкость.\n";
+                        msg += "Сила - 170\n";
+                        msg += "Ловкость - 235\n";
+                        msg += "Интеллект - 155\n";
+                        msg += "Способности Sniper:\n\n";
+                        msg += $"1 - {Heroes.Sniper.AbiNameOne}\nSniper выпускает заряд шрапнели, нанося врагу 100 магического урона в шаг на протяжении 8 шагов, а также ослабляя врага на 75 единиц на 8 шагов.\n\n";
+                        msg += $"2 - {Heroes.Sniper.AbiNamePassive}\nSniper получает возможность попасть в голову противника, обездвиживая его на 1-2 шага.\n\n";
+                        msg += $"3 - {Heroes.Sniper.AbiNameTwo}\nSniper делает 5 выстрелов, каждый выстрел с шансом 65% попадает в противника, нанося ему 350 физического урона.\n\n";
+                        msg += $"4 - {Heroes.Sniper.AbiNameThree}\nSniper берёт самый сильный заряд и точно целится у врага, нанося ему 1000 магического урона.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1763,6 +1949,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Dragon Knight is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 210\n";
+                        msg += "Agility - 190\n";
+                        msg += "Intelligence - 150\n";
+                        msg += "Abilities of Dragon Knight:\n\n";
+                        msg += $"1 - {Heroes.DragonKnight.AbiNameOne}\nDragon Knight emits a flame into the enemy, inflicting 400 magical damage to it, and weakening his attack by 35% for 8 steps.\n\n";
+                        msg += $"2 - {Heroes.DragonKnight.AbiNameTwo}\nDragon Knight stuns the enemy for 3 steps and deals 500 physical damage to him.\n\n";
+                        msg += $"3 - {Heroes.DragonKnight.AbiNamePassive}\nDragon Knight gets +30 health regeneration and +25 armor.\n\n";
+                        msg += $"4 - {Heroes.DragonKnight.AbiNameThree}\nDragon Knight enters into dragon's fury, increasing its attack speed by 45%, increasing health regeneration by 20, increasing armor by 25, and adding 50 to damage. It works 6 steps.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Dragon Knight - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 210\n";
+                        msg += "Ловкость - 190\n";
+                        msg += "Интеллект - 150\n";
+                        msg += "Способности Dragon Knight:\n\n";
+                        msg += $"1 - {Heroes.DragonKnight.AbiNameOne}\nDragon Knight испускает в противника пламя, нанося ему 400 магического урона, а также ослабляя его атаку на 35% на 8 шагов.\n\n";
+                        msg += $"2 - {Heroes.DragonKnight.AbiNameTwo}\nDragon Knight оглушает противника на 3 шага и наносит ему 500 физического урона.\n\n";
+                        msg += $"3 - {Heroes.DragonKnight.AbiNamePassive}\nDragon Knight получает +30 к регенерации здоровья и +25 к броне.\n\n";
+                        msg += $"4 - {Heroes.DragonKnight.AbiNameThree}\nDragon Knight входит в ярость дракона, повышая свою скорость атаки на 45%, регенерацию здоровья на 20, защиту на 25, а также добавляет 50 к урону. Действует 6 шагов.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1770,6 +1982,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Slardar is a hero whose main characteristic is strength.\n";
+                        msg += "Strength - 245\n";
+                        msg += "Agility - 170\n";
+                        msg += "Intelligence - 150\n";
+                        msg += "Slardar's abilities:\n\n";
+                        msg += $"1 - {Heroes.Slardar.AbiNameOne}\nSlardar increases attack speed by 75%, but also receives 15% more damage. It works 8 steps.\n\n";
+                        msg += $"2 - {Heroes.Slardar.AbiNameTwo}\nSlardar deals a powerful blow to the enemy, stunning him for 3 steps and causing 450 physical damage.\n\n";
+                        msg += $"3 - {Heroes.Slardar.AbiNamePassive} (Passive)\nSlardar gets an additional 15% chance of stunning and 55 damage to stun.\n\n";
+                        msg += $"4 - {Heroes.Slardar.AbiNameThree}\nSlardar breaks the enemy's armor, thereby reducing it by 50 units.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Slardar - герой, основая характеристика которого - сила.\n";
+                        msg += "Сила - 245\n";
+                        msg += "Ловкость - 170\n";
+                        msg += "Интеллект - 150\n";
+                        msg += "Способности Slardar:\n\n";
+                        msg += $"1 - {Heroes.Slardar.AbiNameOne}\nSlardar повышает скорость атаки на 75%, но при этом получает на 15% больше урона. Действует 8 шагов.\n\n";
+                        msg += $"2 - {Heroes.Slardar.AbiNameTwo}\nSlardar наносит врагу сильный удар, оглушая его на 3 шага и нанося 450 физического урона.\n\n";
+                        msg += $"3 - {Heroes.Slardar.AbiNamePassive} (Пассивная)\nSlardar получает дополнительные 15% к шансу оглушения и 55 к урону от оглушения.\n\n";
+                        msg += $"4 - {Heroes.Slardar.AbiNameThree}\nSlardar разбивает броню противника, тем самым снижая её на 50 единиц.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1777,6 +2015,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Razor is a hero whose main characteristic is agility.\n";
+                        msg += "Strength - 210\n";
+                        msg += "Agility - 240\n";
+                        msg += "Intelligence - 210\n";
+                        msg += "Razor's abilities:\n\n";
+                        msg += $"1 - {Heroes.Agility.Ursa.AbiNameOne}\nRazor creates a plasma field around itself, which deals 650 magic damage to the enemy.\n\n";
+                        msg += $"2 - {Heroes.Agility.Ursa.AbiNameTwo}\nRazor steals from the enemy 35% damage for 5 steps.\n\n";
+                        msg += $"3 - {Heroes.Agility.Ursa.AbiNamePassive} (Passive)\nRazor during an attack with a probability of 15% can deal an enemy electrical hit - 200 magic damage.\n\n";
+                        msg += $"4 - {Heroes.Agility.Ursa.AbiNameThree}\nRazor causes a storm that, when activated, deals 250 physical damage to the enemy and reduces armor by 5. Each step for 7 steps the enemy receives 85 damage and loses 1 armor.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Razor - герой, основая характеристика которого - ловкость.\n";
+                        msg += "Сила - 210\n";
+                        msg += "Ловкость - 240\n";
+                        msg += "Интеллект - 210\n";
+                        msg += "Способности Razor:\n\n";
+                        msg += $"1 - {Heroes.Agility.Razor.AbiNameOne}\nRazor создаёт вокруг себя плазменное поле, которое наносит противнику 650 магического урона.\n\n";
+                        msg += $"2 - {Heroes.Agility.Razor.AbiNameTwo}\nRazor ворует у противника 35% урона на 5 шагов.\n\n";
+                        msg += $"3 - {Heroes.Agility.Razor.AbiNamePassive} (Пассивная)\nRazor во время атаки с шансом 15% может нанести противнику электрический удар - 200 магического урона.\n\n";
+                        msg += $"4 - {Heroes.Agility.Razor.AbiNameThree}\nRazor вызывает шторм, который при активации наносит врагу 250 физического урона и снижает броню на 5 единиц. Каждый шаг на протяжении 7 шагов противник получает 85 чистого урона и теряет 1 единицу брони.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1784,6 +2048,32 @@ namespace DotaTextGame
             {
                 get
                 {
+                    if (lang == Language.English)
+                    {
+                        string msg = "Ursa is a hero whose main characteristic is agility.\n";
+                        msg += "Strength - 230\n";
+                        msg += "Agility - 200\n";
+                        msg += "Intelligence - 160\n";
+                        msg += "Abilities of Ursa:\n\n";
+                        msg += $"1 - {Heroes.Agility.Ursa.AbiNameOne}\nUrsa creates an earthquake that inflicts 400 magic damage to the enemy and reduces armor by 7 for 5 steps.\n\n";
+                        msg += $"2 - {Heroes.Agility.Ursa.AbiNameTwo}\nUrsa receives 30 points to damage and 1 to attack speed for 4 steps.\n\n";
+                        msg += $"3 - {Heroes.Agility.Ursa.AbiNamePassive} (Passive)\nUrsa deals 0/20/40/60/80/100 additional damage. It grows with every blow. After a threshold of 100 units, the additional damage is reset to zero.\n\n";
+                        msg += $"4 - {Heroes.Agility.Ursa.AbiNameThree}\nUrsa runs into enrage, takes an additional 80 damage and reduces damage taken by 80%.\n";
+                        return msg;
+                    }
+                    else if (lang == Language.Russian)
+                    {
+                        string msg = "Ursa - герой, основая характеристика которого - ловкость.\n";
+                        msg += "Сила - 230\n";
+                        msg += "Ловкость - 200\n";
+                        msg += "Интеллект - 160\n";
+                        msg += "Способности Ursa:\n\n";
+                        msg += $"1 - {Heroes.Agility.Ursa.AbiNameOne}\nUrsa создаёт землетрясение, которое наносит противнику 400 магического урона и снижает броню на 7 единиц на 5 шагов.\n\n";
+                        msg += $"2 - {Heroes.Agility.Ursa.AbiNameTwo}\nUrsa получает 30 единиц к урону и 1 к скорости атаки на 4 шага.\n\n";
+                        msg += $"3 - {Heroes.Agility.Ursa.AbiNamePassive} (Пассивная)\nUrsa наносит 0/20/40/60/80/100 дополнительного урона. Растёт с каждыи ударом. После порога в 100 единиц дополнительный урон сбрасывается к нулю.\n\n";
+                        msg += $"4 - {Heroes.Agility.Ursa.AbiNameThree}\nUrsa впадает в бешенство, получает дополнительные 80 урона и снижает получаемый урон на 80%.\n";
+                        return msg;
+                    }
                     return "";
                 }
             }
@@ -1853,7 +2143,7 @@ namespace DotaTextGame
                             string msg = "\tNetwork Modes\n";
                             msg += "There are 2 network modes in the game - offline and online.\n";
                             msg += "In offline mode you cannot be called to a duel, but you also can't use many functions.\n";
-                            msg += "In online mode you can use all functions and can be called to a duel.";
+                            msg += "In online mode you can use all functions and can be called to a duel.\n";
                             msg += "Use /online to be online.\n";
                             msg += "Use /offline to be offine.\n";
                             msg += "Use /netstatus to get your current network mode.";
@@ -1901,19 +2191,19 @@ namespace DotaTextGame
                         if (lang == Language.English)
                         {
                             string msg = "\tBattle\n";
-                            msg += "To start the game, use /startgame and wait for the game to pick up your enemy.";
+                            msg += "To start the game, use /startgame and wait for the game to pick up your enemy.\n";
                             msg += "Use /stopsearching to stop searching enemy.\n";
                             msg += "Then accept the game by clicking the button or writing 'Yes', or if you change your mind to play - 'No'.\n";
                             msg += "If the enemy doesn't accept or reject the game, write /stopsearching, and you will leave the room.\n";
                             msg += "Select the hero you want to play. You can do this by writing the name of the hero or clicking on the button with his name.\n";
                             msg += "If the enemy doesn't choose a hero or you change your mind, use /stopsearching.\n";
                             msg += "The game has begun. Now you are fighting the enemy hero. At your disposal are different abilities and ordinary attacks.\n";
-                            msg += "More details about the possibilities and the ordinary attacks can be found below.\n";
+                            msg += "More details about the abilities and the ordinary attacks can be found below.\n";
                             msg += "The battle goes on step by step. However, stun and disables can give the attacking hero additional steps.\n";
                             msg += "The winner is the one who kills the enemy first. To do this, you must lower the enemy's health to zero.\n";
                             msg += "For the victory you will get 25 points of the rating, for the defeat - will lose 25 points.\n";
                             msg += "Use /leavegame if you want to leave the game. In this case, you will lose, and the enemy will win.\n";
-                            msg += "Use /report if the opponent is not active for more than 5 minutes. You will win, and the enemy will be defeated.";
+                            msg += "Use /report if the enemy is not active for more than 5 minutes. You will win, and the enemy will be defeated.";
                             return msg;
                         }
                         else if (lang == Language.Russian)
@@ -1952,7 +2242,10 @@ namespace DotaTextGame
                             msg += "The hero's damage is equal to the product of the main characteristic by 0.25 and the attack speed.\n";
                             msg += "Mana is needed to use the abilities of the hero.\n";
                             msg += "Armor blocks a certain amount of damage from the enemy.\n";
-                            msg += "To get information about the hero and his abilities, use the '/' + hero name. For example: /juggernaut.";
+                            msg += "To get information about the hero and his abilities, use the '/' + hero name. For example: /juggernaut.\n";
+                            msg += "List of heroes:\n";
+                            foreach (var hero in Game.hero_list)
+                                msg += $"{hero.Name}\n";
                             return msg;
                         }
                         else if (lang == Language.Russian)
@@ -1966,7 +2259,10 @@ namespace DotaTextGame
                             msg += "Урон героя равен произведению основной характеристики на 0.25 и на скорость атаки.\n";
                             msg += "Мана нужна для использования способностей героя.\n";
                             msg += "Броня блокирует определённое количество урона от противника.\n";
-                            msg += "Чтобы получить информацию о герое и его способностях, используйте '/' + имя героя. Например: /juggernaut.";
+                            msg += "Чтобы получить информацию о герое и его способностях, используйте '/' + имя героя. Например: /juggernaut.\n";
+                            msg += "Список героев:\n";
+                            foreach (var hero in Game.hero_list)
+                                msg += $"{hero.Name}\n";
                             return msg;
                         }
                         return "";
@@ -1982,7 +2278,7 @@ namespace DotaTextGame
                             msg += "Each hero has 5 abilities. Two of them are common, and three are unique.\n";
                             msg += "There are also three types of damage: physical, magical and pure.\n";
                             msg += "Physical damage is the damage done to the target, given its armor (unique indicators).\n";
-                            msg += "Magical damage is the damage done to the target, given its magical resistance (usually 25%).";
+                            msg += "Magical damage is the damage done to the target, given its magical resistance (usually 25%).\n";
                             msg += "Pure damage is the damage done to target, ignoring all its protective properties.\n";
                             msg += "Abilities can deal any of the three types of damage, and some abilities deal several types of damage at the same time.\n";
                             msg += "They can also have other functions. For example, to strengthen the armor, heal health, improve the regeneration of health, increase the damage to the hero, etc.\n";
@@ -2017,7 +2313,40 @@ namespace DotaTextGame
                         return "";
                     }
                 }
-                public string @step7_AboutDonate
+                public string @step7_AboutBuffstAndModifiers
+                {
+                    get
+                    {
+                        if (lang == Language.English)
+                        {
+                            string msg = "\tEffects and Modifiers\n";
+                            msg += "Foldable effects are effects that increase their strength and duration, applying the same ability, or the other, with the same effect.\n";
+                            msg += "Critical hit is a blow that deals increased damage to the enemy (usually x1.5) with a certain chance (usually 15%).\n";
+                            msg += "Stun is a (folding) effect that prohibits the purpose of doing anything, and therefore the goal skips its step. This effect can be applied to both abilities and normal attacks. At the same time, the probability of stunning is usually 10%, and 15% of the hero's damage is added to the strike.\n";
+                            msg += "Immobilization is a (foldable) analog of stun, it can only be inflicted on abilities and does not cause additional damage.\n";
+                            msg += "Penetration of armor is a (folding) effect that reduces the target's armor by X units for Y steps.\n";
+                            msg += "Attack weakening is a (folding) effect, in which the target loses X points of damage for Y steps.\n";
+                            msg += "Immune to magic - (folding) effect, in which the hero does not receive magical damage, and also can not be affected by certain abilities.\n";
+                            msg += "Silence is a (folding) effect, in which the hero cannot use any abilities, except for the attack.";
+                            return msg;
+                        }
+                        else if (lang == Language.Russian)
+                        {
+                            string msg = "\tЭффекты и модификаторы\n";
+                            msg += "Складываемые эффекты - эффекты, которые увеличивают свою силу и длительность за счёт применения такой же способности, или другой, с таким же эффектом.\n";
+                            msg += "Критический удар - удар, который наносит врагу увеличенный урон (обычно - х1.5) с определённым шансом (обычно - 15%).\n";
+                            msg += "Оглушение - (складываемый) эффект, который запрещает цели совершать какие-либо действия, и поэтому цель пропускает свой шаг. Этот эффект может быть нанесён как от способностей, так и от обычной атаки. При этом шанс оглушения, обычно, 10%, и к удару прибавляется 15% от урона героя.\n";
+                            msg += "Обездвиживание - (складываемый) аналог оглушения, только может быть нанесён только от способностей и не наносит дополнительного урона.\n";
+                            msg += "Пробивание брони - (складываемый) эффект, который снижает броню цели на X единиц на Y шагов.\n";
+                            msg += "Ослабление атаки - (складываемый) эффект, при котором цель теряет X единиц урона на Y шагов.\n";
+                            msg += "Невосприимчивость к магии - (складываемый) эффект, при котором герой не получает магический урон, а также не может быть подвержена некоторым способностям.\n";
+                            msg += "Молчание - (складываемый) эффект, при котором герой не может использовать любые способности, за исключением атаки.";
+                            return msg;
+                        }
+                        return "";
+                    }
+                }
+                public string @step8_AboutDonate
                 {
                     get
                     {
@@ -2040,7 +2369,7 @@ namespace DotaTextGame
                         return "";
                     }
                 }
-                public string @step8_AboutDeveloper
+                public string @step9_AboutDeveloper
                 {
                     get
                     {
@@ -2063,7 +2392,7 @@ namespace DotaTextGame
                         return "";
                     }
                 }
-                public string @step9_TheEnd
+                public string @step10_TheEnd
                 {
                     get
                     {

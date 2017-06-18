@@ -156,7 +156,7 @@ namespace DotaTextGame.Heroes
                 return false;
             MP -= KL_ManaPay;
             KL_CD = KL_DefaultCD;
-            float damage = GetRandomNumber(100, 1001);
+            float damage = target.CompileMagicDamage(GetRandomNumber(100, 1001));
             target.GetDamage(damage);
             HP += damage;
             var H_Container = Sender.CreateMessageContainer();

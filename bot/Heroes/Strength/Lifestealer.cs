@@ -25,7 +25,7 @@ namespace DotaTextGame.Heroes
         // Ability Two : Open Wounds
         public static string AbiNameTwo = "Open Wounds";
         private float OW_HpStealPercentPrev = 0.0f;
-        private float OW_HpStealPercentAdditional = 1.5f;
+        private float OW_HpStealPercentAdditional = 5f;
         private float OW_ManaPay = 155.0f;
         private int OW_CD = 0;
         private const int OW_DefaultCD = 15;

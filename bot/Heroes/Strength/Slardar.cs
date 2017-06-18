@@ -29,7 +29,7 @@ namespace DotaTextGame.Heroes
 
         // Ability Passive : Bush of the Deep
         public static string AbiNamePassive = "Bush of the Deep";
-        private float BotD_BushChance = 20.0f;
+        private float BotD_BushChance = 15.0f;
         private float BotD_BushDamage = 55.0f;
 
         // Ability Three : Corrosive Haze

@@ -134,7 +134,7 @@ namespace DotaTextGame
             CriticalHitMultiplier = 1.5f;
             HpStealPercent = 0.2f;
             HpStealAdditional = 0.0f;
-            MissChance = 10.0f;
+            MissChance = 8.0f;
             StunHitChance = 10.0f;
             StunDamage = DPS / 100 * 15;
 

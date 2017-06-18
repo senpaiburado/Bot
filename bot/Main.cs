@@ -182,7 +182,7 @@ namespace DotaTextGame
                                 var text = _usr.lang.instruction;
                                 string message_one = text.step1_Describe + "\n\n" + text.step2_AboutNetMode + "\n\n" + text.step3_AboutLanguage + "\n\n";
                                 message_one += text.step4_AboutBattle + "\n\n" + text.step5_AboutHeroes;
-                                string message_two = text.step6_AboutAbilities + "\n\n" + text.step7_AboutDonate + "\n\n" + text.step8_AboutDeveloper + "\n\n" + text.step9_TheEnd;
+                                string message_two = text.step6_AboutAbilities + "\n\n" + text.step7_AboutBuffstAndModifiers + "\n\n" + text.step8_AboutDonate + "\n\n" + text.step9_AboutDeveloper + "\n\n" + text.step10_TheEnd;
                                 await _usr.Sender.SendAsync(lang => message_one);
                                 await _usr.Sender.SendAsync(lang => message_two);
                             }
@@ -325,7 +325,12 @@ namespace DotaTextGame
                             }
                             else
                             {
-                                await _usr.Sender.SendAsync(lang => lang.HelloMessage);
+                                if (await CheckHeroView(_usr, message.Text))
+                                {
+
+                                }
+                                else
+                                    await _usr.Sender.SendAsync(lang => lang.HelloMessage);
                             }
                         }
                         else if (_usr.status == User.Status.LanguageChanging)
@@ -344,6 +349,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Picking)
                         {
+                            await CheckHeroView(_usr, message.Text);
                             if (message.Text == "/stopsearching")
                             {
                                 GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
@@ -369,6 +375,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Picked)
                         {
+                            await CheckHeroView(_usr, message.Text);
                             if (message.Text == "/stopsearching")
                             {
                                 GetActiveGame(_usr.ActiveGameID).GetController(message.Chat.Id)?.LeaveConfirming();
@@ -378,6 +385,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Attacking)
                         {
+                            await CheckHeroView(_usr, message.Text);
                             await CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
                             if (message.IsDigits(message.Text))
                             {
@@ -390,6 +398,7 @@ namespace DotaTextGame
                         else if (_usr.status == User.Status.Excepting)
                         {
                             await CheckLeave(_usr, GetActiveGame(_usr.ActiveGameID), message.Text);
+                            await CheckHeroView(_usr, message.Text);
                             if (message.Text == "/report")
                             {
                                 GetActiveGame(_usr.ActiveGameID)?.GetController(message.Chat.Id)?.CheckInactive();
@@ -397,6 +406,7 @@ namespace DotaTextGame
                         }
                         else if (_usr.status == User.Status.Searching)
                         {
+                            await CheckHeroView(_usr, message.Text);
                             if (message.Text == "/stopsearching")
                             {
                                 availablePlayers.Remove(availablePlayers.Find(x => x.ID == _usr.ID));
@@ -482,6 +492,49 @@ namespace DotaTextGame
         {
             if (text == "/leavegame")
                 await game.GetController(user.ID)?.LeaveGame();
+        }
+        private async Task<bool> CheckHeroView(User user, string text)
+        {
+            switch (text)
+            {
+                case "/juggernaut":
+                    await user.Sender.SendAsync(lang => lang.JUGGERNAUT_DESCRIBTION);
+                    return true;
+                case "/facelessvoid":
+                    await user.Sender.SendAsync(lang => lang.FACELESSVOID_DESCRIBTION);
+                    return true;
+                case "/alchemist":
+                    await user.Sender.SendAsync(lang => lang.ALCHEMIST_DESCRIBTION);
+                    return true;
+                case "/abaddon":
+                    await user.Sender.SendAsync(lang => lang.ABADDON_DESCRIBTION);
+                    return true;
+                case "/wraithking":
+                    await user.Sender.SendAsync(lang => lang.WRAITHKING_DESCRIBTION);
+                    return true;
+                case "/sniper":
+                    await user.Sender.SendAsync(lang => lang.SNIPER_DESCRIBTION);
+                    return true;
+                case "/silencer":
+                    await user.Sender.SendAsync(lang => lang.SILENCER_DESCRIBTION);
+                    return true;
+                case "/lifestealer":
+                    await user.Sender.SendAsync(lang => lang.LIFESTEALER_DESCRIBTION);
+                    return true;
+                case "/dragonknight":
+                    await user.Sender.SendAsync(lang => lang.DRAGONKNIGHT_DESCRIBTION);
+                    return true;
+                case "/slardar":
+                    await user.Sender.SendAsync(lang => lang.SLARDAR_DESCRIBTION);
+                    return true;
+                case "/razor":
+                    await user.Sender.SendAsync(lang => lang.RAZOR_DESCRIBTION);
+                    return true;
+                case "/ursa":
+                    await user.Sender.SendAsync(lang => lang.URSA_DESCRIBTION);
+                    return true;
+            }
+            return false;
         }
     }
 

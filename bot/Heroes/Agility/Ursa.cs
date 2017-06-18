@@ -40,7 +40,7 @@ namespace DotaTextGame.Heroes.Agility
         private float EnrageAddDamage = 80.0f;
         private int EnrageCD = 0;
         private const int EnrageDefaultCD = 30;
-        private int EnrageDuration = 5;
+        private int EnrageDuration = 6;
         private int EnrageCounter = 0;
         private bool EnrageActivated = false;
 

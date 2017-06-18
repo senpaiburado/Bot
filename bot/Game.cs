@@ -513,7 +513,7 @@ namespace DotaTextGame
         {
             hero_list.Add(new Heroes.Juggernaut("Juggernaut", 215, 240, 145, IHero.MainFeature.Agi));
             hero_list.Add(new Heroes.FacelessVoid("Faceless Void", 230, 250, 150, IHero.MainFeature.Agi));
-            hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 250, IHero.MainFeature.Str));
+            hero_list.Add(new Heroes.Alchemist("Alchemist", 270, 110, 200, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Abaddon("Abaddon", 250, 170, 210, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Lifestealer("Lifestealer", 270, 180, 150, IHero.MainFeature.Str));
             hero_list.Add(new Heroes.Silencer("Silencer", 195, 225, 230, IHero.MainFeature.Intel));

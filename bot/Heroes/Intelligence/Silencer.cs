@@ -11,7 +11,7 @@ namespace DotaTextGame.Heroes
         // Ability One : Arcane Curse
         public static string AbiNameOne = "Arcane Curse";
         private float ArcaneCurseDamage = 60.0f;
-        private float ArcaneCurseSilenceChance = 65.0f;
+        private float ArcaneCurseSilenceChance = 35.0f;
         private int ArcaneCurseSilenceDuration = 4;
         private int ArcaneCurseDuration = 10;
         private int ArcaneCurseCD = 0;

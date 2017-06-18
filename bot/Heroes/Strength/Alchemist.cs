@@ -12,7 +12,7 @@ namespace DotaTextGame.Heroes
         // Ability One : Acid Spray
         public static string AbiNameOne = "Acid Spray";
         private float AcidSprayArmorPenetrate = 17.0f;
-        private float AcidSprayDamage = 35.0f;
+        private float AcidSprayDamage = 45.0f;
         private int AcidSprayDuration = 9;
         private float AcidSprayManaPay = 150.0f;
         private const int AcidSprayDefaultCD = 17;
@@ -40,13 +40,13 @@ namespace DotaTextGame.Heroes
         public static string AbiNameThree = "Chemical Rage";
         private bool ChemicalRageActivated = false;
         private int ChemicalRageCounter = 0;
-        private int ChemicalRageDuration = 15;
+        private int ChemicalRageDuration = 11;
         private const int ChemicalRageDefaultCD = 30;
         private int ChemicalRageCD = 0;
         private float ChemicalRageHpRegeneration = 75.0f;
         private float ChemicalRageMpRegeneration = 25.0f;
         private float ChemicalRageManaPay = 300.0f;
-        private float ChemicalRageAdditionalAttackSpeed = 2.5f;
+        private float ChemicalRageAdditionalAttackSpeed = 2.1f;
 
         public Alchemist(string name, int str, int agi, int intel, MainFeature feat) : base(name, str, agi, intel, feat)
         {
